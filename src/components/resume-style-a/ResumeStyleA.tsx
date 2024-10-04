@@ -9,6 +9,8 @@ import {WorkExperienceSection} from "./WorkExperienceSection";
 import {EducationSection} from "./EducationSection";
 import {ProjectsSection} from "./ProjectsSection";
 import {useResumeProvider} from "../../context/ResumeContext";
+import {DESIGN_BORDER} from "../../constants/DesignConstants";
+import {CertificationsSection} from "./CertificationsSection";
 
 export const ResumeStyleA: React.FC = () =>{
     const {resumeData, setResumeData} = useResumeProvider();
@@ -16,10 +18,6 @@ export const ResumeStyleA: React.FC = () =>{
     const [hasSkills, setHasSkills] = useState(false);
     const [hasWorkExperience, setHasWorkExperience] = useState(false);
     const [hasEducation, setHasEducation] = useState(false);
-    const designBorder = {
-        // border: '1px solid black',
-    };
-
 
     useEffect(() => {
         // Update state for sections visibility
@@ -34,7 +32,9 @@ export const ResumeStyleA: React.FC = () =>{
             <HeaderSection/>
             <SummarySection/>
             <ContactInfoSection/>
-            <Container style={{...designBorder}} className={"subSections-container"}>
+            <Container style={{
+                // ...DESIGN_BORDER
+            }} className={"subSections-container"}>
                 {hasSkills && <SkillsSection />}
                 {hasWorkExperience && <WorkExperienceSection/>}
                 {hasEducation && <EducationSection/>}

@@ -28,12 +28,12 @@ export const ResumePrintPage: React.FC = () => {
     };
 
     return (
-            <div>
-                <div>
+            <div className={"print-page-container"}>
+                <div className={"button-container"}>
                     <button onClick={handlePrint}>Print</button>
                     <button onClick={handleNavigate}>Input Page</button>
                 </div>
-                <div ref={contentRef} className="print-page-container">
+                <div ref={contentRef} className="pdf-container">
                     <ResumeStyleA/>
                 </div>
             </div>

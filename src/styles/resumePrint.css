@@ -1,4 +1,32 @@
 .print-page-container {
+    margin-top: 20px;
+    padding: 20px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.button-container button {
+    padding: 5px 15px;
+    margin: 0 10px;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    flex-grow: 1;
+}
+
+.button-container button:hover {
+    background-color: #0056b3;
+}
+
+.pdf-container {
     width: 10in;
     height: 11in;
     padding: 20px;

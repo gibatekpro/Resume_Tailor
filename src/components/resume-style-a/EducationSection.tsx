@@ -1,30 +1,29 @@
 import React from 'react';
-import {Row, Col} from 'react-bootstrap';
+import {Row} from 'react-bootstrap';
 import {useResumeProvider} from "../../context/ResumeContext";
+import {CustomCol} from "../../custom_tags/CustomCol";
 
 export const EducationSection: React.FC = () => {
     const {resumeData, setResumeData} = useResumeProvider();
-    const designBorder = {
-        border: '1px solid black',
-    };
+
     return (
         <div>
             <Row className={"main-row"} style={{
-                // ...designBorder
+                // ...DESIGN_BORDER
             }}>
-                <Col lg={3} md={4} sm={12} className={"left-col"}>
+                <CustomCol isLeft={true}>
                     {/* Content for the first column */}
                     <h2>Education</h2>
-                </Col>
-                <Col lg={9} md={8} sm={12} className={"right-col"}>
+                </CustomCol>
+                <CustomCol isLeft={false}>
 
-                </Col>
+                </CustomCol>
             </Row>
             {resumeData.education.map((education, index) => (
                 <Row key={index} className={"sub-row"} style={{
-                    // ...designBorder
+                    // ...DESIGN_BORDER
                 }}>
-                    <Col lg={3} md={4} sm={12} className={"left-col"}>
+                    <CustomCol isLeft={true}>
                         <h3>
                             {education.link ? (
                                 <a href={education.link} target="_blank" rel="noopener noreferrer">
@@ -35,10 +34,10 @@ export const EducationSection: React.FC = () => {
                             )}
                         </h3>
                         <text>{education.startDate} - {education.endDate}</text>
-                    </Col>
-                    <Col lg={9} md={8} sm={12} className={"right-col"}>
+                    </CustomCol>
+                    <CustomCol isLeft={false}>
                         <h4>{education.degree} - {education.course}</h4>
-                    </Col>
+                    </CustomCol>
                 </Row>
             ))}
         </div>

@@ -1,12 +1,7 @@
 import React, {useEffect} from 'react';
-import { Row, Col } from 'react-bootstrap';
-import {ResumeData} from "../../models/ResumeData";
+import { Row} from 'react-bootstrap';
 import {useResumeProvider} from "../../context/ResumeContext";
-import {resumeData} from "../../data/resumeData";
-
-type SkillsSectionProps= {
-    resumeData: ResumeData
-}
+import {CustomCol} from "../../custom_tags/CustomCol";
 
 export const SkillsSection: React.FC = () => {
     const {resumeData, setResumeData} = useResumeProvider();
@@ -20,18 +15,19 @@ export const SkillsSection: React.FC = () => {
     },[resumeData]);
 
     return (
-        <Row className={"main-row"}>
-            <Col lg={3} md={4} sm={12} className={"left-col"}>
-                {/* Content for the first column */}
+        <Row>
+            <CustomCol isLeft={true}>
+                {/* Content for the first CustomColumn */}
                 <h2>Skills</h2>
-            </Col>
-            <Col lg={9} md={8} sm={12} className={"right-col"}>
+            </CustomCol>
+            <CustomCol isLeft={false}>
                 {/* Map through the skills array to render each skill */}
                 {resumeData?.skills.map((skill, index) => (
                     <text key={index} style={{...skillsTextDecoration}}>{skill}</text>
 
                 ))}
-            </Col>
+            </CustomCol>
         </Row>
     );
 };
+

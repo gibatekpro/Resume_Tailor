@@ -1,13 +1,11 @@
 import React, {useEffect} from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row } from 'react-bootstrap';
 import {useResumeProvider} from "../../context/ResumeContext";
+import {CustomCol} from "../../custom_tags/CustomCol";
 
 
 export const WorkExperienceSection: React.FC = () => {
     const {resumeData, setResumeData} = useResumeProvider();
-    const designBorder = {
-        border: '1px solid black',
-    };
 
     useEffect(()=>{
 
@@ -17,32 +15,32 @@ export const WorkExperienceSection: React.FC = () => {
     return (
         <div>
             <Row className={"main-row"} style={{
-                // ...designBorder
+                // ...DESIGN_BORDER
             }}>
-                <Col lg={3} md={4} sm={12} className={"left-col"}>
+                <CustomCol isLeft={true}>
                     {/* Content for the first column */}
                     <h2>Work Experience</h2>
-                </Col>
-                <Col lg={9} md={8} sm={12} className={"right-col"}>
+                </CustomCol>
+                <CustomCol isLeft={false}>
 
-                </Col>
+                </CustomCol>
             </Row>
             {resumeData.workExperience.map((experience, index) => (
                 <Row key={index} className={"sub-row"} style={{
-                    // ...designBorder
+                    // ...DESIGN_BORDER
                 }}>
-                    <Col lg={3} md={4} sm={12} className={"left-col"}>
+                    <CustomCol isLeft={true}>
                         <h3>{experience.companyName}</h3>
                         <text>{experience.startDate} - {experience.endDate}</text>
-                    </Col>
-                    <Col lg={9} md={8} sm={12} className={"right-col"}>
+                    </CustomCol>
+                    <CustomCol isLeft={false}>
                         <h4>{experience.jobTitle}</h4>
                         <ul>
                             {experience.roles.map((role, roleIndex) => (
                                 <li key={roleIndex}>{role}</li>
                             ))}
                         </ul>
-                    </Col>
+                    </CustomCol>
                 </Row>
             ))}
         </div>

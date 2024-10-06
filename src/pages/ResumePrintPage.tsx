@@ -8,7 +8,7 @@ import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
 
 export const ResumePrintPage: React.FC = () => {
     const {resumeData, setResumeData} = useResumeProvider();
-    const [hideButton, setHideButton] = useState(false);
+    const {hideButton, setHideButton} = useResumeProvider();
     const contentRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const handlePrint = useReactToPrint({
@@ -18,7 +18,7 @@ export const ResumePrintPage: React.FC = () => {
             setHideButton(true);
         },
         onAfterPrint: () => {
-            setHideButton(false);
+            // setHideButton(false);
         },
         onPrintError: (errorLocation, error) => {
             console.error('Print error:', errorLocation, error);

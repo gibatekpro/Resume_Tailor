@@ -5,6 +5,8 @@ import {ResumeData} from "../models/ResumeData";
 interface ResumeContextType {
     resumeData: ResumeData;
     setResumeData: React.Dispatch<React.SetStateAction<ResumeData>>
+    hideButton: boolean;
+    setHideButton: React.Dispatch<React.SetStateAction<boolean>>
 }
 const ResumeContext = createContext<ResumeContextType | null>(null);
 
@@ -13,8 +15,9 @@ type ResumeProviderProps = {
 }
 
 export const ResumeProvider: React.FC<ResumeProviderProps> = ({children}) => {
-    const [resumeData, setResumeData] = useState(initialResumeData)
-    const value = {resumeData, setResumeData}
+    const [resumeData, setResumeData] = useState(initialResumeData);
+    const [hideButton, setHideButton] = useState(false);
+    const value = {resumeData, setResumeData, hideButton, setHideButton}
 
     useEffect(() => {
         console.log(">>>>>>>>>>" + JSON.stringify(resumeData))

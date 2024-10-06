@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 export const ResumeInputPage: React.FC = () => {
     const { resumeData, setResumeData } = useResumeProvider();
+    const {hideButton, setHideButton} = useResumeProvider();
     const [pastedData, setPastedData] = useState('');
     const [showToast, setShowToast] = useState(false); // State for controlling the toast visibility
     const [toastMessage, setToastMessage] = useState(''); // Custom message for each action
@@ -16,6 +17,10 @@ export const ResumeInputPage: React.FC = () => {
     useEffect(() => {
         setPastedData(JSON.stringify(resumeData, null, 2));
     }, [resumeData]);
+
+    useEffect(() => {
+        setHideButton(false);
+    }, []);
 
     // Formik for handling the copy action (first form)
     const { values, errors, touched, handleSubmit, handleChange } = useFormik({

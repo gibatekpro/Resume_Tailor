@@ -8,19 +8,30 @@ import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
 
 export const ResumePrintPage: React.FC = () => {
     const {resumeData, setResumeData} = useResumeProvider();
+    const [hideButton, setHideButton] = useState(false);
     const contentRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const handlePrint = useReactToPrint({
         content: () => contentRef.current,
         documentTitle: resumeData.documentTitle,
         onBeforePrint: () => {
+            setHideButton(true);
         },
         onAfterPrint: () => {
+            setHideButton(false);
         },
         onPrintError: (errorLocation, error) => {
             console.error('Print error:', errorLocation, error);
         },
     });
+
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         handlePrint();
+    //     }, 3000);
+    //
+    //     return () => clearTimeout(timer);
+    // }, []);
 
     const handleNavigate = () => {
         // Navigate to a specific route
@@ -29,10 +40,10 @@ export const ResumePrintPage: React.FC = () => {
 
     return (
             <div className={"print-page-container"}>
-                <div className={"button-container"}>
+                {!hideButton && <div className={"button-container"}>
                     <button onClick={handlePrint}>Print</button>
                     <button onClick={handleNavigate}>Input Page</button>
-                </div>
+                </div>}
                 <div ref={contentRef} className="pdf-container">
                     <ResumeStyleA/>
                 </div>

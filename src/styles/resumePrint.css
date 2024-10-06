@@ -1,14 +1,6 @@
-@media print {
-    /* Hides default page margins where the headers and footers usually are */
-    @page {
-        margin: 0;
-    }
-
-}
-
 .print-page-container {
     margin-top: 20px;
-    padding: 20px;
+    /*padding: 20px;*/
 }
 
 .button-container {

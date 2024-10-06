@@ -15,7 +15,7 @@ export const ResumePrintPage: React.FC = () => {
         content: () => contentRef.current,
         documentTitle: resumeData.documentTitle,
         onBeforePrint: () => {
-            setHideButton(true);
+            // setHideButton(true);
         },
         onAfterPrint: () => {
             // setHideButton(false);
@@ -25,13 +25,13 @@ export const ResumePrintPage: React.FC = () => {
         },
     });
 
-    // useEffect(() => {
-    //     const timer = setTimeout(() => {
-    //         handlePrint();
-    //     }, 3000);
-    //
-    //     return () => clearTimeout(timer);
-    // }, []);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            handlePrint();
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     const handleNavigate = () => {
         // Navigate to a specific route
@@ -40,10 +40,10 @@ export const ResumePrintPage: React.FC = () => {
 
     return (
             <div className={"print-page-container"}>
-                {!hideButton && <div className={"button-container"}>
-                    <button onClick={handlePrint}>Print</button>
-                    <button onClick={handleNavigate}>Input Page</button>
-                </div>}
+                {/*{!hideButton && <div className={"button-container"}>*/}
+                {/*    <button onClick={handlePrint}>Print</button>*/}
+                {/*    <button onClick={handleNavigate}>Input Page</button>*/}
+                {/*</div>}*/}
                 <div ref={contentRef} className="pdf-container">
                     <ResumeStyleA/>
                 </div>

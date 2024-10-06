@@ -60,8 +60,8 @@ export const ResumeInputPage: React.FC = () => {
     };
 
     const handleNavigate = () => {
-        navigate('/');
-        showToastNotification("Navigated to Home!"); // Show toast on navigation
+        navigate('/print');
+        showToastNotification("Navigated to print!"); // Show toast on navigation
     };
 
     // Function to show toast with custom message

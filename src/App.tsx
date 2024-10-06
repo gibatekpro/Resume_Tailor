@@ -10,9 +10,9 @@ function App() {
         <Router>
             <ResumeProvider>
                 <Routes>
-                    <Route path="/" element={<ResumePrintPage />} >
+                    <Route path="/" element={<ResumeInputPage />} >
                     </Route>
-                    <Route path="/input" element={<ResumeInputPage />} >
+                    <Route path="/print" element={<ResumePrintPage />} >
                     </Route>
                 </Routes>
             </ResumeProvider>

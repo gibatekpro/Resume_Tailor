@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Playpen+Sans:wght@100..800&display=swap');
+
+:root {
+    /*//////////////////////*/
+    --styleB-large-text-color-rw: #232e53;
+    --styleB-sections-text-color-rw: #232e53;
+    --styleB-sections-spacing: 10px;
+    --styleB-main-row-top-spacing: 30px;
+    --styleB-main-row-left-col-background: #015a84;
+    --styleB-main-row-bottom-spacing: 8px;
+    --styleB-sub-row-spacing: 8px;
+    --styleB-sub-row-spacing-big: 15px;
+    --styleB-sub-row-green-text: #0f5a73;
+    --styleB-sub-row-text-spacing: 8px;
+}
+
+.style-b-main-container{
+    /*height: 11in;*/
+}
+
+.style-b-main-container h1 {
+    font-size: 30px;
+    font-family: "Crimson Text", serif;
+    font-weight: 700;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    color: black;
+    text-transform: uppercase;
+    position: relative;
+    display: inline-block;
+}
+
+
+.style-b-main-container h2 {
+    font-size: 20px;
+    font-family: "Crimson Text", serif;
+    font-weight: 400;
+    text-align: center;
+    padding: 0;
+    margin-top: 30px;
+    color: dimgrey;
+    text-transform: uppercase;
+}
+
+.style-b-main-container h1::after {
+    content: '';
+    position: absolute;
+    margin-top: 20px;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 3px;
+    border-radius: 8px;
+    background-color: black;
+    width: 50%;
+}
+
+
+.style-b-main-container .main-row .header-container{
+    justify-content: center;
+    text-align: center;
+    padding: 25px;
+    background-color: #F0F0F0;
+}
+
+.style-b-main-container .main-row{
+    /*height: 11in;*/
+}
+
+.style-b-main-container .main-row .right-col{
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.style-b-main-container .main-row .right-col .sub-right-col{
+    margin-top: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+
+.style-b-main-container .main-row .right-col .sub-right-col .sub-row{
+    margin-bottom: 0;
+}
+
+.style-b-main-container .main-row .right-col .sub-right-col text{
+    font-size: 16px;
+    font-family: "Crimson Text", serif;
+    font-weight: 400;
+    font-style: normal;
+    padding: 0;
+    margin-top: 0;
+    margin-bottom: 80px;
+    text-align: justify;
+    color: black;
+}
+
+.style-b-main-container .main-row .right-col .sub-right-col .sub-row .left-col{
+    text-align: start;
+    padding-left: 10px;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.style-b-main-container .main-row .right-col .sub-right-col .sub-row .right-col{
+    text-align: end;
+    padding-right: 20px;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.style-b-main-container .main-row .right-col .sub-right-col .sub-row .left-col h4{
+    font-size: 15px;
+    font-family: "Crimson Text", serif;
+    font-weight: 700;
+    font-style: normal;
+    text-align: start;
+    justify-content: start;
+    color: var(--styleB-sub-row-green-text);
+    margin-bottom: 0;
+}
+
+.style-b-main-container .main-row .right-col .sub-right-col .sub-row .left-col h4 a{
+    font-size: 15px;
+    font-family: "Crimson Text", serif;
+    font-weight: 700;
+    font-style: normal;
+    text-align: start;
+    justify-content: start;
+    color: var(--styleB-sub-row-green-text);
+    margin-bottom: 0;
+}
+
+.style-b-main-container .main-row .right-col .sub-right-col .sub-row .right-col h4{
+    font-size: 15px;
+    font-family: "Crimson Text", serif;
+    font-weight: 700;
+    font-style: normal;
+    text-align: end;
+    justify-content: start;
+    color: var(--styleB-sub-row-green-text);
+    margin-bottom: 0;
+}
+
+.style-b-main-container .main-row .right-col h3{
+    font-size: 15px;
+    font-family: "Crimson Text", serif;
+    font-weight: 700;
+    font-style: normal;
+    text-align: start;
+    color: var(--styleB-sub-row-green-text);
+    margin-bottom: var(--styleB-sub-row-spacing-big);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--styleB-sub-row-green-text);
+    display: inline-block;
+}
+
+.style-b-main-container .main-row .left-col{
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 33px;
+}
+
+.style-b-main-container .main-row .left-col h2{
+    font-size: 15px;
+    font-family: "Crimson Text", serif;
+    font-weight: 700;
+    font-style: normal;
+    text-align: start;
+    color: white;
+    margin-bottom: var(--styleB-sub-row-spacing);
+    text-transform: uppercase;
+    border-bottom: 1px solid white;
+    display: inline-block;
+}
+
+.style-b-main-container .main-row .left-col p{
+    font-size: 13px;
+    font-weight: normal;
+    text-align: start;
+    padding: 0;
+    margin-bottom: var(--styleB-sub-row-text-spacing);
+    color: white;
+    hyphens: auto; /* Enables hyphenation */
+    word-break: break-word; /* Ensures that long words break */
+    overflow-wrap: break-word;
+}
+
+.style-b-main-container .main-row .left-col a{
+    font-size: 13px;
+    font-weight: normal;
+    text-align: start;
+    padding: 0;
+    margin-bottom: var(--styleB-sub-row-text-spacing);
+    color: white;
+}
+
+.style-b-main-container .main-row .left-col .sub-sections-container{
+    margin-bottom: var(--styleB-sections-spacing);
+}
+
+.avatar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.avatar {
+    justify-content: center;
+    align-items: center;
+    width: 105px;
+    height: 105px;
+    border-radius: 50%;
+    border: 2px solid black;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

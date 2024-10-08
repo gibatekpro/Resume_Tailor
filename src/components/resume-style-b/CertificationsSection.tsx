@@ -1,5 +1,4 @@
 import {Col, Container, Row} from "react-bootstrap";
-import '../../styles/resumeStyleA.css';
 import React from "react";
 import {DESIGN_BORDER} from "../../constants/DesignConstants";
 

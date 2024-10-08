@@ -1,5 +1,5 @@
 .print-page-container {
-    margin-top: 20px;
+    /*margin-top: 20px;*/
     /*padding: 20px;*/
 }
 
@@ -28,7 +28,7 @@
 
 .pdf-container {
     width: 10in;
-    height: 11in;
+    /*height: 11in;*/
     padding: 20px;
     font-family: 'Arial', sans-serif;
     color: #333;

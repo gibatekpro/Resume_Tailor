@@ -5,6 +5,7 @@ import {useReactToPrint} from "react-to-print";
 import {ResumeProvider, useResumeProvider} from "../context/ResumeContext";
 import {useNavigate} from "react-router-dom";
 import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
+import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
 
 export const ResumePrintPage: React.FC = () => {
     const {resumeData, setResumeData} = useResumeProvider();
@@ -45,7 +46,8 @@ export const ResumePrintPage: React.FC = () => {
                 {/*    <button onClick={handleNavigate}>Input Page</button>*/}
                 {/*</div>}*/}
                 <div ref={contentRef} className="pdf-container">
-                    <ResumeStyleA/>
+                    {/*<ResumeStyleA/>*/}
+                    <ResumeStyleB/>
                 </div>
             </div>
     );

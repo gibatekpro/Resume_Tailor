@@ -2,6 +2,7 @@ import React from 'react';
 import { Row } from 'react-bootstrap';
 import {useResumeProvider} from "../../context/ResumeContext";
 import {CustomCol} from "../../custom_tags/CustomCol";
+import '../../styles/resumeStyleA.css';
 
 export const ProjectsSection: React.FC = () => {
     const {resumeData, setResumeData} = useResumeProvider();

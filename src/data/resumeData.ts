@@ -10,14 +10,21 @@ export const resumeData: ResumeData = {
     //Note to OpenAI: Do not alter profile
     profile: {
         firstName: "Anthony",
-        lastName: "Gibah"
+        lastName: "Gibah",
+        profession: "Software Engineer"
     },
     contactInfo: [
         {
-            infoTitle: "Email: gibahanthony@gmail.com"
+            infoTitle: "Email",
+            infoDetails: "gibahanthony@gmail.com",
         },
         {
-            infoTitle: "Phone: +44 788 264 8701"
+            infoTitle: "Location",
+            infoDetails: "London, UK",
+        },
+        {
+            infoTitle: "Phone",
+            infoDetails: "+44 788 264 8701",
         },
         {
             infoTitle: "LinkedIn",
@@ -40,16 +47,14 @@ export const resumeData: ResumeData = {
         "C#",
         "REST APIs",
         "MS SQL Server",
-        "Domain Driven Design (DDD)",
-        "SOLID Principles",
-        "Azure/DevOps",
-        "NoSQL/Document DB",
-        "HTML, CSS/SASS",
         "JavaScript",
         "Typescript",
-        "Angular 2+/React",
-        "Front-end Build Tools (NPM, Webpack, Babel)",
-        "Unit Testing & TDD"
+    ],
+    languages: [
+        {
+            name: "English",
+            level: "Fluent"
+        }
     ],
     //Note to OpenAI: Company name should remain the same, but Job titles and roles should be based on job description
     //Note to OpenAI: Do not use buzzwords. Use clear human-like statements. 5 bullet points each
@@ -85,8 +90,8 @@ export const resumeData: ResumeData = {
                 "Implemented Agile methodologies, including TDD, for faster and more reliable project delivery.",
                 "Worked closely with cloud platforms like Azure and AWS for deployment and hosting.",
                 "Assisted in the development of web applications using C# and SQL.",
-                "Contributed to bug fixing, version control using Git, and collaboration in Agile teams.",
-                "Supported daily stand-ups and sprint planning for project management."
+                // "Contributed to bug fixing, version control using Git, and collaboration in Agile teams.",
+                // "Supported daily stand-ups and sprint planning for project management."
             ],
             startDate: "Sep 2020",
             endDate: "Aug 2021",

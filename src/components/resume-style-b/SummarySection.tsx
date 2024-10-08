@@ -1,11 +1,12 @@
 import React from "react";
+import '../../styles/resumeStyleB.css';
 import {useResumeProvider} from "../../context/ResumeContext";
-import '../../styles/resumeStyleA.css';
 
 export const SummarySection: React.FC = () => {
     const {resumeData, setResumeData} = useResumeProvider();
     return(
-        <div className={"summary-container"}>
+        <div>
+            <h3>Summary</h3>
             <p>
                 {resumeData.summary}
             </p>

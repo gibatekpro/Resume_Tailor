@@ -6,10 +6,15 @@ import {LEFT_COL_BREAKPOINTS, RIGHT_COL_BREAKPOINTS} from "../constants/BreakPoi
 interface CustomColProps {
     isLeft?: boolean;
     children: React.ReactNode;
+    style?: React.CSSProperties;
+    className?: string; // Optional additional class names
 }
 
-export const CustomCol: React.FC<CustomColProps> = ({ isLeft, children }) => {
+export const CustomCol: React.FC<CustomColProps> = ({ isLeft, style, className = '', children }) => {
     const breakpoints = isLeft ? LEFT_COL_BREAKPOINTS : RIGHT_COL_BREAKPOINTS;
+
+    // Concatenate the default class with any additional className provided
+    const colClassName = `${isLeft ? "left-col" : "right-col"} ${className}`.trim();
 
     return (
         <Col
@@ -17,7 +22,8 @@ export const CustomCol: React.FC<CustomColProps> = ({ isLeft, children }) => {
             md={breakpoints.MD}
             sm={breakpoints.SM}
             xs={breakpoints.XS}
-            className={isLeft ? "left-col" : "right-col"}
+            className={colClassName}
+            style={style}
         >
             {children}
         </Col>

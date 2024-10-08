@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
+import '../../styles/resumeStyleB.css';
 import {useResumeProvider} from "../../context/ResumeContext";
-import '../../styles/resumeStyleA.css';
 
 export const HeaderSection: React.FC = () => {
     const {resumeData, setResumeData} = useResumeProvider();
@@ -10,8 +10,8 @@ export const HeaderSection: React.FC = () => {
 
     return (
         <header className={"header-container"}>
-            <h1>{resumeData.profile.firstName}</h1>
-            <h1>{resumeData.profile.lastName}</h1>
+            <h1>{resumeData.profile.firstName} {resumeData.profile.lastName}</h1>
+            <h2>{resumeData.profile.profession}</h2>
         </header>
     );
 };

@@ -19,7 +19,7 @@ export const EducationSection: React.FC = () => {
             {resumeData.education.map((education, index) => (
                 <div key={index}>
                     <Row className={"sub-row"} key={index} >
-                        <Col className={"left-col"} xs={6} sm={6} md={6} lg={6}>
+                        <Col className={"left-sub-col"} xs={6} sm={6} md={6} lg={6}>
                             <h4>{education.link ? (
                                 <a href={education.link} target="_blank" rel="noopener noreferrer">
                                     {education.institutionName}

@@ -42,7 +42,7 @@ export const ResumeStyleB: React.FC = () =>{
                 <CustomCol className={"left-col"} isLeft={true}
                     style={{
                         // ...DESIGN_BORDER,
-                        backgroundColor: "#015a84"
+                        // backgroundColor: "#015a84"
                     }}>
                     <AvatarSection/>
                     <ContactInfoSection/>

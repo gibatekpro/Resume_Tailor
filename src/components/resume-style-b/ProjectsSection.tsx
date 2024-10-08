@@ -18,7 +18,7 @@ export const ProjectsSection: React.FC = () => {
             {resumeData.projects.map((project, index) => (
                 <div key={index}>
                     <Row className={"sub-row"} key={index}>
-                        <Col className={"left-col"} xs={6} sm={6} md={6} lg={6}>
+                        <Col className={"left-sub-col"} xs={6} sm={6} md={6} lg={6}>
                             <h4>{project.projectName}</h4>
                         </Col>
                         <Col className={"right-col"} xs={6} sm={6} md={6} lg={6}>

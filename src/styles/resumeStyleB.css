@@ -223,3 +223,55 @@
     height: 100%;
     object-fit: cover;
 }
+
+@media print {
+    .style-b-main-container .main-row .left-col{
+        background-color: #015a84 !important;
+        print-color-adjust: exact;
+    }
+
+    .style-b-main-container .main-row .header-container{
+        justify-content: center;
+        text-align: center;
+        padding: 25px;
+        background-color: #F0F0F0 !important;
+        print-color-adjust: exact;
+    }
+
+    .style-b-main-container .main-row .left-col h2{
+        font-size: 15px;
+        font-family: "Crimson Text", serif;
+        font-weight: 700;
+        font-style: normal;
+        text-align: start;
+        color: white !important;
+        margin-bottom: var(--styleB-sub-row-spacing);
+        text-transform: uppercase;
+        border-bottom: 1px solid white !important;
+        display: inline-block;
+        print-color-adjust: exact;
+    }
+
+    .style-b-main-container .main-row .left-col p{
+        font-size: 13px;
+        font-weight: normal;
+        text-align: start;
+        padding: 0;
+        margin-bottom: var(--styleB-sub-row-text-spacing);
+        color: white !important;
+        hyphens: auto; /* Enables hyphenation */
+        word-break: break-word; /* Ensures that long words break */
+        overflow-wrap: break-word;
+        print-color-adjust: exact;
+    }
+
+    .style-b-main-container .main-row .left-col a{
+        font-size: 13px;
+        font-weight: normal;
+        text-align: start;
+        padding: 0;
+        margin-bottom: var(--styleB-sub-row-text-spacing);
+        color: white !important;
+        print-color-adjust: exact;
+    }
+}

@@ -102,7 +102,7 @@ export const resumeData: ResumeData = {
         {
             institutionName: "University of Westminster",
             degree: "Masters Degree",
-            course: "Software Engineering",
+            course: "Software Engineering (Distinction)",
             startDate: "Sep 2023",
             endDate: "Aug 2024",
             current: false,

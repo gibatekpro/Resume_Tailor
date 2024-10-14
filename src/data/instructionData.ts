@@ -105,7 +105,7 @@ export const instructionData=
         "        {\n" +
         "            institutionName: \"University of Westminster\",\n" +
         "            degree: \"Masters Degree\",\n" +
-        "            course: \"Software Engineering\",\n" +
+        "            course: \"Software Engineering (Distinction)\",\n" +
         "            startDate: \"Sep 2023\",\n" +
         "            endDate: \"Aug 2024\",\n" +
         "            current: false,\n" +

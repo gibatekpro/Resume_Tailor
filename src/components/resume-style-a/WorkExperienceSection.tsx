@@ -48,3 +48,7 @@ export const WorkExperienceSection: React.FC = () => {
 
     );
 };
+
+WorkExperienceSection.propTypes = {
+
+}

@@ -25,3 +25,4 @@ export const ContactInfoSection: React.FC = () => {
         </div>
     );
 };
+

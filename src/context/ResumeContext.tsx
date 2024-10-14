@@ -20,7 +20,6 @@ export const ResumeProvider: React.FC<ResumeProviderProps> = ({children}) => {
     const value = {resumeData, setResumeData, hideButton, setHideButton}
 
     useEffect(() => {
-        console.log(">>>>>>>>>>" + JSON.stringify(resumeData))
     }, [resumeData]);
 
 

@@ -9,8 +9,7 @@ import {WorkExperienceSection} from "./WorkExperienceSection";
 import {EducationSection} from "./EducationSection";
 import {ProjectsSection} from "./ProjectsSection";
 import {useResumeProvider} from "../../context/ResumeContext";
-import {DESIGN_BORDER} from "../../constants/DesignConstants";
-import {CertificationsSection} from "./CertificationsSection";
+
 
 export const ResumeStyleA: React.FC = () =>{
     const {resumeData, setResumeData} = useResumeProvider();
@@ -21,10 +20,10 @@ export const ResumeStyleA: React.FC = () =>{
 
     useEffect(() => {
         // Update state for sections visibility
-        setHasProjects(resumeData.projects && resumeData.projects.length > 0);
-        setHasSkills(resumeData.skills && resumeData.skills.length > 0);
-        setHasWorkExperience(resumeData.workExperience && resumeData.workExperience.length > 0);
-        setHasEducation(resumeData.education && resumeData.education.length > 0);
+        setHasProjects(!!resumeData.projects && resumeData.projects.length > 0);
+        setHasSkills(!!resumeData.skills && resumeData.skills.length > 0);
+        setHasWorkExperience(!!resumeData.workExperience && resumeData.workExperience.length > 0);
+        setHasEducation(!!resumeData.education && resumeData.education.length > 0);
     }, [resumeData]);
 
     return(

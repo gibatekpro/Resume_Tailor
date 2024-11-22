@@ -8,7 +8,7 @@ export const SummarySection: React.FC = () => {
         <div>
             <h3>Summary</h3>
             <p>
-                {resumeData.summary}
+                {resumeData.profile.summary}
             </p>
         </div>
     );

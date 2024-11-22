@@ -1,10 +1,16 @@
 import React, {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {resumeData as initialResumeData} from "../data/resumeData";
+import {openAIInstruction as initialOpenAIInstructionData} from "../data/openAIInstruction";
 import {ResumeData} from "../models/ResumeData";
+import {ResumeInfo} from "../models/ResumeInfo";
+import {openAIInstruction} from "../data/openAIInstruction";
+import {OpenAIInstruction} from "../models/OpenAIInstruction";
 
 interface ResumeContextType {
-    resumeData: ResumeData;
-    setResumeData: React.Dispatch<React.SetStateAction<ResumeData>>
+    resumeData: ResumeInfo;
+    setResumeData: React.Dispatch<React.SetStateAction<ResumeInfo>>
+    openAIInstructionData: OpenAIInstruction;
+    setOpenAIInstructionData: React.Dispatch<React.SetStateAction<OpenAIInstruction>>
     hideButton: boolean;
     setHideButton: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -16,11 +22,12 @@ type ResumeProviderProps = {
 
 export const ResumeProvider: React.FC<ResumeProviderProps> = ({children}) => {
     const [resumeData, setResumeData] = useState(initialResumeData);
+    const [openAIInstructionData, setOpenAIInstructionData] = useState(initialOpenAIInstructionData);
     const [hideButton, setHideButton] = useState(false);
-    const value = {resumeData, setResumeData, hideButton, setHideButton}
+    const value = {resumeData, setResumeData, hideButton, setHideButton, openAIInstructionData, setOpenAIInstructionData}
 
     useEffect(() => {
-    }, [resumeData]);
+    }, [resumeData, openAIInstructionData]);
 
 
     return(

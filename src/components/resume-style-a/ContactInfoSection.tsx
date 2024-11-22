@@ -8,7 +8,7 @@ export const ContactInfoSection: React.FC = () => {
     return (
         <div className="contactInfo-container">
             <p>
-                {resumeData.contactInfo.map((info, index) => (
+                {resumeData.contactInfo?.map((info, index) => (
                     info.infoLink ? (
                         <span key={index}>
                             {/* eslint-disable-next-line eqeqeq */}

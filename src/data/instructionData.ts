@@ -1,7 +1,106 @@
 
+export const jobDescriptionData = "Full job description\n" +
+    "About the Role\n" +
+    "\n" +
+    "Forge Your Future with Us!\n" +
+    "\n" +
+    "Do you have a passion for tech and a hunger to kickstart your career in mobile app software development? Whether you're a fresh graduate or eager for a career change, this is your chance to join a leading force in the holiday industry!\n" +
+    "\n" +
+    "Salary: Up to £28,000 per annum.\n" +
+    "\n" +
+    "Work Days & Hours: Monday to Friday, 37.5 hours per week.\n" +
+    "\n" +
+    "Working Policy: Flexible hybrid-working policy, with a minimum of two days a week from our Chester head office.\n" +
+    "\n" +
+    "Team: Development Team.\n" +
+    "\n" +
+    "Reports to: Lead Developer\n" +
+    "\n" +
+    "\n" +
+    "\n" +
+    "About Us\n" +
+    "\n" +
+    "The Forge Holiday Group encompasses Sykes Holiday Cottages, Forest Holidays, UKcaravans4hire and Bachcare in New Zealand. We unite under four core company values that serve as the foundation of everything we do.\n" +
+    "\n" +
+    "We’re on the lookout for a Graduate App Developer to join our award-winning Technology Team at The Forge Holiday Group. If you're ready to learn, innovate, and grow alongside some of the brightest tech minds in the North West, this is the opportunity for you!\n" +
+    "\n" +
+    "\n" +
+    "\n" +
+    "Why You’ll Love It Here:\n" +
+    "\n" +
+    "At Forge, we believe in more than just a job – we offer a springboard into a dynamic tech career, where you'll be supported by a vibrant, inclusive culture, fast-tracked career progression, and access to a wealth of knowledge and resources. You'll work on native iOS and Android apps using the latest technologies (Swift, Swift UI, Kotlin and Compose) to help build innovative app solutions that make an impact.\n" +
+    "\n" +
+    "This isn’t just another graduate role—it’s the start of something big.\n" +
+    "\n" +
+    "\n" +
+    "\n" +
+    "What’s in it for You:\n" +
+    "\n" +
+    "Bonus Scheme: Access to our annual STIP (annual company-wide bonus) scheme with an additional 10% of your salary\n" +
+    "️ Holidays: 33 days annual leave (including bank holidays), plus your birthday off!\n" +
+    "Volunteering: 2 additional days off for volunteering\n" +
+    "Enhanced maternity/paternity policy\n" +
+    "Inclusive environment: Be part of a diverse, supportive culture\n" +
+    "✨ Career progression: Fast-track your tech skills and career\n" +
+    "Training & development: Study support for qualifications and courses\n" +
+    "Wellbeing: Access to mental health support 24/7, wellbeing programs\n" +
+    "\n" +
+    "Your Responsibilities\n" +
+    "\n" +
+    "As part of our Technology Team, you’ll join one of our dedicated App Squads, creating resilient solutions used by both colleagues and customers. You’ll innovate, collaborate, and grow every day, as you:\n" +
+    "\n" +
+    "Build well-crafted, scalable software solutions\n" +
+    "Own the delivery of software into the business\n" +
+    "Participate in sprint planning and retrospectives\n" +
+    "Promote software development best practices\n" +
+    "Collaborate with stakeholders to clarify requirements and resolve issues\n" +
+    "Explore new technologies to solve real-world business challenges\n" +
+    "Review and enhance colleagues' code submissions\n" +
+    "Skills and Qualifications\n" +
+    "\n" +
+    "We’re all about personality and potential. If you’re driven by problem-solving, love the latest tech trends, and want to work with native mobile app technology (Swift, Swift UI Kotlin and Compose) we want to hear from you!\n" +
+    "\n" +
+    "To set you up for success, we’re looking for:\n" +
+    "\n" +
+    "A passion for tech and problem-solving\n" +
+    "\n" +
+    "Interest in cutting-edge technologies\n" +
+    "\n" +
+    "Academic or commercial experience with either Swift, Kotlin, Java or other object-oriented programming language\n" +
+    "\n" +
+    "Strong communication and teamwork skills\n" +
+    "\n" +
+    "A degree in Software Development or equivalent\n" +
+    "\n" +
+    "\n" +
+    "\n" +
+    "Nice to have:\n" +
+    "\n" +
+    "Experience developing and publishing native iOS or Android apps.\n" +
+    "\n" +
+    "Familiarity with iOS or Android operating systems and ecosystems.\n" +
+    "\n" +
+    "Understanding of modern app architectures (MVVM, MVI)\n" +
+    "\n" +
+    "Agile development methodologies (e.g. Scrum)\n" +
+    "\n" +
+    "Experience with REST APIs, Retrofit, RxJava, RxSwift, Combine, Kotlin Coroutines.\n" +
+    "\n" +
+    "\n" +
+    "\n" +
+    "Why Forge Holiday Group?\n" +
+    "\n" +
+    "As well as being a leader in the holiday space, we’re also one of the fastest-growing tech businesses in the North West. We’re proud to connect customers with unforgettable holiday moments using the latest technology. With 120+ tech professionals, we live and breathe innovation and foster a rich culture of continuous learning and collaboration.\n" +
+    "\n" +
+    "Diversity and Inclusion:\n" +
+    "We encourage and welcome our people to bring their authentic and best selves to work every day. We know the power that comes from different ideas, backgrounds and perspectives. We recognise the role diversity plays in achieving our goals as a business. We actively welcome applications from as wide a range of backgrounds as possible. If you need any particular support or accommodations as part of your application process, please get in touch - our recruitment team are happy to help.\n" +
+    "\n" +
+    "Apply now to be a part of our inclusive and supportive work environment, where you'll find excellent opportunities for career progression and personal development!";
+
 export const instructionData=
 "\n" +
-        "Produce ONLY JSON,  with no comments at all.\n" +
+        "Produce ONLY JSON,  with NO OPEN AI comments or explanations at all.\n STRICT: PRODUCE ONLY JSON" +
+    "DO NOT INCLUDE this ```json or any backticks at all" +
         "Use the Note to OpenAI comments as guidelines. Follow guidelines strictly.\n" +
         "//Note to OpenAI: Use the Job description to alter this json and produce another one\n" +
         "//Note to OpenAI: Summary and skills should be replaced with the job description's requirements\n" +

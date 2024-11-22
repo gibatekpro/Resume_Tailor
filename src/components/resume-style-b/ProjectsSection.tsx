@@ -15,14 +15,14 @@ export const ProjectsSection: React.FC = () => {
     return (
         <div>
             <h3>Projects</h3>
-            {resumeData.projects.map((project, index) => (
+            {resumeData.projects?.map((project, index) => (
                 <div key={index}>
                     <Row className={"sub-row"} key={index}>
                         <Col className={"left-sub-col"} xs={6} sm={6} md={6} lg={6}>
                             <h4>{project.projectName}</h4>
                         </Col>
                         <Col className={"right-col"} xs={6} sm={6} md={6} lg={6}>
-                            <h4>{project.startDate} - {project.endDate}</h4>
+                            <h4>{project.startMonth + project.startYear} - {project.endMonth + project.endYear}</h4>
                         </Col>
                     </Row>
                     {/*<div className={"sub-row"}>*/}

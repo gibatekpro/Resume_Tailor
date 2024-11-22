@@ -14,7 +14,7 @@ export const SkillsSection: React.FC = () => {
             <h2>
                 Skills
             </h2>
-            {resumeData?.skills.map((skill, index) => (
+            {resumeData?.skills?.map((skill, index) => (
                 <p key={index}>{skill}</p>
 
             ))}

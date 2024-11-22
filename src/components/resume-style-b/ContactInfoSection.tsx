@@ -46,7 +46,7 @@ export const ContactInfoSection: React.FC = () => {
             <h2>
                 Contact
             </h2>
-            {resumeData.contactInfo.map((info, index) => (
+            {resumeData.contactInfo?.map((info, index) => (
                 info.infoLink ? (
                     <p key={index}>
                         <span>{getInfoIcon(info.infoTitle!)}  <a href={info.infoLink} target="_blank"

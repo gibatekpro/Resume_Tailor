@@ -16,7 +16,7 @@ export const EducationSection: React.FC = () => {
     return (
         <div>
             <h3>Education</h3>
-            {resumeData.education.map((education, index) => (
+            {resumeData.education?.map((education, index) => (
                 <div key={index}>
                     <Row className={"sub-row"} key={index} >
                         <Col className={"left-sub-col"} xs={6} sm={6} md={6} lg={6}>
@@ -30,7 +30,7 @@ export const EducationSection: React.FC = () => {
                             </h4>
                         </Col>
                         <Col className={"right-col"} xs={6} sm={6} md={6} lg={6}>
-                            <h4>{education.startDate} - {education.endDate}</h4>
+                            <h4>{education.startMonth + education.startYear} - {education.endMonth + education.endYear}</h4>
                         </Col>
                     </Row>
                     <p>{education.degree} - {education.course}</p>

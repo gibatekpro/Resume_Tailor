@@ -23,7 +23,7 @@ export const SkillsSection: React.FC = () => {
             </CustomCol>
             <CustomCol isLeft={false}>
                 {/* Map through the skills array to render each skill */}
-                {resumeData?.skills.map((skill, index) => (
+                {resumeData.skills?.map((skill, index) => (
                     <text key={index} style={{...skillsTextDecoration}}>{skill}</text>
 
                 ))}

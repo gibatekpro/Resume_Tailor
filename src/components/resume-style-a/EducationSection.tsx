@@ -20,7 +20,7 @@ export const EducationSection: React.FC = () => {
 
                 </CustomCol>
             </Row>
-            {resumeData.education.map((education, index) => (
+            {resumeData.education?.map((education, index) => (
                 <Row key={index} className={"sub-row"} style={{
                     // ...DESIGN_BORDER
                 }}>
@@ -34,7 +34,7 @@ export const EducationSection: React.FC = () => {
                                 education.institutionName
                             )}
                         </h3>
-                        <text>{education.startDate} - {education.endDate}</text>
+                        <text>{education.startMonth + education.startYear} - {education.endMonth + education.endYear}</text>
                     </CustomCol>
                     <CustomCol isLeft={false}>
                         <h4>{education.degree} - {education.course}</h4>

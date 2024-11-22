@@ -12,14 +12,17 @@ export const LanguageSection: React.FC = () => {
     return (
         <div>
             <h2>Languages</h2>
-            {resumeData?.languages?.length > 0 ? (
+            {resumeData.languages && resumeData.languages.length > 0 ? (
                 resumeData.languages.map((language, index) => (
-                    <p key={index}>{language.name} - {language.level}</p>
+                    <p key={index}>
+                        {language.name} - {language.proficiency}
+                    </p>
                 ))
             ) : (
                 <p>No languages available</p> // Fallback when there are no languages
             )}
         </div>
     );
+
 };
 

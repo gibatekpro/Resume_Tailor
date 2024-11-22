@@ -1,5 +1,5 @@
 
 export interface Language{
     name: string;
-    level: string;
+    proficiency: string;
 }

@@ -3,9 +3,12 @@ export interface WorkExperience {
 
     companyName: string;
     jobTitle: string;
-    roles: string[];
-    startDate: string;
-    endDate: string;
+    duties: string[];
+    startMonth: string;
+    startYear: string;
+    endMonth: string;
+    endYear: string;
     current: boolean;
+    website?: boolean;
 
 }

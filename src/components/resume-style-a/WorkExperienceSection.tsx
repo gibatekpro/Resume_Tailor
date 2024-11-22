@@ -26,18 +26,18 @@ export const WorkExperienceSection: React.FC = () => {
 
                 </CustomCol>
             </Row>
-            {resumeData.workExperience.map((experience, index) => (
+            {resumeData.workExperience?.map((experience, index) => (
                 <Row key={index} className={"sub-row"} style={{
                     // ...DESIGN_BORDER
                 }}>
                     <CustomCol isLeft={true}>
                         <h3>{experience.companyName}</h3>
-                        <text>{experience.startDate} - {experience.endDate}</text>
+                        <text>{experience.startMonth + experience.startYear} - {experience.endMonth + experience.endYear}</text>
                     </CustomCol>
                     <CustomCol isLeft={false}>
                         <h4>{experience.jobTitle}</h4>
                         <ul>
-                            {experience.roles.map((role, roleIndex) => (
+                            {experience.duties.map((role, roleIndex) => (
                                 <li key={roleIndex}>{role}</li>
                             ))}
                         </ul>

@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Button, Form, Toast, ToastContainer } from "react-bootstrap";
 import '../styles/resumeInput.css'; // Updated styles
 import { useResumeProvider } from "../context/ResumeContext";
-import { instructionData } from "../data/instructionData";
+import {instructionData, jobDescriptionData} from "../data/instructionData";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
+import {fetchOpenAIResponse} from "../services/OpenAIService";
+import ResumeForm from "../components/forms/resumeForm/ResumeForm";
+import {ResumeInfo} from "../models/ResumeInfo";
 
 export const ResumeInputPage: React.FC = () => {
     const { resumeData, setResumeData } = useResumeProvider();
@@ -23,7 +26,7 @@ export const ResumeInputPage: React.FC = () => {
     }, []);
 
     // Formik for handling the copy action (first form)
-    const { values, errors, touched, handleSubmit, handleChange } = useFormik({
+    const { values, errors, touched, handleSubmit: handleTheSubmit, handleChange } = useFormik({
         initialValues: {
             instructionData: instructionData, // Instructions for OpenAI
         },
@@ -48,11 +51,12 @@ export const ResumeInputPage: React.FC = () => {
         }
     };
 
-    const handleResumeSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleResumeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
             const parsedData = JSON.parse(pastedData);
             setResumeData(parsedData);
+            await getResponse();
             showToastNotification("Resume data submitted!"); // Show toast on submit
         } catch (error) {
             console.error('Failed to submit data. Invalid JSON:', error);
@@ -69,6 +73,20 @@ export const ResumeInputPage: React.FC = () => {
         setToastMessage(message);
         setShowToast(true);
     };
+
+    const getResponse = async () => {
+        try {
+            const prompt = instructionData + jobDescriptionData;
+            const response = await fetchOpenAIResponse(prompt);
+
+            let jsonContent = response.choices[0]?.message?.content;
+
+            console.log("Parsed JSON Response:", jsonContent);
+        } catch (error) {
+            console.error("Error parsing JSON response:", error);
+        }
+    };
+
 
     return (
         <div className="fancy-input-page-container">
@@ -89,7 +107,7 @@ export const ResumeInputPage: React.FC = () => {
             </ToastContainer>
 
             {/* First form for copying instructions */}
-            <Form onSubmit={handleSubmit} className="fancy-form">
+            <Form onSubmit={handleTheSubmit} className="fancy-form">
                 <Form.Group className="mb-3" controlId="openAIInstruction">
                     <Form.Label className="fancy-label">Open AI Instructions</Form.Label>
                     <Form.Control

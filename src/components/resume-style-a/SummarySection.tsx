@@ -7,7 +7,7 @@ export const SummarySection: React.FC = () => {
     return(
         <div className={"summary-container"}>
             <p>
-                {resumeData.summary}
+                {resumeData.profile.summary}
             </p>
         </div>
     );

@@ -20,7 +20,7 @@ export const ProjectsSection: React.FC = () => {
 
                 </CustomCol>
             </Row>
-            {resumeData.projects.map((project, index) => (
+            {resumeData.projects?.map((project, index) => (
                 <Row key={index} className={"sub-row"} style={{
                     // ...DESIGN_BORDER
                 }}>
@@ -34,7 +34,7 @@ export const ProjectsSection: React.FC = () => {
                                 project.projectName
                             )}
                         </h3>
-                        <text>{project.startDate} - {project.endDate}</text>
+                        <text>{project.startMonth + project.startYear} - {project.endMonth + project.endYear}</text>
                     </CustomCol>
                     <CustomCol isLeft={false}>
                         <h4>{project.role}</h4>

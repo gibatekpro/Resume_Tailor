@@ -24,10 +24,10 @@ export const ResumeStyleB: React.FC = () =>{
 
     useEffect(() => {
         // Update state for sections visibility
-        setHasProjects(resumeData.projects && resumeData.projects.length > 0);
-        setHasSkills(resumeData.skills && resumeData.skills.length > 0);
-        setHasWorkExperience(resumeData.workExperience && resumeData.workExperience.length > 0);
-        setHasEducation(resumeData.education && resumeData.education.length > 0);
+        setHasProjects(!!resumeData.projects && resumeData.projects.length > 0);
+        setHasSkills(!!resumeData.skills && resumeData.skills.length > 0);
+        setHasWorkExperience(!!resumeData.workExperience && resumeData.workExperience.length > 0);
+        setHasEducation(!!resumeData.education && resumeData.education.length > 0);
     }, [resumeData]);
 
     return(

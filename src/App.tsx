@@ -5,6 +5,7 @@ import {ResumeProvider} from "./context/ResumeContext";
 import {Route, BrowserRouter as Router, Routes} from "react-router-dom";
 import {HomePage} from "./pages/HomePage";
 import {ResumeInfoPage} from "./pages/ResumeInfoPage";
+import {TestPrintPage} from "./pages/TestPrintPage";
 
 function App() {
     return (
@@ -13,7 +14,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<HomePage />} >
                     </Route>
-                    <Route path="/print" element={<ResumePrintPage />} >
+                    <Route path="/print" element={<TestPrintPage />} >
                     </Route>
                     <Route path="/input" element={<ResumeInfoPage />} >
                     </Route>

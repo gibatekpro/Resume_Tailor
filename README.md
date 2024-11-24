@@ -14,6 +14,11 @@ Printing to PDF [Documentation](https://github.com/MatthewHerbst/react-to-print#
 #### `npm install --save react-to-print`
 ***
 
+React PDF Printing to PDF Alternate [Documentation](https://react-pdf.org)
+
+#### `npm install @react-pdf/renderer --save`
+***
+
 Tailwind CSS [Documentation](https://tailwindcss.com/docs/installation)
 
 #### `npm install -D tailwindcss`

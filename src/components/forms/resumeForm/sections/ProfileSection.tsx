@@ -2,7 +2,7 @@ import React from "react";
 import {ResumeInfo} from "../../../../models/ResumeInfo";
 
 interface ProfileSectionProps {
-    resumeFormFormik: any; // Replace 'any' with the type from your resumeFormFormik configuration if available.
+    resumeFormFormik: any;
     inputFieldClassName: string;
 }
 
@@ -19,7 +19,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ resumeFormFormik
                         placeholder="First Name"
                         className={inputFieldClassName}
                         onChange={resumeFormFormik.handleChange}
-                        value={resumeFormFormik.values.profile.firstName}
+                        value={resumeFormFormik.values?.profile?.firstName || ""}
                     />
                 </div>
                 <div>
@@ -30,7 +30,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ resumeFormFormik
                         placeholder="Last Name"
                         className={inputFieldClassName}
                         onChange={resumeFormFormik.handleChange}
-                        value={resumeFormFormik.values.profile.lastName}
+                        value={resumeFormFormik?.values?.profile?.lastName}
                     />
                 </div>
             </div>
@@ -43,20 +43,20 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ resumeFormFormik
                     placeholder="Profession"
                     className={inputFieldClassName}
                     onChange={resumeFormFormik.handleChange}
-                    value={resumeFormFormik.values.profile.profession}
+                    value={resumeFormFormik?.values?.profile?.profession}
                 />
             </div>
 
             <div className="mb-1">
-                <textarea
-                    id="summary"
-                    name="profile.summary"
-                    rows={3}
-                    placeholder="Summary"
-                    className={inputFieldClassName}
-                    onChange={resumeFormFormik.handleChange}
-                    value={resumeFormFormik.values.profile.summary}
-                />
+            <textarea
+                id="summary"
+                name="profile.summary"
+                rows={3}
+                placeholder="Summary"
+                className={inputFieldClassName}
+                onChange={resumeFormFormik.handleChange}
+                value={resumeFormFormik?.values?.profile?.summary}
+            />
             </div>
         </>
     );

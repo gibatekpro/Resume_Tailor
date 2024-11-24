@@ -1,8 +1,9 @@
 import {ResumeInfo} from "./ResumeInfo";
 
 export interface OpenAIInstruction {
-    openAIStrictInstructions?: string[],
-    openAINote?: string[],
+    prompt?: string[],
+    responseFormat?: string,
+    rules?: string[],
     jobDescriptionData?: string,
     resumeInfo?: ResumeInfo,
 }

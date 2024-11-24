@@ -8,7 +8,7 @@ export interface WorkExperience {
     startYear: string;
     endMonth: string;
     endYear: string;
-    current: boolean;
-    website?: boolean;
+    current?: boolean;
+    website?: string;
 
 }

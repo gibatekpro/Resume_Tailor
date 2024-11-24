@@ -6,8 +6,6 @@ import {instructionData, jobDescriptionData} from "../data/instructionData";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import {fetchOpenAIResponse} from "../services/OpenAIService";
-import ResumeForm from "../components/forms/resumeForm/ResumeForm";
-import {ResumeInfo} from "../models/ResumeInfo";
 
 export const ResumeInputPage: React.FC = () => {
     const { resumeData, setResumeData } = useResumeProvider();

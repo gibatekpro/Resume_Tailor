@@ -10,8 +10,8 @@ export const HeaderSection: React.FC = () => {
 
     return (
         <header className={"header-container"}>
-            <h1>{resumeData.profile.firstName}</h1>
-            <h1>{resumeData.profile.lastName}</h1>
+            <h1>{resumeData.profile?.firstName}</h1>
+            <h1>{resumeData.profile?.lastName}</h1>
         </header>
     );
 };

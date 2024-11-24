@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import {Col, Row} from "react-bootstrap";
 
 interface LanguageSectionProps {
     resumeFormFormik: any; // Replace 'any' with the type from your Formik configuration.
@@ -31,8 +32,8 @@ export const LanguageSection: React.FC<LanguageSectionProps> = ({
                 onMouseEnter={() => setIsIconVisible(true)}
                 onMouseLeave={() => setIsIconVisible(false)}
             >
-                <div className="flex items-center">
-                    <span className="mr-4 font-normal sm:text-sm pl-3.5 text-gray-500">Language: </span>
+                <div className="flex items-center flex-1">
+                    <span className=" font-normal sm:text-sm pl-3.5 text-gray-500">Language:</span>
 
                     <input
                         id={`language-${language.id}-name`}
@@ -52,7 +53,7 @@ export const LanguageSection: React.FC<LanguageSectionProps> = ({
                         viewBox="0 0 24 24"
                         strokeWidth="1.5"
                         stroke="currentColor"
-                        className="w-6 h-6 text-gray-500 cursor-pointer mr-3"
+                        className="w-6 h-6 text-gray-500 cursor-pointer mr-3 ml-2"
                         onClick={removeLanguage}
                     >
                         <path
@@ -64,48 +65,58 @@ export const LanguageSection: React.FC<LanguageSectionProps> = ({
                 )}
             </div>
 
-            <div className="flex items-center mb-1 px-3.5 bg-white pb-2">
-                <span className="mr-4 font-normal sm:text-sm text-gray-500">Proficiency: </span>
+            <Row
+                className="mb-1 pb-2 bg-white mx-0 row row-cols-4 row-cols-sm-4
+                row-cols-md-4 row-cols-lg-12 row-gap-3 row-gap-sm-3
+                row-gap-md-3 row-gap-lg-0"
+            >
+                <Col lg={1} sm={1} xs={1} className={"mr-4 mr-md-2 "}>
+                    <span className="font-normal text-gray-500">Level:</span>
+                </Col>
+                <Col lg={3} sm={2} xs={2}  className={"mr-4 mr-md-2 "}>
+                    <label className="d-flex align-items-center">
+                        <input
+                            id={`language-${language.id}-proficiency-basic`}
+                            name={`languages.${index}.proficiency`}
+                            type="radio"
+                            className="me-2"
+                            onChange={resumeFormFormik.handleChange}
+                            value="Basic"
+                            checked={language.proficiency === "Basic"}
+                        />
+                        Basic
+                    </label>
+                </Col>
+                <Col lg={3} sm={3} xs={2} className={"mr-4 mr-md-2 "}>
+                    <label className="d-flex align-items-center">
+                        <input
+                            id={`language-${language.id}-proficiency-fluent`}
+                            name={`languages.${index}.proficiency`}
+                            type="radio"
+                            className="me-2"
+                            onChange={resumeFormFormik.handleChange}
+                            value="Fluent"
+                            checked={language.proficiency === "Fluent"}
+                        />
+                        Fluent
+                    </label>
+                </Col>
+                <Col lg={3} sm={3}>
+                    <label className="d-flex align-items-center">
+                        <input
+                            id={`language-${language.id}-proficiency-intermediate`}
+                            name={`languages.${index}.proficiency`}
+                            type="radio"
+                            className="me-2"
+                            onChange={resumeFormFormik.handleChange}
+                            value="Intermediate"
+                            checked={language.proficiency === "Intermediate"}
+                        />
+                        Intermediate
+                    </label>
+                </Col>
+            </Row>
 
-                <label className="flex items-center mr-4 sm:text-sm">
-                    <input
-                        id={`language-${language.id}-proficiency-basic`}
-                        name={`languages.${index}.proficiency`} // Correct name binding for Formik
-                        type="radio"
-                        className="mr-2"
-                        onChange={resumeFormFormik.handleChange}
-                        value="Basic"
-                        checked={language.proficiency === "Basic"}
-                    />
-                    Basic
-                </label>
-
-                <label className="flex items-center mr-4 sm:text-sm">
-                    <input
-                        id={`language-${language.id}-proficiency-intermediate`}
-                        name={`languages.${index}.proficiency`} // Correct name binding for Formik
-                        type="radio"
-                        className="mr-2"
-                        onChange={resumeFormFormik.handleChange}
-                        value="Intermediate"
-                        checked={language.proficiency === "Intermediate"}
-                    />
-                    Intermediate
-                </label>
-
-                <label className="flex items-center mr-4 sm:text-sm">
-                    <input
-                        id={`language-${language.id}-proficiency-fluent`}
-                        name={`languages.${index}.proficiency`} // Correct name binding for Formik
-                        type="radio"
-                        className="mr-2"
-                        onChange={resumeFormFormik.handleChange}
-                        value="Fluent"
-                        checked={language.proficiency === "Fluent"}
-                    />
-                    Fluent
-                </label>
-            </div>
         </>
     );
 };

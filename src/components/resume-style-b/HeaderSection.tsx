@@ -1,17 +1,17 @@
 import React, {useEffect} from 'react';
 import '../../styles/resumeStyleB.css';
 import {useResumeProvider} from "../../context/ResumeContext";
+import {ResumeInfo} from "../../models/ResumeInfo";
 
-export const HeaderSection: React.FC = () => {
-    const {resumeData, setResumeData} = useResumeProvider();
+export const HeaderSection: React.FC<{resumeDataOpenAI: ResumeInfo}> = ({resumeDataOpenAI}) => {
 
     useEffect(() => {
-    }, [resumeData]);
+    }, [resumeDataOpenAI]);
 
     return (
         <header className={"header-container"}>
-            <h1>{resumeData.profile.firstName} {resumeData.profile.lastName}</h1>
-            <h2>{resumeData.profile.profession}</h2>
+            <h1>{resumeDataOpenAI.profile?.firstName} {resumeDataOpenAI.profile?.lastName}</h1>
+            <h2>{resumeDataOpenAI.profile?.profession}</h2>
         </header>
     );
 };

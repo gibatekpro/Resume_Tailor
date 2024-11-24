@@ -1,61 +1,70 @@
-import React, {useEffect, useState} from "react";
-import {MONTHS} from "../../../../data/applicationData";
-import {Col, Row} from "react-bootstrap";
+import React, { useState } from "react";
+import { Col, Row } from "react-bootstrap";
+import {MONTHS} from "../../../../../data/applicationData";
+import {DutyInput} from "./DutyInput";
 
-interface EducationSectionProps {
+interface WorkExperienceSectionProps {
     resumeFormFormik: any; // Replace 'any' with the type from your Formik configuration.
     inputFieldClassName: string;
     index: number;
 }
 
-export const EducationSection: React.FC<EducationSectionProps> = ({
-                                                                      resumeFormFormik,
-                                                                      inputFieldClassName,
-                                                                      index,
-                                                                  }) => {
-    const educationList = resumeFormFormik.values.education;
-    const education = educationList[index];
+export const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
+                                                                                resumeFormFormik,
+                                                                                inputFieldClassName,
+                                                                                index,
+                                                                            }) => {
+    const workExperienceList = resumeFormFormik.values.workExperience;
+    const workExperience = workExperienceList[index];
     const [isIconVisible, setIsIconVisible] = useState(false);
 
-    const removeEducation = () => {
-        const updatedEducation = educationList.filter(
-            (_: any, idx: number) => idx !== index
-        );
-        resumeFormFormik.setFieldValue("education", updatedEducation);
+    const addDuty = () => {
+        const updatedDuties = [...(workExperience.duties || []), ""];
+        resumeFormFormik.setFieldValue(`workExperience[${index}].duties`, updatedDuties);
     };
 
-    if (!education) return null;
+    const removeDuty = (dutyIndex: number) => {
+        const updatedDuties = workExperience.duties.filter((_: any, idx: number) => idx !== dutyIndex);
+        if (workExperience.duties.length > 1) {
+            resumeFormFormik.setFieldValue(`workExperience[${index}].duties`, updatedDuties);
+        }
+    };
+
+    const removeWorkExperience = () => {
+        const updatedWorkExperience = workExperienceList.filter(
+            (_: any, idx: number) => idx !== index
+        );
+        resumeFormFormik.setFieldValue("workExperience", updatedWorkExperience);
+    };
+
+    if (!workExperience) return null;
 
     return (
         <>
-
-            <div className="grid grid-cols-2 gap-1 mb-1"
-                 onMouseEnter={() => setIsIconVisible(true)}
-                 onMouseLeave={() => setIsIconVisible(false)}>
-
+            <div className="grid grid-cols-2 gap-1 mb-1">
                 <div className="bg-white">
                     <input
-                        id={`education-${education.id}-institutionName`}
-                        name={`education[${index}].institutionName`}
+                        id={`workExperience-${workExperience.id}-companyName`}
+                        name={`workExperience[${index}].companyName`}
                         type="text"
-                        placeholder="Institution Name"
+                        placeholder="Company Name"
                         className={inputFieldClassName}
                         onChange={resumeFormFormik.handleChange}
-                        value={education.institutionName || ""}
+                        value={workExperience.companyName || ""}
                     />
                 </div>
-                <div className="bg-white flex items-center">
-
+                <div className="bg-white flex items-center"
+                     onMouseEnter={() => setIsIconVisible(true)}
+                     onMouseLeave={() => setIsIconVisible(false)}>
                     <input
-                        id={`education-${education.id}-degree`}
-                        name={`education[${index}].degree`}
+                        id={`workExperience-${workExperience.id}-jobTitle`}
+                        name={`workExperience[${index}].jobTitle`}
                         type="text"
-                        placeholder="Degree Name (Bachelors/Masters)"
+                        placeholder="Job Title"
                         className={inputFieldClassName}
                         onChange={resumeFormFormik.handleChange}
-                        value={education.degree || ""}
+                        value={workExperience.jobTitle || ""}
                     />
-
                         <>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -64,7 +73,7 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
                                 strokeWidth="1.5"
                                 stroke="currentColor"
                                 className="w-6 h-6 ml-2 text-gray-500 cursor-pointer mr-1"
-                                onClick={removeEducation}
+                                onClick={removeWorkExperience}
                             >
                                 <path
                                     strokeLinecap="round"
@@ -75,46 +84,34 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
                 </div>
             </div>
 
-            <div className="bg-white flex items-center">
-                <input
-                    id={`education-${education.id}-course`}
-                    name={`education[${index}].course`}
-                    type="text"
-                    placeholder="Course Title"
-                    className={inputFieldClassName}
-                    onChange={resumeFormFormik.handleChange}
-                    value={education.course || ""}
-                />
-            </div>
 
             <div className="mb-1">
                 <input
-                    id={`education-${education.id}-link`}
-                    name={`education[${index}].link`}
+                    id={`workExperience-${workExperience.id}-website`}
+                    name={`workExperience[${index}].website`}
                     type="url"
-                    placeholder="Institution Website"
+                    placeholder="Company Website"
                     className={inputFieldClassName}
                     onChange={resumeFormFormik.handleChange}
-                    value={education.link}
+                    value={workExperience.website}
                 />
             </div>
 
             <div className="grid grid-rows-2 gap-1 bg-white py-2 pl-4 pr-2">
-                <Row
-                    className="
-            row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-12
-            row-gap-3 row-gap-sm-3 row-gap-md-3 row-gap-lg-0"
+                <Row className="
+                row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-12
+                row-gap-3 row-gap-sm-3 row-gap-md-3 row-gap-lg-0"
                 >
                     <Col lg={2} className={"flex justify-start"}>
                         <span className="text-sm font-normal text-gray-500">Start</span>
                     </Col>
                     <Col lg={3}>
                         <select
-                            id={`education-${education.id}-startMonth`}
-                            name={`education[${index}].startMonth`}
+                            id={`workExperience-${workExperience.id}-startMonth`}
+                            name={`workExperience[${index}].startMonth`}
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
-                            value={educationList[index]?.startMonth || ""}
+                            value={workExperienceList[index]?.startMonth || ""}
                         >
                             {MONTHS.map((month) => (
                                 <option key={month} value={month}>
@@ -125,11 +122,11 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
                     </Col>
                     <Col lg={3} className={"mb-4 mb-md-2"}>
                         <select
-                            id={`education-${education.id}-startYear`}
-                            name={`education[${index}].startYear`}
+                            id={`workExperience-${workExperience.id}-startYear`}
+                            name={`workExperience[${index}].startYear`}
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
-                            value={educationList[index]?.startYear || ""}
+                            value={workExperienceList[index]?.startYear || ""}
                         >
                             {Array.from({length: 50}, (_, i) => new Date().getFullYear() - i).map((year) => (
                                 <option key={year} value={year}>
@@ -140,21 +137,20 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
                     </Col>
                 </Row>
 
-                <Row
-                    className="
-            row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-12
-            row-gap-3 row-gap-sm-3 row-gap-md-3 row-gap-lg-0"
+                <Row className="
+                row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-12
+                row-gap-3 row-gap-sm-3 row-gap-md-3 row-gap-lg-0"
                 >
                     <Col lg={2} className={"flex justify-start"}>
                         <span className="text-sm font-normal text-gray-500">End</span>
                     </Col>
                     <Col lg={3}>
                         <select
-                            id={`education-${education.id}-endMonth`}
-                            name={`education[${index}].endMonth`}
+                            id={`workExperience-${workExperience.id}-endMonth`}
+                            name={`workExperience[${index}].endMonth`}
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
-                            value={educationList[index]?.endMonth || ""}
+                            value={workExperienceList[index]?.endMonth || ""}
                         >
                             {MONTHS.map((month) => (
                                 <option key={month} value={month}>
@@ -165,11 +161,11 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
                     </Col>
                     <Col lg={3} className={"mb-2 mb-md-0"}>
                         <select
-                            id={`education-${education.id}-endYear`}
-                            name={`education[${index}].endYear`}
+                            id={`workExperience-${workExperience.id}-endYear`}
+                            name={`workExperience[${index}].endYear`}
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
-                            value={educationList[index]?.endYear || ""}
+                            value={workExperienceList[index]?.endYear || ""}
                         >
                             {Array.from({length: 50}, (_, i) => new Date().getFullYear() - i).map((year) => (
                                 <option key={year} value={year}>
@@ -179,6 +175,20 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
                         </select>
                     </Col>
                 </Row>
+            </div>
+
+            <div className="bg-white mb-1">
+                {workExperience.duties?.map((_: any, dutyIndex: number) => (
+                    <DutyInput
+                        key={dutyIndex}
+                        dutyIndex={dutyIndex}
+                        resumeFormFormik={resumeFormFormik}
+                        workExperienceIndex={index}
+                        inputFieldClassName={inputFieldClassName}
+                        addDuty={addDuty}
+                        removeDuty={(dutyIndex:number) => removeDuty(dutyIndex)}
+                    />
+                ))}
             </div>
         </>
     );

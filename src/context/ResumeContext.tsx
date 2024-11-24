@@ -5,10 +5,13 @@ import {ResumeData} from "../models/ResumeData";
 import {ResumeInfo} from "../models/ResumeInfo";
 import {openAIInstruction} from "../data/openAIInstruction";
 import {OpenAIInstruction} from "../models/OpenAIInstruction";
+import {DefaultResumeData} from "../data/defaultResumeData";
 
 interface ResumeContextType {
     resumeData: ResumeInfo;
     setResumeData: React.Dispatch<React.SetStateAction<ResumeInfo>>
+    resumeDataOpenAI: ResumeInfo;
+    setResumeDataOpenAI: React.Dispatch<React.SetStateAction<ResumeInfo>>
     openAIInstructionData: OpenAIInstruction;
     setOpenAIInstructionData: React.Dispatch<React.SetStateAction<OpenAIInstruction>>
     hideButton: boolean;
@@ -22,12 +25,16 @@ type ResumeProviderProps = {
 
 export const ResumeProvider: React.FC<ResumeProviderProps> = ({children}) => {
     const [resumeData, setResumeData] = useState(initialResumeData);
+    const [resumeDataOpenAI, setResumeDataOpenAI] = useState(DefaultResumeData);
     const [openAIInstructionData, setOpenAIInstructionData] = useState(initialOpenAIInstructionData);
     const [hideButton, setHideButton] = useState(false);
-    const value = {resumeData, setResumeData, hideButton, setHideButton, openAIInstructionData, setOpenAIInstructionData}
+    const value = {resumeData, setResumeData, resumeDataOpenAI, setResumeDataOpenAI, hideButton, setHideButton, openAIInstructionData, setOpenAIInstructionData}
 
     useEffect(() => {
-    }, [resumeData, openAIInstructionData]);
+    }, [resumeData]);
+    //
+    // useEffect(() => {
+    // }, [resumeDataOpenAI]);
 
 
     return(

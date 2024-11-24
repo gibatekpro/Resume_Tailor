@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
+import {Col, Row} from "react-bootstrap";
 
 interface ContactInfoSectionProps {
     resumeFormFormik: any; // Replace 'any' with the type from your Formik configuration.
@@ -26,75 +27,68 @@ export const ContactInfoSection: React.FC<ContactInfoSectionProps> = ({
     const shouldShowInfoDetailsInput = ["Email", "Phone", "Location"].includes(contactInfo.infoTitle);
 
     return (
-        <>
-            <div className="flex items-center mb-0 px-3.5 bg-white pt-2 pb-2">
-                <span className="mr-4 font-normal sm:text-sm text-gray-500">Type: </span>
-
-                <label className="flex items-center mr-4 sm:text-sm">
-                    <input
-                        id={`contactInfo-${index}-infoTitle-linkedin`}
-                        name={`contactInfo.${index}.infoTitle`}
-                        type="radio"
-                        className="mr-2"
-                        onChange={resumeFormFormik.handleChange}
-                        value="LinkedIn"
-                        checked={contactInfo.infoTitle === "LinkedIn"}
-                    />
-                    LinkedIn
-                </label>
-
-                <label className="flex items-center mr-4 sm:text-sm">
-                    <input
-                        id={`contactInfo-${index}-infoTitle-email`}
-                        name={`contactInfo.${index}.infoTitle`}
-                        type="radio"
-                        className="mr-2"
-                        onChange={resumeFormFormik.handleChange}
-                        value="Email"
-                        checked={contactInfo.infoTitle === "Email"}
-                    />
-                    Email
-                </label>
-
-                <label className="flex items-center mr-4 sm:text-sm">
-                    <input
-                        id={`contactInfo-${index}-infoTitle-phone`}
-                        name={`contactInfo.${index}.infoTitle`}
-                        type="radio"
-                        className="mr-2"
-                        onChange={resumeFormFormik.handleChange}
-                        value="Phone"
-                        checked={contactInfo.infoTitle === "Phone"}
-                    />
-                    Phone
-                </label>
-
-                <label className="flex items-center mr-4 sm:text-sm">
-                    <input
-                        id={`contactInfo-${index}-infoTitle-location`}
-                        name={`contactInfo.${index}.infoTitle`}
-                        type="radio"
-                        className="mr-2"
-                        onChange={resumeFormFormik.handleChange}
-                        value="Location"
-                        checked={contactInfo.infoTitle === "Location"}
-                    />
-                    Location
-                </label>
-
-                <label className="flex items-center mr-4 sm:text-sm">
-                    <input
-                        id={`contactInfo-${index}-infoTitle-github`}
-                        name={`contactInfo.${index}.infoTitle`}
-                        type="radio"
-                        className="mr-2"
-                        onChange={resumeFormFormik.handleChange}
-                        value="GitHub"
-                        checked={contactInfo.infoTitle === "GitHub"}
-                    />
-                    GitHub
-                </label>
-            </div>
+        <div>
+            <Row className=" bg-white mx-0 p-2
+            row row-cols-4 row-cols-sm-4 row-cols-md-4 row-cols-lg-12
+            row-gap-3 row-gap-sm-3 row-gap-md-3 row-gap-lg-0
+            ">
+                <Col lg={3}>
+                    <label className="flex items-center mr-4 sm:text-sm">
+                        <input
+                            id={`contactInfo-${index}-infoTitle-email`}
+                            name={`contactInfo.${index}.infoTitle`}
+                            type="radio"
+                            className="mr-2"
+                            onChange={resumeFormFormik.handleChange}
+                            value="Email"
+                            checked={contactInfo.infoTitle === "Email"}
+                        />
+                        Email
+                    </label>
+                </Col>
+                <Col lg={3}>
+                    <label className="flex items-center mr-4 sm:text-sm">
+                        <input
+                            id={`contactInfo-${index}-infoTitle-phone`}
+                            name={`contactInfo.${index}.infoTitle`}
+                            type="radio"
+                            className="mr-2"
+                            onChange={resumeFormFormik.handleChange}
+                            value="Phone"
+                            checked={contactInfo.infoTitle === "Phone"}
+                        />
+                        Phone
+                    </label>
+                </Col>
+                <Col lg={3}>
+                    <label className="flex items-center mr-4 sm:text-sm">
+                        <input
+                            id={`contactInfo-${index}-infoTitle-location`}
+                            name={`contactInfo.${index}.infoTitle`}
+                            type="radio"
+                            className="mr-2"
+                            onChange={resumeFormFormik.handleChange}
+                            value="Location"
+                            checked={contactInfo.infoTitle === "Location"}
+                        />
+                        Location
+                    </label>
+                </Col>
+                <Col lg={3}>
+                    <label className="flex items-center mr-4 sm:text-sm">
+                        <input
+                            id={`contactInfo-${index}-infoTitle-github`}
+                            name={`contactInfo.${index}.infoTitle`}
+                            type="radio"
+                            className="mr-2"
+                            onChange={resumeFormFormik.handleChange}
+                            value="GitHub"
+                            checked={contactInfo.infoTitle === "GitHub"}
+                        />
+                        GitHub
+                    </label>
+                </Col>
+            </Row>
 
             <div
                 className="flex items-center mb-1 bg-white"
@@ -147,6 +141,6 @@ export const ContactInfoSection: React.FC<ContactInfoSectionProps> = ({
                     </svg>
                 )}
             </div>
-        </>
+        </div>
     );
 };

@@ -1,9 +1,9 @@
 import React from 'react';
 import '../../styles/resumeStyleB.css';
 import {useResumeProvider} from "../../context/ResumeContext";
+import {ResumeInfo} from "../../models/ResumeInfo";
 
-export const ContactInfoSection: React.FC = () => {
-    const {resumeData, setResumeData} = useResumeProvider();
+export const ContactInfoSection: React.FC<{resumeDataOpenAI: ResumeInfo}> = ({resumeDataOpenAI}) => {
 
     const getInfoIcon = (title:string) => {
         switch (title.toLowerCase()) {
@@ -43,20 +43,28 @@ export const ContactInfoSection: React.FC = () => {
 
     return (
         <div className={"sub-sections-container"}>
-            <h2>
-                Contact
-            </h2>
-            {resumeData.contactInfo?.map((info, index) => (
+            <h2>Contact</h2>
+            {resumeDataOpenAI.contactInfo?.map((info, index) => (
                 info.infoLink ? (
-                    <p key={index}>
-                        <span>{getInfoIcon(info.infoTitle!)}  <a href={info.infoLink} target="_blank"
-                                 rel="noopener noreferrer">{info.infoTitle}</a></span>
-
+                    <p key={index} className="flex items-center">
+                        <span className="mr-2">{getInfoIcon(info.infoTitle!)}</span>
+                        <a
+                            href={info.infoLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:underline"
+                        >
+                            {info.infoTitle}
+                        </a>
                     </p>
                 ) : (
-                    <p key={index}>{getInfoIcon(info.infoTitle!)} {info.infoDetails}</p>
+                    <p key={index} className="flex items-center">
+                        <span className="mr-2">{getInfoIcon(info.infoTitle!)}</span>
+                        {info.infoDetails}
+                    </p>
                 )
             ))}
         </div>
     );
+
 };

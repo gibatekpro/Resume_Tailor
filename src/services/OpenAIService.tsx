@@ -1,11 +1,13 @@
 import axios from "axios";
 
-
 export const fetchOpenAIResponse = async (prompt: string): Promise<any> => {
 
-    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+    const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
     const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
-
+    if (!OPENAI_API_KEY) {
+        console.error("OPENAI_API_KEY is not defined in the environment");
+        throw new Error("API key is missing");
+    }
     try {
         const response = await axios.post(
             OPENAI_API_URL,

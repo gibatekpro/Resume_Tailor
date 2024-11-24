@@ -9,12 +9,13 @@ import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
 
 export const ResumePrintPage: React.FC = () => {
     const {resumeData, setResumeData} = useResumeProvider();
+    const {resumeDataOpenAI, setResumeDataOpenAI} = useResumeProvider();
     const {hideButton, setHideButton} = useResumeProvider();
     const contentRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const handlePrint = useReactToPrint({
         content: () => contentRef.current,
-        documentTitle: resumeData.documentTitle,
+        documentTitle: resumeDataOpenAI.documentTitle,
         onBeforePrint: () => {
             // setHideButton(true);
         },

@@ -2,46 +2,27 @@ import {useFormik} from "formik";
 import {ResumeInfo} from "../../../models/ResumeInfo";
 import React, {useEffect} from "react";
 import {ProfileSection} from "./sections/ProfileSection";
-import {WorkExperienceSection} from "./sections/WorkExperienceSection";
 import {SectionHeader} from "./sections/SectionHeader";
-import {SkillsSection} from "./sections/SkillsSection";
+import {SkillsSection} from "./sections/skillSection/SkillsSection";
 import {EducationSection} from "./sections/EducationSection";
 import {LanguageSection} from "./sections/LanguageSection";
-import {ProjectsSection} from "./sections/ProjectsSection";
+import {ProjectsSection} from "./sections/projectsSection/ProjectsSection";
 import {ContactInfoSection} from "./sections/ContactInfoSection";
 import {useResumeProvider} from "../../../context/ResumeContext";
+import {WorkExperienceSection} from "./sections/workExperienceSection/WorkExperienceSection";
+import {Button, Spinner} from "react-bootstrap";
 
-const ResumeForm: React.FC<{ onValuesChange: (values: any) => void }> = ({ onValuesChange }) => {
-    const {resumeData, setResumeData} = useResumeProvider();
+interface ResumeFormProps {
+    resumeFormFormik: any;
+    hasSubmitButton?: boolean;
+}
+
+const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButton = false}) => {
+    const isLoading = false;
     const inputFieldClassName =
         "mt-1 block w-full px-3 py-2 focus:outline-none " +
         "focus:ring-0 focus:border-black focus:border-2 sm:text-sm";
 
-    // const defaultValues: ResumeInfo = {
-    //     workExperience: initialFormValues?.workExperience || [...resumeData.workExperience],
-    //     skills: initialFormValues?.skills || [...resumeData.skills],
-    //     education: initialFormValues?.education || [...resumeData.education],
-    //     languages: initialFormValues?.languages || [...resumeData.languages],
-    //     profile: initialFormValues?.profile || {...resumeData.profile},
-    // };
-    // Emit changes to the parent
-
-    const defaultValues: ResumeInfo = {
-        workExperience: [...resumeData.workExperience || []],
-        projects: [...resumeData.projects || []],
-        skills: [...resumeData.skills || []],
-        education: [...resumeData.education || []],
-        languages: [...resumeData.languages || []],
-        contactInfo: [...resumeData.contactInfo || []],
-        profile: {...resumeData.profile},
-    };
-
-    const resumeFormFormik = useFormik({
-        initialValues: defaultValues,
-        onSubmit: (values) => {
-            console.log(values);
-        },
-    });
 
     const addToSection = (section: keyof ResumeInfo) => {
         const currentSectionData = (resumeFormFormik.values[section] as any[]) || []; // Explicitly cast to array
@@ -58,8 +39,7 @@ const ResumeForm: React.FC<{ onValuesChange: (values: any) => void }> = ({ onVal
                 endYear: "",
                 duties: [""],
             };
-        }
-        else if (section === "projects") {
+        } else if (section === "projects") {
             newItem = {
                 projectName: "",
                 role: "",
@@ -73,21 +53,18 @@ const ResumeForm: React.FC<{ onValuesChange: (values: any) => void }> = ({ onVal
                 current: false,
                 link: "https://github.com/gibatekpro"
             };
-        }
-        else if (section === "languages") {
+        } else if (section === "languages") {
             newItem = {
                 name: "",
                 proficiency: ""
             }
-        }
-        else if (section === "contactInfo") {
+        } else if (section === "contactInfo") {
             newItem = {
                 infoTitle: "",
                 infoDetails: "",
                 infoLink: ""
             }
-        }
-        else {
+        } else {
             console.error(`Add to section not implemented for section: ${section}`);
             return;
         }
@@ -101,150 +78,160 @@ const ResumeForm: React.FC<{ onValuesChange: (values: any) => void }> = ({ onVal
         resumeFormFormik.setFieldValue(section, null);
     }
 
-    useEffect(() => {
-        onValuesChange(resumeFormFormik.values);
-        setResumeData(resumeFormFormik.values);
-    }, [resumeFormFormik.values]);
-
-
     return (
-        <div className="col-md-8">
-            <div className="flex justify-center items-center">
-                    <form onSubmit={resumeFormFormik.handleSubmit}>
+        <div className="flex justify-center items-center">
+            <form onSubmit={resumeFormFormik.handleSubmit}>
 
-                        {resumeFormFormik.values.profile &&
-                            <SectionHeader
-                                title={"About"}
-                                addToSection={() => addToSection("profile")}
-                                removeSection={() => removeSection("profile")}
-                                hasAddIcon={false}
-                                hasDeleteIcon={false}
-                            />
-                        }
-                        <ProfileSection
+                {resumeFormFormik.values.profile &&
+                    <SectionHeader
+                        title={"About"}
+                        addToSection={() => addToSection("profile")}
+                        removeSection={() => removeSection("profile")}
+                        hasAddIcon={false}
+                        hasDeleteIcon={false}
+                    />
+                }
+                <ProfileSection
+                    resumeFormFormik={resumeFormFormik}
+                    inputFieldClassName={inputFieldClassName}
+                />
+
+                {resumeFormFormik.values.contactInfo &&
+                    <SectionHeader
+                        title={"Contact Info"}
+                        addToSection={() => addToSection("contactInfo")}
+                        removeSection={() => removeSection("contactInfo")}
+                        hasAddIcon={true}
+                        hasDeleteIcon={true}
+                    />
+                }
+                {resumeFormFormik.values.contactInfo?.map((_: string, index: number) => (
+                    <div key={index} className="mb-0 pb-0">
+                        <ContactInfoSection
                             resumeFormFormik={resumeFormFormik}
                             inputFieldClassName={inputFieldClassName}
+                            index={index}
                         />
+                    </div>
+                ))}
 
-                        {resumeFormFormik.values.contactInfo &&
-                            <SectionHeader
-                                title={"Contact Info"}
-                                addToSection={() => addToSection("contactInfo")}
-                                removeSection={() => removeSection("contactInfo")}
-                                hasAddIcon={true}
-                                hasDeleteIcon={true}
-                            />
-                        }
-                        {resumeFormFormik.values.contactInfo?.map((_, index) => (
-                            <div key={index} className="mb-0 pb-0">
-                                <ContactInfoSection
-                                    resumeFormFormik={resumeFormFormik}
-                                    inputFieldClassName={inputFieldClassName}
-                                    index={index}
+                {resumeFormFormik.values.skills &&
+                    <SectionHeader
+                        title={"Skill"}
+                        addToSection={() => addToSection("skills")}
+                        removeSection={() => removeSection("skills")}
+                        hasAddIcon={false}
+                        hasDeleteIcon={true}
+                    />
+                }
+                <div className="mb-2 pb-4">
+                    <SkillsSection
+                        resumeFormFormik={resumeFormFormik}
+                        inputFieldClassName={inputFieldClassName}
+                    />
+                </div>
+
+                {resumeFormFormik.values.workExperience &&
+                    <SectionHeader
+                        title={"Work Experience"}
+                        addToSection={() => addToSection("workExperience")}
+                        removeSection={() => removeSection("workExperience")}
+                        hasAddIcon={true}
+                        hasDeleteIcon={true}
+                    />
+                }
+                {resumeFormFormik.values.workExperience?.map((_: string, index: number) => (
+                    <div key={index} className="mb-2 pb-4">
+                        <WorkExperienceSection
+                            resumeFormFormik={resumeFormFormik}
+                            inputFieldClassName={inputFieldClassName}
+                            index={index}
+                        />
+                    </div>
+                ))}
+
+                {resumeFormFormik.values.education &&
+                    <SectionHeader
+                        title={"Education"}
+                        addToSection={() => addToSection("education")}
+                        removeSection={() => removeSection("education")}
+                        hasAddIcon={true}
+                        hasDeleteIcon={true}
+                    />
+                }
+                {resumeFormFormik.values.education?.map((_: string, index: number) => (
+                    <div key={index} className="mb-2 pb-4">
+                        <EducationSection
+                            resumeFormFormik={resumeFormFormik}
+                            inputFieldClassName={inputFieldClassName}
+                            index={index}
+                        />
+                    </div>
+                ))}
+
+                {resumeFormFormik.values.projects &&
+                    <SectionHeader
+                        title={"Projects"}
+                        addToSection={() => addToSection("projects")}
+                        removeSection={() => removeSection("projects")}
+                        hasAddIcon={true}
+                        hasDeleteIcon={true}
+                    />
+                }
+                {resumeFormFormik.values.projects?.map((_: string, index: number) => (
+                    <div key={index} className="mb-2 pb-4">
+                        <ProjectsSection
+                            resumeFormFormik={resumeFormFormik}
+                            inputFieldClassName={inputFieldClassName}
+                            index={index}
+                        />
+                    </div>
+                ))}
+
+
+                {resumeFormFormik.values.languages &&
+                    <SectionHeader
+                        title={"Language"}
+                        addToSection={() => addToSection("languages")}
+                        removeSection={() => removeSection("languages")}
+                        hasAddIcon={true}
+                        hasDeleteIcon={true}
+                    />
+                }
+                {resumeFormFormik.values.languages?.map((_: string, index: number) => (
+                    <div key={index} className="mb-0 pb-0">
+                        <LanguageSection
+                            resumeFormFormik={resumeFormFormik}
+                            inputFieldClassName={inputFieldClassName}
+                            index={index}
+                        />
+                    </div>
+                ))}
+
+                {hasSubmitButton && (
+                    <Button
+                        type="submit"
+                        className="w-full mt-4 bg-blue-500 text-white hover:bg-blue-600"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <>
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="me-2"
                                 />
-                            </div>
-                        ))}
-
-                        {resumeFormFormik.values.skills &&
-                            <SectionHeader
-                                title={"Skill"}
-                                addToSection={() => addToSection("skills")}
-                                removeSection={() => removeSection("skills")}
-                                hasAddIcon={false}
-                                hasDeleteIcon={true}
-                            />
-                        }
-                        <div className="mb-2 pb-4">
-                            <SkillsSection
-                                resumeFormFormik={resumeFormFormik}
-                                inputFieldClassName={inputFieldClassName}
-                            />
-                        </div>
-
-                        {resumeFormFormik.values.workExperience &&
-                            <SectionHeader
-                                title={"Work Experience"}
-                                addToSection={() => addToSection("workExperience")}
-                                removeSection={() => removeSection("workExperience")}
-                                hasAddIcon={true}
-                                hasDeleteIcon={true}
-                            />
-                        }
-                        {resumeFormFormik.values.workExperience?.map((_, index) => (
-                            <div key={index} className="mb-2 pb-4">
-                                <WorkExperienceSection
-                                    resumeFormFormik={resumeFormFormik}
-                                    inputFieldClassName={inputFieldClassName}
-                                    index={index}
-                                />
-                            </div>
-                        ))}
-
-                        {resumeFormFormik.values.projects &&
-                            <SectionHeader
-                                title={"Projects"}
-                                addToSection={() => addToSection("projects")}
-                                removeSection={() => removeSection("projects")}
-                                hasAddIcon={true}
-                                hasDeleteIcon={true}
-                            />
-                        }
-                        {resumeFormFormik.values.projects?.map((_, index) => (
-                            <div key={index} className="mb-2 pb-4">
-                                <ProjectsSection
-                                    resumeFormFormik={resumeFormFormik}
-                                    inputFieldClassName={inputFieldClassName}
-                                    index={index}
-                                />
-                            </div>
-                        ))}
-
-                        {resumeFormFormik.values.languages &&
-                            <SectionHeader
-                                title={"Language"}
-                                addToSection={() => addToSection("languages")}
-                                removeSection={() => removeSection("languages")}
-                                hasAddIcon={true}
-                                hasDeleteIcon={true}
-                            />
-                        }
-                        {resumeFormFormik.values.languages?.map((_, index) => (
-                            <div key={index} className="mb-0 pb-0">
-                                <LanguageSection
-                                    resumeFormFormik={resumeFormFormik}
-                                    inputFieldClassName={inputFieldClassName}
-                                    index={index}
-                                />
-                            </div>
-                        ))}
-
-                        {resumeFormFormik.values.education &&
-                            <SectionHeader
-                                title={"Education"}
-                                addToSection={() => addToSection("education")}
-                                removeSection={() => removeSection("education")}
-                                hasAddIcon={true}
-                                hasDeleteIcon={true}
-                            />
-                        }
-                        {resumeFormFormik.values.education?.map((_, index) => (
-                            <div key={index} className="mb-2 pb-4">
-                                <EducationSection
-                                    resumeFormFormik={resumeFormFormik}
-                                    inputFieldClassName={inputFieldClassName}
-                                    index={index}
-                                />
-                            </div>
-                        ))}
-
-                        <button
-                            type="submit"
-                            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                        >
-                            Submit
-                        </button>
-                    </form>
-            </div>
+                                Generating...
+                            </>
+                        ) : (
+                            "Print CV"
+                        )}
+                    </Button>
+                )}
+            </form>
         </div>
 
     );

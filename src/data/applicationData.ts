@@ -26,3 +26,5 @@ export const MONTHS = [
     "November",
     "December",
 ];
+
+export const LOCAL_STORAGE_RESUME_DATA: string = "LOCAL_STORAGE_RESUME_DATA"

@@ -35,10 +35,6 @@ export const ResumePrintPage: React.FC = () => {
         return () => clearTimeout(timer);
     }, []);
 
-    const handleNavigate = () => {
-        // Navigate to a specific route
-        navigate('/input'); // Replace '/your-route' with the desired path
-    };
 
     return (
             <div className={"print-page-container"}>

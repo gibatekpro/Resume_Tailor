@@ -18,6 +18,20 @@ React PDF Printing to PDF Alternate [Documentation](https://react-pdf.org)
 
 #### `npm install @react-pdf/renderer --save`
 ***
+***
+
+Tutorial for printing [StackOverflow Documentation](https://stackoverflow.com/questions/44989119/generating-a-pdf-file-from-react-components) 
+
+HTML2Canvas (for printing) [Documentation](http://html2canvas.hertzen.com)
+
+#### `npm install --force --save html2canvas`
+***
+
+jsPDF (for printing) [Documentation](https://github.com/parallax/jsPDF)
+
+#### `npm install jspdf --force --save`
+***
+***
 
 Tailwind CSS [Documentation](https://tailwindcss.com/docs/installation)
 
@@ -53,6 +67,12 @@ Yup for Formik Validation [Documentation](https://github.com/jquense/yup)
 Axios, HTTP Client [Documentation](https://axios-http.com/docs/intro)
 
 #### `npm install axios --save`
+***
+
+
+Firebase, For Auth & CloudFirestore [Documentation](https://firebase.google.com/docs/web/setup)
+
+#### `npm install firebase`
 ***
 
 

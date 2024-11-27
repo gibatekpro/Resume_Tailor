@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import '../styles/resumeInput.css';
 import ResumeForm from "../components/forms/resumeForm/ResumeForm";
 import {useFormik} from "formik";
@@ -11,10 +11,17 @@ import {fetchOpenAIResponse} from "../services/OpenAIService";
 import InstructionForm from "../components/forms/instructionForm/InstructionForm";
 import {useNavigate} from "react-router-dom";
 import {useResumeProvider} from "../context/ResumeContext";
-import {LOCAL_STORAGE_RESUME_DATA} from "../data/applicationData";
+import {LOCAL_STORAGE_APPLICATION_DATA, LOCAL_STORAGE_RESUME_DATA} from "../data/applicationData";
+import ROUTES from "../data/routes";
+import JobApplicationService from "../services/JobApplicationService";
+import {useAuth} from "../services/auth/AuthProvider";
+import {JobApplicationInfo} from "../models/JobApplicationInfo";
+import {ResumeInfo} from "../models/ResumeInfo";
 
 export const ResumeInfoPage: React.FC = () => {
-    const { resumeData, setResumeData } = useResumeProvider();
+    const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
+    const [jobApplicationInfo, setJobApplicationInfo] = useState<JobApplicationInfo>();
+    const {resumeData, setResumeData} = useResumeProvider();
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const saved = localStorage.getItem(LOCAL_STORAGE_RESUME_DATA);
@@ -29,9 +36,25 @@ export const ResumeInfoPage: React.FC = () => {
 
     const generatedResumeFormFormik = useFormik({
         initialValues: SavedResumeDataOpenAI || DefaultResumeData,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
+            setIsLoading(true);
             setResumeData(values);
-            navigate('/print');
+            if (!user) {
+                alert("You must be logged in to save your job application.");
+                return;
+            }
+            // try {
+            //     await JobApplicationService.saveJobApplication(
+            //         user ?? "", // Ensures `user` is never `null`, defaults to an empty string
+            //         JSON.parse(localStorage.getItem(LOCAL_STORAGE_APPLICATION_DATA) || "{}")
+            //     );
+            //     setIsLoading(false);
+            //     alert("Job application saved successfully.");
+            // } catch (error) {
+            // }
+            navigate(ROUTES.APPLICATION_PREVIEW);
+            setIsLoading(false)
+            // navigate(ROUTES.RESUME_INPUT_PAGE);
         },
     });
 
@@ -50,8 +73,10 @@ export const ResumeInfoPage: React.FC = () => {
 
             if (response) {
                 const parsedResponse = JSON.parse(response);
+                setJobApplicationInfo(parsedResponse);
                 await generatedResumeFormFormik.setValues(parsedResponse.resumeInfo);
             }
+
             setIsLoading(false);
         },
     });
@@ -68,41 +93,90 @@ export const ResumeInfoPage: React.FC = () => {
             return jsonContent || null;
         } catch (error) {
             console.error("Error parsing JSON response:", error);
-            return null; // Return null if there's an error
+            return null;
         }
     };
 
+    const overlayStyle = {
+        position: "fixed" as const,
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1000,
+    };
+
+    const loadingMessageStyle = {
+        fontSize: "1.5rem",
+        color: "#333",
+        fontWeight: "bold" as const,
+    };
+
+    const blurredStyle = {
+        filter: "blur(3px)",
+        pointerEvents: "none" as const,
+    };
+
+    //     openAIJobTitle?: string,
+    //     openAIExpectedSalary?: string,
+    //     openAIJobLocation?: string,
+    //     openAISimpleJobDescription?: string,
+    //     resumeInfo?: ResumeInfo,
+
     useEffect(() => {
         localStorage.setItem(LOCAL_STORAGE_RESUME_DATA, JSON.stringify(generatedResumeFormFormik.values));
+        const savedJobApplicationInfo = {
+            openAIJobTitle: jobApplicationInfo?.openAIJobTitle,
+            openAIExpectedSalary: jobApplicationInfo?.openAIExpectedSalary,
+            openAIJobLocation: jobApplicationInfo?.openAIJobLocation,
+            openAISimpleJobDescription: jobApplicationInfo?.openAISimpleJobDescription,
+            ...generatedResumeFormFormik.values
+        }
+        localStorage.setItem(LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(savedJobApplicationInfo));
     }, [generatedResumeFormFormik]);
 
-    return(
-        <div className="bg-gray-100 py-4">
-            <div className="row g-1 p-2 p-md-0">
+    return (
 
-                <div className="col-md-4">
-                    <ResumeForm
-                        resumeFormFormik={customResumeFormFormik}
-                    />
+        <div className="bg-gray-100 py-4 my-5">
+
+            {isLoading && (
+                <div style={overlayStyle}>
+                    <div style={loadingMessageStyle}>Loading, please wait...</div>
                 </div>
+            )}
 
-                <div className="col-md-4 mt-10 mt-md-0">
-                    <div className="position-sticky" style={{
-                        top: "2rem"
-                    }}>
-                        <InstructionForm
-                            isLoading={isLoading}
-                            instructionFormFormik={instructionFormFormik}/>
+            <div style={isLoading ? blurredStyle : {}}>
+
+                <div className="row g-1 p-2 p-md-0">
+
+                    <div className="col-md-4">
+                        <ResumeForm
+                            resumeFormFormik={customResumeFormFormik}
+                        />
                     </div>
-                </div>
 
-                <div className="col-md-4">
-                    <ResumeForm
-                        hasSubmitButton={true}
-                        resumeFormFormik={generatedResumeFormFormik}
-                    />
-                </div>
+                    <div className="col-md-4 mt-10 mt-md-0">
+                        <div className="position-sticky" style={{
+                            top: "2rem"
+                        }}>
+                            <InstructionForm
+                                isLoading={isLoading}
+                                instructionFormFormik={instructionFormFormik}/>
+                        </div>
+                    </div>
 
+                    <div className="col-md-4">
+                        <ResumeForm
+                            hasSubmitButton={true}
+                            resumeFormFormik={generatedResumeFormFormik}
+                        />
+                    </div>
+
+                </div>
             </div>
 
         </div>

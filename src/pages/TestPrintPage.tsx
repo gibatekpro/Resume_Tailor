@@ -1,25 +1,14 @@
 import React from 'react';
-import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
-import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
+import { Page, Document, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
+import { ResumeStyleB } from '../components/resume-style-b/ResumeStyleB';
+import {ResumeDocument} from "./ResumeDocument";
 
-// Create styles
-const styles = StyleSheet.create({
-    page: {
-        flexDirection: 'row',
-        backgroundColor: '#E4E4E4'
-    },
-    section: {
-        margin: 10,
-        padding: 10,
-        flexGrow: 1
-    }
-});
+export const TestPrintPage: React.FC = () => {
+    return (
+        <div>
+            <PDFDownloadLink document={<ResumeDocument/>} fileName="somename.pdf">
 
-// Create Document Component
-export const TestPrintPage:React.FC = () => (
-    <Document>
-        <Page size="A4" style={styles.page}>
-            <ResumeStyleB/>
-        </Page>
-    </Document>
-);
+            </PDFDownloadLink>
+        </div>
+    );
+};

@@ -6,10 +6,6 @@ import {CustomCol} from "../../custom_tags/CustomCol";
 import avatarImage from  "../../assets/images/avatar_image.jpeg"
 
 export const AvatarSection: React.FC = () => {
-    const {resumeDataOpenAI, setResumeDataOpenAI} = useResumeProvider();
-    useEffect(()=>{
-
-    },[resumeDataOpenAI]);
 
     return (
         <div className={"avatar-container"}>

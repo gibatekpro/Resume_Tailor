@@ -8,6 +8,7 @@ export const openAIInstruction: OpenAIInstruction = {
         "Fill in the missing objects that have openAI in them using the job description",
         "The JSON should be of this type interface JobApplicationInfo {\n" +
         "    openAIJobTitle?: string,\n" +
+        "openAIJobCompanyName?: string,\n" +
         "    openAIExpectedSalary?: string,\n" +
         "    openAIJobLocation?: string,\n" +
         "    openAISimpleJobDescription?: string,\n" +

@@ -17,6 +17,7 @@ import JobApplicationService from "../services/JobApplicationService";
 import {useAuth} from "../services/auth/AuthProvider";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import {ResumeInfo} from "../models/ResumeInfo";
+import {CustomAccordion} from "../custom_tags/CustomAccordion";
 
 export const ResumeInfoPage: React.FC = () => {
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
@@ -26,6 +27,8 @@ export const ResumeInfoPage: React.FC = () => {
     const navigate = useNavigate();
     const saved = localStorage.getItem(LOCAL_STORAGE_RESUME_DATA);
     const SavedResumeDataOpenAI = saved ? JSON.parse(saved) : DefaultResumeData;
+    const [isCustomFormOpen, setIsCustomFormOpen] = useState(false);
+    const [isGeneratedFormOpen, setIsGeneratedFormOpen] = useState(false);
 
 
     const customResumeFormFormik = useFormik({
@@ -154,8 +157,12 @@ export const ResumeInfoPage: React.FC = () => {
                 <div className="row g-1 p-2 p-md-0">
 
                     <div className="col-md-4">
-                        <ResumeForm
-                            resumeFormFormik={customResumeFormFormik}
+                        <CustomAccordion
+                            isOpen={isCustomFormOpen}
+                            setIsOpen={setIsCustomFormOpen}
+                            children={<ResumeForm
+                                resumeFormFormik={customResumeFormFormik}
+                            />}
                         />
                     </div>
 
@@ -170,9 +177,11 @@ export const ResumeInfoPage: React.FC = () => {
                     </div>
 
                     <div className="col-md-4">
-                        <ResumeForm
-                            hasSubmitButton={true}
-                            resumeFormFormik={generatedResumeFormFormik}
+                        <CustomAccordion isOpen={isGeneratedFormOpen} setIsOpen={setIsGeneratedFormOpen}
+                                         children={<ResumeForm
+                                             hasSubmitButton={true}
+                                             resumeFormFormik={generatedResumeFormFormik}
+                                         />}
                         />
                     </div>
 

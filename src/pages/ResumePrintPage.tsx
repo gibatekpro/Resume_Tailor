@@ -7,12 +7,13 @@ import {useNavigate} from "react-router-dom";
 import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
 import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
 
-export const ResumePrintPage: React.FC = () => {
+export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void }> = ({ setHideNavbar }) => {
     const {resumeData, setResumeData} = useResumeProvider();
     const {resumeDataOpenAI, setResumeDataOpenAI} = useResumeProvider();
     const {hideButton, setHideButton} = useResumeProvider();
     const contentRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+
     const handlePrint = useReactToPrint({
         content: () => contentRef.current,
         documentTitle: resumeDataOpenAI.documentTitle,
@@ -28,12 +29,14 @@ export const ResumePrintPage: React.FC = () => {
     });
 
     useEffect(() => {
-        const timer = setTimeout(() => {
+        setHideNavbar(true); // Hide Navbar when this page is loaded
+
+        setTimeout(() => {
             handlePrint();
         }, 3000);
 
-        return () => clearTimeout(timer);
-    }, []);
+        return () => setHideNavbar(false);
+    }, [setHideNavbar]);
 
 
     return (

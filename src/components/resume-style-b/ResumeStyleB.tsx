@@ -16,24 +16,27 @@ import {AvatarSection} from "./AvatarSection";
 import {LanguageSection} from "./LanguageSection";
 import {DefaultResumeData} from "../../data/defaultResumeData";
 import {LOCAL_STORAGE_RESUME_DATA} from "../../data/applicationData";
+import html2canvas from "html2canvas";
+import {jsPDF} from "jspdf";
+
 
 export const ResumeStyleB: React.FC = () =>{
-    const [hasProjects, setHasProjects] = useState(false);
-    const [hasSkills, setHasSkills] = useState(false);
-    const [hasWorkExperience, setHasWorkExperience] = useState(false);
-    const [hasEducation, setHasEducation] = useState(false);
-
     const saved = localStorage.getItem(LOCAL_STORAGE_RESUME_DATA);
     const resumeDataOpenAI = saved ? JSON.parse(saved) : DefaultResumeData;
 
-    useEffect(() => {
-        // Update state for sections visibility
-
-        setHasProjects(!!resumeDataOpenAI.projects && resumeDataOpenAI.projects.length > 0);
-        setHasSkills(!!resumeDataOpenAI.skills && resumeDataOpenAI.skills.length > 0);
-        setHasWorkExperience(!!resumeDataOpenAI.workExperience && resumeDataOpenAI.workExperience.length > 0);
-        setHasEducation(!!resumeDataOpenAI.education && resumeDataOpenAI.education.length > 0);
-    }, []);
+    // const [hasProjects, setHasProjects] = useState(false);
+    // const [hasSkills, setHasSkills] = useState(false);
+    // const [hasWorkExperience, setHasWorkExperience] = useState(false);
+    // const [hasEducation, setHasEducation] = useState(false);
+    //
+    // useEffect(() => {
+    //     // Update state for sections visibility
+    //
+    //     setHasProjects(!!resumeDataOpenAI.projects && resumeDataOpenAI.projects.length > 0);
+    //     setHasSkills(!!resumeDataOpenAI.skills && resumeDataOpenAI.skills.length > 0);
+    //     setHasWorkExperience(!!resumeDataOpenAI.workExperience && resumeDataOpenAI.workExperience.length > 0);
+    //     setHasEducation(!!resumeDataOpenAI.education && resumeDataOpenAI.education.length > 0);
+    // }, []);
 
     return(
         <div className={"style-b-main-container"} style={{

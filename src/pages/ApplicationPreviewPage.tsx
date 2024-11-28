@@ -9,7 +9,7 @@ import {LOCAL_STORAGE_APPLICATION_DATA} from "../data/applicationData";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import ROUTES from "../data/routes";
 
-export const ResumePreviewPage: React.FC = () => {
+export const ResumePreviewPage: React.FC<{ setHideNavbar: (hide: boolean) => void }> = ({ setHideNavbar }) => {
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
     const [isLoading, setIsLoading] = useState(false);
     const [applicationData, setApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(LOCAL_STORAGE_APPLICATION_DATA) || "{}"))
@@ -23,6 +23,7 @@ export const ResumePreviewPage: React.FC = () => {
             );
             setIsLoading(false);
             // alert("Job application saved successfully.");
+            setHideNavbar(true); // Ensure Navbar is hidden before navigating
             navigate(ROUTES.RESUME_PRINT_PAGE);
         } catch (error) {
         }

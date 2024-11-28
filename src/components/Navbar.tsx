@@ -8,7 +8,7 @@ import {getAuth, onAuthStateChanged} from "firebase/auth";
 
 
 
-export const Navbar:React.FC = () => {
+export const Navbar:React.FC<{ hide?: boolean }> = ({hide}) => {
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     let [isOpen, setIsOpen] = useState(true);
@@ -57,7 +57,8 @@ export const Navbar:React.FC = () => {
         {name: 'Marketplace', href: '#'},
         {name: 'Company', href: '#'},
     ]
-    
+    if (hide) return null;
+
     return (
         <header className="absolute inset-x-0 top-0 z-50 bg-gray-300">
             {/*flex: Applies Flexbox to the <nav> container, allowing child elements to be positioned in a flexible layout (in this case, horizontally by default).

@@ -46,13 +46,13 @@ export const ContactInfoSection: React.FC<{resumeDataOpenAI: ResumeInfo}> = ({re
             <h2>Contact</h2>
             {resumeDataOpenAI.contactInfo?.map((info, index) => (
                 info.infoLink ? (
-                    <p key={index} className="flex items-center">
-                        <span className="mr-2">{getInfoIcon(info.infoTitle!)}</span>
+                    <p key={index} className="flex items-center underline">
+                        <span className="mr-2 p-0">{getInfoIcon(info.infoTitle!)}</span>
                         <a
                             href={info.infoLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-500 hover:underline"
+                            className="text-blue-500 underline p-0 m-0"
                         >
                             {info.infoTitle}
                         </a>

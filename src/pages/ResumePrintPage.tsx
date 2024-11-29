@@ -1,22 +1,21 @@
-import React, {useEffect, useRef, useState} from "react";
-import {HeaderSection} from '../components/resume-style-a/HeaderSection';
-import '../styles/resumePrint.css';
-import {useReactToPrint} from "react-to-print";
-import {ResumeProvider, useResumeProvider} from "../context/ResumeContext";
-import {useNavigate} from "react-router-dom";
-import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
-import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
+import React, { useEffect, useRef, useState } from "react";
+import { ResumeProvider, useResumeProvider } from "../context/ResumeContext";
+import { useNavigate } from "react-router-dom";
+import { ResumeStyleA } from "../components/resume-style-a/ResumeStyleA";
+import { ResumeStyleB } from "../components/resume-style-b/ResumeStyleB";
+import { JobApplicationInfo } from "../models/JobApplicationInfo";
+import {APP_TITLE, LOCAL_STORAGE_APP_TITLE, LOCAL_STORAGE_APPLICATION_DATA} from "../data/applicationData";
+import { useReactToPrint } from "react-to-print";
+import {ResumeInfo} from "../models/ResumeInfo";
 
-export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void }> = ({ setHideNavbar }) => {
-    const {resumeData, setResumeData} = useResumeProvider();
-    const {resumeDataOpenAI, setResumeDataOpenAI} = useResumeProvider();
-    const {hideButton, setHideButton} = useResumeProvider();
+export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void, setAppTitle:React.Dispatch<React.SetStateAction<string>> }> = ({ setHideNavbar, setAppTitle }) => {
+    const [applicationData, setApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(LOCAL_STORAGE_APPLICATION_DATA) || "{}"));
     const contentRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
     const handlePrint = useReactToPrint({
         content: () => contentRef.current,
-        documentTitle: resumeDataOpenAI.documentTitle,
+        documentTitle: applicationData.openAIDocumentTitle,
         onBeforePrint: () => {
             // setHideButton(true);
         },
@@ -31,24 +30,27 @@ export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void 
     useEffect(() => {
         setHideNavbar(true); // Hide Navbar when this page is loaded
 
+        // Dynamically set the document title
+        if (applicationData && applicationData.openAIDocumentTitle) {
+            localStorage.setItem(LOCAL_STORAGE_APP_TITLE, applicationData.openAIDocumentTitle);
+        }
+
         setTimeout(() => {
             handlePrint();
         }, 3000);
 
-        return () => setHideNavbar(false);
-    }, [setHideNavbar]);
-
+        return () => {
+            setHideNavbar(false);
+            setAppTitle(APP_TITLE);
+        };
+    }, [setHideNavbar, applicationData]);
 
     return (
-            <div className={"print-page-container"}>
-                {/*{!hideButton && <div className={"button-container"}>*/}
-                {/*    <button onClick={handlePrint}>Print</button>*/}
-                {/*    <button onClick={handleNavigate}>Input Page</button>*/}
-                {/*</div>}*/}
-                <div ref={contentRef} className="pdf-container">
-                    {/*<ResumeStyleA/>*/}
-                    <ResumeStyleB/>
-                </div>
+        <div className={"print-page-container"}>
+            <div ref={contentRef} className="pdf-container">
+                {/*<ResumeStyleA/>*/}
+                <ResumeStyleB/>
             </div>
+        </div>
     );
 };

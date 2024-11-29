@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import {ResumePrintPage} from "./pages/ResumePrintPage";
 import {ResumeProvider} from "./context/ResumeContext";
@@ -17,7 +17,7 @@ import {RegisterPage} from "./pages/auth/RegisterPage";
 import {LoginPage} from "./pages/auth/LoginPage";
 import {ResetPasswordPage} from "./pages/auth/ResetPasswordPage";
 import {RequireAuth} from "./services/auth/RequireAuth";
-import {firebaseConfig} from "./data/applicationData";
+import {APP_TITLE, firebaseConfig, LOCAL_STORAGE_APP_TITLE} from "./data/applicationData";
 import {ResumePreviewPage} from "./pages/ApplicationPreviewPage";
 import {ResumeInfoPage} from "./pages/ResumeInfoPage";
 
@@ -29,6 +29,11 @@ const db = getFirestore(app);
 
 function App() {
     const [hideNavbar, setHideNavbar] = useState(false);
+    const [appTitle, setAppTitle] = useState<string>(localStorage.getItem(LOCAL_STORAGE_APP_TITLE) || APP_TITLE);
+
+    useEffect(() => {
+        document.title = appTitle
+    }, [appTitle]);
 
     return (
         <Router>
@@ -50,14 +55,14 @@ function App() {
                         <Route path={ROUTES.APPLICATION_PREVIEW}
                                element={
                                    <RequireAuth>
-                                       <ResumePreviewPage setHideNavbar={setHideNavbar} />
+                                       <ResumePreviewPage setHideNavbar={setHideNavbar} setAppTitle={setAppTitle} />
                                    </RequireAuth>
                                }>
                         </Route>
                         <Route path={ROUTES.RESUME_PRINT_PAGE}
                                element={
                                    <RequireAuth>
-                                       <ResumePrintPage setHideNavbar={setHideNavbar} />
+                                       <ResumePrintPage setHideNavbar={setHideNavbar} setAppTitle={setAppTitle} />
                                    </RequireAuth>
                                }>
                         </Route>

@@ -7,7 +7,6 @@ import {ResumeInfo} from "../models/ResumeInfo";
 export const resumeData: ResumeInfo = {
     //Note to OpenAI: Document title should be anthony-gibah-*company name*
     //Note to OpenAI: Add only company name, not description. e.g anthony-gibah-google-inc
-    documentTitle: "anthony-gibah-",
     //Note to OpenAI: Do not alter profile
     profile: {
         firstName: "Anthony",

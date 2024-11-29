@@ -198,8 +198,40 @@
     color: white;
 }
 
+.sub-sections-container {
+    margin-bottom: 10px; /* Keep margin consistent */
+    padding: 0; /* Ensure no extra padding disrupts alignment */
+}
+
+.sub-sections-container h2 {
+    font-size: 20px;
+    font-family: "Crimson Text", serif;
+    font-weight: 400;
+    text-align: center;
+    color: dimgrey;
+    margin-top: 30px;
+    text-transform: uppercase;
+    text-decoration: none; /* Remove default underline styles */
+    border-bottom: 2px solid dimgrey; /* Explicit underline via border */
+    display: inline-block; /* Ensure underline is sized to content */
+    padding-bottom: 4px; /* Add space between text and underline */
+}
+
+.sub-sections-container a {
+    color: var(--styleB-sub-row-green-text);
+    text-decoration: none; /* Remove default underline */
+    border-bottom: 1px solid var(--styleB-sub-row-green-text); /* Add custom underline */
+    padding-bottom: 2px; /* Space between text and underline */
+}
+
+.sub-sections-container p {
+    margin: 0;
+    padding: 0;
+    line-height: 1.5; /* Adjust for better spacing */
+}
+
 .style-b-main-container .main-row .left-col .sub-sections-container{
-    margin-bottom: var(--styleB-sections-spacing);
+    margin-bottom: 10px;
 }
 
 .avatar-container {

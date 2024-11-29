@@ -6,7 +6,9 @@ export const openAIInstruction: OpenAIInstruction = {
         "This is a set of instructions for you (ChatGPT/OpenAI to follow",
         "DO NOT INCLUDE this ```json or any backticks",
         "Fill in the missing objects that have openAI in them using the job description",
+        "Document title should be resumeInfo.firstName-resumeInfo-lastname-*company name",
         "The JSON should be of this type interface JobApplicationInfo {\n" +
+        "openAIDocumentTitle?: string,\n" +
         "    openAIJobTitle?: string,\n" +
         "openAIJobCompanyName?: string,\n" +
         "    openAIExpectedSalary?: string,\n" +
@@ -18,7 +20,7 @@ export const openAIInstruction: OpenAIInstruction = {
     ],
     responseFormat: "JSON",
     rules: [
-        "Document title should be anthony-gibah-*company name",
+        "Document title should be resumeInfo.firstName-resumeInfo-lastname-*company name",
         "Add only company name, not description. e.g anthony-gibah-google-inc",
         "Do not alter profile",
         "Skills should not be too long. always include Java, C# and MySQL",

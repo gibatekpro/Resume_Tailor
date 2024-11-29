@@ -18,6 +18,8 @@ import {useAuth} from "../services/auth/AuthProvider";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import {ResumeInfo} from "../models/ResumeInfo";
 import {CustomAccordion} from "../custom_tags/CustomAccordion";
+import {openAIInstruction} from "../data/openAIInstruction";
+import moment from "moment";
 
 export const ResumeInfoPage: React.FC = () => {
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
@@ -133,11 +135,13 @@ export const ResumeInfoPage: React.FC = () => {
     useEffect(() => {
         localStorage.setItem(LOCAL_STORAGE_RESUME_DATA, JSON.stringify(generatedResumeFormFormik.values));
         const savedJobApplicationInfo = {
+            date: moment(new Date(), "YYYY-MM-DD HH:mm"),
+            openAIDocumentTitle: jobApplicationInfo?.openAIDocumentTitle,
             openAIJobTitle: jobApplicationInfo?.openAIJobTitle,
             openAIExpectedSalary: jobApplicationInfo?.openAIExpectedSalary,
             openAIJobLocation: jobApplicationInfo?.openAIJobLocation,
             openAISimpleJobDescription: jobApplicationInfo?.openAISimpleJobDescription,
-            ...generatedResumeFormFormik.values
+            resumeInfo: generatedResumeFormFormik.values,
         }
         localStorage.setItem(LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(savedJobApplicationInfo));
     }, [generatedResumeFormFormik]);

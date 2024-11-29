@@ -5,7 +5,6 @@ import {Project} from "./Project";
 import {ContactInfo} from "./ContactInfo";
 
 export interface ResumeInfo {
-    documentTitle?: string,
     profile?: {
         firstName?: string;
         lastName?: string;

@@ -138,6 +138,7 @@ export const ResumeInfoPage: React.FC = () => {
             date: moment(new Date(), "YYYY-MM-DD HH:mm"),
             openAIDocumentTitle: jobApplicationInfo?.openAIDocumentTitle,
             openAIJobTitle: jobApplicationInfo?.openAIJobTitle,
+            openAIJobCompanyName: jobApplicationInfo?.openAIJobCompanyName,
             openAIExpectedSalary: jobApplicationInfo?.openAIExpectedSalary,
             openAIJobLocation: jobApplicationInfo?.openAIJobLocation,
             openAISimpleJobDescription: jobApplicationInfo?.openAISimpleJobDescription,

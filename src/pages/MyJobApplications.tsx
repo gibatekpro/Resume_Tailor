@@ -8,6 +8,7 @@ import JobApplicationService from "../services/JobApplicationService";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import {useNavigate} from "react-router-dom";
 import ROUTES from "../data/routes";
+import {LOCAL_STORAGE_APPLICATION_DATA} from "../data/applicationData";
 
 export const MyJobApplications: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -61,7 +62,7 @@ export const MyJobApplications: React.FC = () => {
                     // Check if the application is from this year
                     const startOfYear = moment().startOf("year");
                     if (date.isSameOrAfter(startOfYear, "day")) {
-                        if (!todayArr.includes(data) && !thisMonthArr.includes(data)) {
+                        if (!todayArr.includes(data) && !thisMonthArr.includes(data) && !thisWeekArr.includes(data)) {
                             thisYearArr.push(data); // Add to thisYear array if not already added as today or this month
                         }
                     }
@@ -175,8 +176,9 @@ export const MyJobApplications: React.FC = () => {
     };
 
     const handleNavigate = (path: string) => {
-            navigate(path)
-        }
+        localStorage.setItem(LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(selectedApplication))
+        navigate(path)
+    }
 
     return (
         <div className="py-0 my-2">
@@ -189,7 +191,7 @@ export const MyJobApplications: React.FC = () => {
                 <div className="row g-1 p-2 p-md-0">
                     {/* Left Column */}
                     <div
-                        className="col-md-2"
+                        className="col-md-2 pb-4"
                         style={{
                             ...styles.rightBorderStyle,
                             ...styles.leftColumn.padding,
@@ -305,23 +307,24 @@ export const MyJobApplications: React.FC = () => {
                         ) : (
                             <div>Select a job application to view details.</div>
                         )}
-                        {/*{selectedApplication?.resumeInfo && (*/}
-                        {/*    <Button onClick={() => handleNavigate(ROUTES.RESUME_PRINT_PAGE)} className="mb-1 mt-5" style={{*/}
-                        {/*        backgroundColor: '#ccc',*/}
-                        {/*        borderColor: '#ccc',*/}
-                        {/*        color: 'black',*/}
-                        {/*        display: 'flex',*/}
-                        {/*        alignItems: 'center'*/}
-                        {/*    }}>*/}
-                        {/*        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"*/}
-                        {/*             strokeWidth="1.5"*/}
-                        {/*             stroke="currentColor" className="size-6" style={{marginRight: '8px'}}>*/}
-                        {/*            <path strokeLinecap="round" strokeLinejoin="round"*/}
-                        {/*                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>*/}
-                        {/*        </svg>*/}
-                        {/*        Download CV*/}
-                        {/*    </Button>*/}
-                        {/*)}*/}
+                        {selectedApplication?.resumeInfo && (
+                            <Button onClick={() => handleNavigate(ROUTES.RESUME_PRINT_PAGE)} className="mb-1 mt-5"
+                                    style={{
+                                        backgroundColor: '#ccc',
+                                        borderColor: '#ccc',
+                                        color: 'black',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     strokeWidth="1.5"
+                                     stroke="currentColor" className="size-6" style={{marginRight: '8px'}}>
+                                    <path strokeLinecap="round" strokeLinejoin="round"
+                                          d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                                </svg>
+                                Download CV
+                            </Button>
+                        )}
                         {selectedApplication?.resumeInfo && (
                             <Card className="justify-center align-items-center p-2">
                                 <ResumeStyleB resumeData={selectedApplication?.resumeInfo}/>

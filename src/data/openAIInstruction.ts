@@ -7,6 +7,7 @@ export const openAIInstruction: OpenAIInstruction = {
         "DO NOT INCLUDE this ```json or any backticks",
         "Fill in the missing objects that have openAI in them using the job description",
         "Document title should be resumeInfo.firstName-resumeInfo-lastname-*company name",
+        "openAIJobCompanyName is the name of the company. please include it if available",
         "The JSON should be of this type interface JobApplicationInfo {\n" +
         "openAIDocumentTitle?: string,\n" +
         "    openAIJobTitle?: string,\n" +

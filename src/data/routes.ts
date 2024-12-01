@@ -7,6 +7,7 @@ const ROUTES = {
     REGISTER: "/register",
     PASSWORD_RESET: "/reset-password",
     APPLICATION_PREVIEW: "/application-preview",
+    MY_JOB_APPLICATIONS: "/my-job-applications",
 } as const;
 
 export default ROUTES;

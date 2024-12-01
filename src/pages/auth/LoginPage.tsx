@@ -7,7 +7,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {Formik} from "formik";
-import {useAuth} from "../../services/auth/AuthProvider";
+import {useAuth} from "../../context/auth/AuthProvider";
 import {appName} from "../../data/applicationData";
 
 
@@ -29,7 +29,6 @@ export const LoginPage:React.FC = () => {
         try {
             // Call the login function with email and password
             await auth?.login(values.email, values.password, (user: string) => {
-                console.log(user);
                 // Navigate back to the previous location or to the home page if no location is available
                 const from = (location.state as any)?.from?.pathname || "/";
                 navigate(from, { replace: true });

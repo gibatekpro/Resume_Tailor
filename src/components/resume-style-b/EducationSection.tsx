@@ -6,17 +6,17 @@ import {DESIGN_BORDER} from "../../constants/DesignConstants";
 import {ResumeInfo} from "../../models/ResumeInfo";
 
 
-export const EducationSection: React.FC<{resumeDataOpenAI: ResumeInfo}> = ({resumeDataOpenAI}) => {
+export const EducationSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
 
     useEffect(()=>{
 
-    },[resumeDataOpenAI]);
+    },[resumeData]);
 
 
     return (
         <div>
             <h3>Education</h3>
-            {resumeDataOpenAI.education?.map((education, index) => (
+            {resumeData.education?.map((education, index) => (
                 <div key={index}>
                     <Row className={"sub-row"} key={index} >
                         <Col className={"left-sub-col"} xs={6} sm={6} md={6} lg={6}>

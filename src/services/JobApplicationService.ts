@@ -3,6 +3,7 @@ import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import {initializeApp} from "firebase/app";
 import {firebaseConfig} from "../data/applicationData";
 import { addDoc, collection, getDocs } from "firebase/firestore";
+import {getAuth} from "firebase/auth";
 
 class JobApplicationService {
     /**
@@ -15,8 +16,7 @@ class JobApplicationService {
      */
 
     async saveJobApplication(uid: string, jobApplication?: JobApplicationInfo): Promise<void> {
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = getFirestore();
 
         if (!uid) {
             throw new Error("User ID (uid) is required.");
@@ -43,13 +43,18 @@ class JobApplicationService {
     }
 
     async getAllJobApplications(): Promise<{ id: string; data: JobApplicationInfo }[]> {
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = getFirestore();
+        const auth = getAuth();
+        const user = auth.currentUser;
 
-        const jobApplicationsRef = collection(db, "jobApplications");
+        if (!user) {
+            throw new Error("User is not authenticated.");
+        }
+
+        const userJobApplicationsRef = collection(db, `jobApplications/${user.uid}/applications`);
 
         try {
-            const querySnapshot = await getDocs(jobApplicationsRef);
+            const querySnapshot = await getDocs(userJobApplicationsRef);
 
             const jobApplications = querySnapshot.docs.map((doc) => ({
                 id: doc.id,

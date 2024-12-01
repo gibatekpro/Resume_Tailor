@@ -25,7 +25,7 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({ children }) => {
     }, []);
 
     if (isAuthenticated === null) {
-        return <div>Loading...</div>; // or any loading spinner
+        return <div></div>;
     }
 
     if (!isAuthenticated) {

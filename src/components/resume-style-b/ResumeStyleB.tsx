@@ -18,11 +18,10 @@ import {DefaultResumeData} from "../../data/defaultResumeData";
 import {LOCAL_STORAGE_RESUME_DATA} from "../../data/applicationData";
 import html2canvas from "html2canvas";
 import {jsPDF} from "jspdf";
+import {ResumeInfo} from "../../models/ResumeInfo";
 
 
-export const ResumeStyleB: React.FC = () =>{
-    const saved = localStorage.getItem(LOCAL_STORAGE_RESUME_DATA);
-    const resumeDataOpenAI = saved ? JSON.parse(saved) : DefaultResumeData;
+export const ResumeStyleB: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =>{
 
     // const [hasProjects, setHasProjects] = useState(false);
     // const [hasSkills, setHasSkills] = useState(false);
@@ -54,28 +53,28 @@ export const ResumeStyleB: React.FC = () =>{
                     }}>
                     <AvatarSection/>
                     <ContactInfoSection
-                        resumeDataOpenAI={resumeDataOpenAI}
+                        resumeData={resumeData}
                     />
                     <SkillsSection
-                        resumeDataOpenAI={resumeDataOpenAI}/>
+                        resumeData={resumeData}/>
                     <LanguageSection
-                        resumeDataOpenAI={resumeDataOpenAI}/>
+                        resumeData={resumeData}/>
                 </CustomCol>
                 <CustomCol className={"right-col"} isLeft={false}
                     style={{
                         // ...DESIGN_BORDER
                     }}>
                     <HeaderSection
-                        resumeDataOpenAI={resumeDataOpenAI}/>
+                        resumeData={resumeData}/>
                     <div className={"sub-right-col"}>
                         <SummarySection
-                            resumeDataOpenAI={resumeDataOpenAI}/>
+                            resumeData={resumeData}/>
                         <WorkExperienceSection
-                            resumeDataOpenAI={resumeDataOpenAI}/>
+                            resumeData={resumeData}/>
                         <EducationSection
-                            resumeDataOpenAI={resumeDataOpenAI}/>
+                            resumeData={resumeData}/>
                         <ProjectsSection
-                            resumeDataOpenAI={resumeDataOpenAI}/>
+                            resumeData={resumeData}/>
                     </div>
                 </CustomCol>
             </Row>

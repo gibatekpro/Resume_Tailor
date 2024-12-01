@@ -42,7 +42,7 @@ const InstructionForm: React.FC<InstructionFormProps> = ({instructionFormFormik,
     };
 
     return (
-        <div className="mt-0 mt-md-5">
+        <div className="mt-0 mt-md-4">
             <div className="flex justify-center items-center">
                 <form onSubmit={instructionFormFormik.handleSubmit} className="w-full max-w-lg">
                     <div className="mb-4">

@@ -5,17 +5,17 @@ import {CustomCol} from "../../custom_tags/CustomCol";
 import {ResumeInfo} from "../../models/ResumeInfo";
 
 
-export const ProjectsSection: React.FC<{resumeDataOpenAI: ResumeInfo}> = ({resumeDataOpenAI}) => {
+export const ProjectsSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
 
     useEffect(()=>{
 
-    },[resumeDataOpenAI]);
+    },[resumeData]);
 
 
     return (
         <div>
             <h3>Projects</h3>
-            {resumeDataOpenAI.projects?.map((project, index) => (
+            {resumeData.projects?.map((project, index) => (
                 <div key={index}>
                     <Row className={"sub-row"} key={index}>
                         <Col className={"left-sub-col"} xs={6} sm={6} md={6} lg={6}>

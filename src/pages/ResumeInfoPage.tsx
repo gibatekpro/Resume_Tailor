@@ -14,7 +14,7 @@ import {useResumeProvider} from "../context/ResumeContext";
 import {LOCAL_STORAGE_APPLICATION_DATA, LOCAL_STORAGE_RESUME_DATA} from "../data/applicationData";
 import ROUTES from "../data/routes";
 import JobApplicationService from "../services/JobApplicationService";
-import {useAuth} from "../services/auth/AuthProvider";
+import {useAuth} from "../context/auth/AuthProvider";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import {ResumeInfo} from "../models/ResumeInfo";
 import {CustomAccordion} from "../custom_tags/CustomAccordion";
@@ -148,7 +148,7 @@ export const ResumeInfoPage: React.FC = () => {
 
     return (
 
-        <div className="bg-gray-100 py-4 my-5">
+        <div className="bg-gray-100 py-4">
 
             {isLoading && (
                 <div style={overlayStyle}>

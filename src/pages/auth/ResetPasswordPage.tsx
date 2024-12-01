@@ -6,7 +6,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
-import {useAuth} from "../../services/auth/AuthProvider";
+import {useAuth} from "../../context/auth/AuthProvider";
 import {appName} from "../../data/applicationData";
 
 export const ResetPasswordPage: React.FC = () => {

@@ -43,13 +43,11 @@ export const HomePage: React.FC = () => {
                     </div>
                     <div className="text-center">
                         <h1 className="text-balance text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-                            Data to enrich your online business
+                            Tailor your CV to the job requirements
                         </h1>
                         <p className="mt-6 text-lg leading-8 text-gray-600">
-                            Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo.
-                            Elit
-                            sunt amet
-                            fugiat veniam occaecat fugiat aliqua.
+                            A great tool to help you tailor your cv to a job requirement,
+                            while keeping your skills and experience unchanged.
                         </p>
                         <div className="mt-10 flex items-center justify-center gap-x-6">
                             <a
@@ -59,7 +57,7 @@ export const HomePage: React.FC = () => {
                                 Get started
                             </a>
                             <a onClick={handleNavigateToInput} className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
-                                Learn more <span aria-hidden="true">→</span>
+                                Generate CV <span aria-hidden="true">→</span>
                             </a>
                         </div>
                     </div>

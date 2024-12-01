@@ -3,7 +3,7 @@ import {Bars3Icon, XMarkIcon} from "@heroicons/react/24/outline";
 import {Dialog, DialogPanel} from "@headlessui/react";
 import {useNavigate} from "react-router-dom";
 import ROUTES from "../data/routes";
-import {useAuth} from "../services/auth/AuthProvider";
+import {useAuth} from "../context/auth/AuthProvider";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
 
 
@@ -11,7 +11,7 @@ import {getAuth, onAuthStateChanged} from "firebase/auth";
 export const Navbar:React.FC<{ hide?: boolean }> = ({hide}) => {
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-    let [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(true);
     const [loggedIn, setLogedIn] = useState<boolean>(false)
     let auth = useAuth();
 
@@ -50,23 +50,27 @@ export const Navbar:React.FC<{ hide?: boolean }> = ({hide}) => {
         auth?.logout();
 
     }
+
+    const handleNavigate = (path: string, ) => {
+        navigate(path);
+    }
     
     const navigation = [
-        {name: 'Product', href: '#'},
-        {name: 'Features', href: '#'},
-        {name: 'Marketplace', href: '#'},
-        {name: 'Company', href: '#'},
+        {name: 'My Job Applications', href: '#', onClick: () => handleNavigate(ROUTES.MY_JOB_APPLICATIONS)},
+        {name: 'Generate CV', href: '#', onClick: () => handleNavigate(ROUTES.RESUME_INPUT_PAGE)},
+        // {name: 'Marketplace'},
+        // {name: 'Company'},
     ]
     if (hide) return null;
 
     return (
-        <header className="absolute inset-x-0 top-0 z-50 bg-gray-300">
+        <header className="inset-x-0 top-0 z-50 bg-gray-300">
             {/*flex: Applies Flexbox to the <nav> container, allowing child elements to be positioned in a flexible layout (in this case, horizontally by default).
                    items-center: Aligns all child items (flex items) along the center of the cross-axis, which is vertically centered in a horizontal Flexbox.
                    justify-between: Distributes space between the child items so they are spaced out, with the first item aligned to the start and the last item aligned to the end of the container.
                    p-6: Applies padding of 1.5rem (24px) on all sides of the <nav> element, adding space inside the container.
                    lg:px-8: Adds horizontal padding (px) of 2rem (32px) on large screens and above (lg breakpoint), giving extra padding on the left and right sides when the screen is larger.*/}
-            <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
+            <nav aria-label="Global" className="flex items-center justify-between p-6">
                 {/*flex: Applies Flexbox to the <div>, making it a flex container. This allows any child elements inside this <div> to be laid out in a flexible, responsive manner (by default in a row).
                        lg:flex-1: This is a responsive utility that only applies at the lg (large) breakpoint and above. It sets flex: 1 1 0%, which makes the <div>:
                             Grow to fill any available space (flex-grow: 1).
@@ -77,6 +81,7 @@ export const Navbar:React.FC<{ hide?: boolean }> = ({hide}) => {
                         <span className="sr-only">Your Company</span>
                         <img
                             alt=""
+                            onClick={() => navigate(ROUTES.HOME)}
                             src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
                             className="h-8 w-auto"
                         />
@@ -94,7 +99,7 @@ export const Navbar:React.FC<{ hide?: boolean }> = ({hide}) => {
                 </div>
                 <div className="hidden lg:flex lg:gap-x-12">
                     {navigation.map((item) => (
-                        <a key={item.name} href={item.href}
+                        <a key={item.name} onClick={item.onClick}
                            className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
                             {item.name}
                         </a>
@@ -155,8 +160,8 @@ export const Navbar:React.FC<{ hide?: boolean }> = ({hide}) => {
                                 {navigation.map((item) => (
                                     <a
                                         key={item.name}
-                                        href={item.href}
-                                        className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                                        onClick={item.onClick}
+                                        className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 cursor-pointer"
                                     >
                                         {item.name}
                                     </a>

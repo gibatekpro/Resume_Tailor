@@ -5,17 +5,24 @@ import {useNavigate} from "react-router-dom";
 import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
 import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
 import JobApplicationService from "../services/JobApplicationService";
-import {APP_TITLE, LOCAL_STORAGE_APP_TITLE, LOCAL_STORAGE_APPLICATION_DATA} from "../data/applicationData";
+import {
+    APP_TITLE,
+    LOCAL_STORAGE_APP_TITLE,
+    LOCAL_STORAGE_APPLICATION_DATA,
+    LOCAL_STORAGE_RESUME_DATA
+} from "../data/applicationData";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import ROUTES from "../data/routes";
+import {DefaultResumeData} from "../data/defaultResumeData";
 
-export const ResumePreviewPage: React.FC<{ setHideNavbar: (hide: boolean) => void, setAppTitle:React.Dispatch<React.SetStateAction<string>> }> = ({ setHideNavbar, setAppTitle }) => {
+export const JobApplicationPreviewPage: React.FC<{ setHideNavbar: (hide: boolean) => void, setAppTitle:React.Dispatch<React.SetStateAction<string>> }> = ({ setHideNavbar, setAppTitle }) => {
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
     const [isLoading, setIsLoading] = useState(false);
     const [applicationData, setApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(LOCAL_STORAGE_APPLICATION_DATA) || "{}"));
     const [theAppTitle, setTheAppTitle] = useState<string>(JSON.parse(localStorage.getItem(LOCAL_STORAGE_APPLICATION_DATA) || "{}").openAIDocumentTitle);
     const navigate = useNavigate();
-
+    const saved = localStorage.getItem(LOCAL_STORAGE_RESUME_DATA);
+    const resumeDataOpenAI = saved ? JSON.parse(saved) : DefaultResumeData;
 
     const saveAndPrint = async () =>{
         try {
@@ -41,7 +48,7 @@ export const ResumePreviewPage: React.FC<{ setHideNavbar: (hide: boolean) => voi
             <div className="row g-1 p-2 p-md-0 my-32">
                 <div className="col-md-6">
                     {/*<ResumeStyleA/>*/}
-                    <ResumeStyleB/>
+                    <ResumeStyleB resumeData={resumeDataOpenAI}/>
                 </div>
                 <div className="col-md-6 mt-10 mt-md-0">
                     <div

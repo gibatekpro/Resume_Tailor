@@ -41,6 +41,7 @@ export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void,
 
         return () => {
             setHideNavbar(false);
+            localStorage.setItem(LOCAL_STORAGE_APP_TITLE, APP_TITLE);
             setAppTitle(APP_TITLE);
         };
     }, [setHideNavbar, applicationData]);
@@ -49,7 +50,7 @@ export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void,
         <div className={"print-page-container"}>
             <div ref={contentRef} className="pdf-container">
                 {/*<ResumeStyleA/>*/}
-                <ResumeStyleB/>
+                <ResumeStyleB resumeData={applicationData.resumeInfo || {}}/>
             </div>
         </div>
     );

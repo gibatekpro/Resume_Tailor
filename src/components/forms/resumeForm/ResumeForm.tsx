@@ -79,9 +79,8 @@ const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButto
     }
 
     return (
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center sm:px-2">
             <form onSubmit={resumeFormFormik.handleSubmit}>
-
                 {resumeFormFormik.values.profile &&
                     <SectionHeader
                         title={"About"}

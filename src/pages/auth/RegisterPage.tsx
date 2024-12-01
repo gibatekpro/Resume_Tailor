@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 import {Link, Navigate, useLocation, useNavigate} from "react-router-dom";
 import {Col} from "react-bootstrap";
 import {bool} from "yup";
-import {useAuth} from "../../services/auth/AuthProvider";
+import {useAuth} from "../../context/auth/AuthProvider";
 import {appName} from "../../data/applicationData";
 
 

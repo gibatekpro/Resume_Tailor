@@ -3,15 +3,15 @@ import '../../styles/resumeStyleB.css';
 import {useResumeProvider} from "../../context/ResumeContext";
 import {ResumeInfo} from "../../models/ResumeInfo";
 
-export const HeaderSection: React.FC<{resumeDataOpenAI: ResumeInfo}> = ({resumeDataOpenAI}) => {
+export const HeaderSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
 
     useEffect(() => {
-    }, [resumeDataOpenAI]);
+    }, [resumeData]);
 
     return (
         <header className={"header-container"}>
-            <h1>{resumeDataOpenAI.profile?.firstName} {resumeDataOpenAI.profile?.lastName}</h1>
-            <h2>{resumeDataOpenAI.profile?.profession}</h2>
+            <h1>{resumeData.profile?.firstName} {resumeData.profile?.lastName}</h1>
+            <h2>{resumeData.profile?.profession}</h2>
         </header>
     );
 };

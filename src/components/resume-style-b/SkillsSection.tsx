@@ -4,17 +4,17 @@ import {useResumeProvider} from "../../context/ResumeContext";
 import {CustomCol} from "../../custom_tags/CustomCol";
 import {ResumeInfo} from "../../models/ResumeInfo";
 
-export const SkillsSection: React.FC<{resumeDataOpenAI: ResumeInfo}> = ({resumeDataOpenAI}) => {
+export const SkillsSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
     useEffect(()=>{
 
-    },[resumeDataOpenAI]);
+    },[resumeData]);
 
     return (
         <div>
             <h2>
                 Skills
             </h2>
-            {resumeDataOpenAI?.skills?.map((skill, index) => (
+            {resumeData?.skills?.map((skill, index) => (
                 <p key={index}>{skill}</p>
 
             ))}

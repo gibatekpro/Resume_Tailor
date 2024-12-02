@@ -51,10 +51,6 @@ export const resumeData: ResumeInfo = {
         {
             name: "English",
             proficiency: "Fluent"
-        },
-        {
-            name: "French",
-            proficiency: "Intermediate"
         }
     ],
     //Note to OpenAI: Company name should remain the same, but Job titles and roles should be based on job description

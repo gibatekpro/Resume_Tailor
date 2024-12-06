@@ -26,6 +26,7 @@ import {fontSize} from "html2canvas/dist/types/css/property-descriptors/font-siz
 export const CreateCV: React.FC = () => {
     const [createNewHover, setCreateNewHover] = useState(false);
     const [isBeingEdited, setIsBeingEdited] = useState<SavedResumesResponse>();
+    const [resumeToDelete, setResumeToDelete] = useState<SavedResumesResponse>();
     const [isBeingEditedIndex, setIsBeingEditedIndex] = useState<number>(-1);
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
     const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +38,7 @@ export const CreateCV: React.FC = () => {
     const [resumePreviewClassName, setResumePreviewClassName] = useState("col-md-8 px-2");
     const [isResumesPanelOpen, setIsResumesPanelOpen] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [resumeList, setResumeList] = useState<SavedResumesResponse[]>([])
     const [activeTab, setActiveTab] = useState("link-1");
     const [selectedApplication, setSelectedApplication] = useState<JobApplicationInfo>();
@@ -161,12 +163,12 @@ export const CreateCV: React.FC = () => {
             setIsSaveComplete(false);
             setIsSaveFailed(false);
             try {
-                if (isBeingEdited?.id){
+                if (isBeingEdited?.id) {
                     console.log("Is being edited " + isBeingEdited?.id + isBeingEdited?.data);
                     await JobApplicationService.editResume(
                         user ?? "", isBeingEdited?.id || "", isBeingEdited!.data
                     )
-                }else {
+                } else {
                     console.log("Is New CV");
                     const theResumeData: ResumeInfo = customResumeFormFormik.values;
                     theResumeData.resumeName = values.resumeName;
@@ -175,7 +177,7 @@ export const CreateCV: React.FC = () => {
                     );
                 }
 
-               setIsSaveLoading(false);
+                setIsSaveLoading(false);
                 setIsSaveComplete(true);
                 setIsSaveFailed(false);
 
@@ -208,8 +210,45 @@ export const CreateCV: React.FC = () => {
     };
 
     const handleDeleteResume = (resume: SavedResumesResponse) => {
-        openDialog()
+        setResumeToDelete(resume)
+        openDeleteDialog()
     }
+
+    const openDeleteDialog = () => {
+        setIsDeleteDialogOpen(true);
+    }
+
+    const deleteResume = async () => {
+        try {
+            await JobApplicationService.deleteResume(user ?? "", resumeToDelete?.id || "")
+            const fetchResumes = async () => {
+                setIsLoading(true);
+                try {
+                    const savedResumes: SavedResumesResponse[] = await JobApplicationService.getAllSavedResumes();
+
+                    setResumeList(savedResumes);
+
+                    setIsLoading(false);
+                } catch (error) {
+                    console.error("Error fetching job applications:", error);
+                    setIsLoading(false);
+                }
+            };
+
+            fetchResumes();
+
+        } catch (error) {
+            console.log(error)
+        }
+        setIsDeleteDialogOpen(false)
+    }
+
+
+    const closeDeleteDialog = () => {
+        setIsDeleteDialogOpen(false);
+    }
+
+
     const handleSave = () => {
         openDialog()
     }
@@ -282,97 +321,129 @@ export const CreateCV: React.FC = () => {
             )}
             {!isLoading && (
                 <div className="row g-1 p-2 p-md-0">
-                        <Dialog open={isDialogOpen} as="div" className="relative z-10 focus:outline-none" onClose={closeDialog}>
-                            <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                                <div className="flex min-h-full items-center justify-center p-4">
-                                    {!isSaveComplete && !isSaveFailed && (
-                                        <DialogPanel
-                                            transition
-                                            className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
-                                        >
-                                            <DialogTitle as="h3" className="text-black font-medium mb-4">
-                                                <div className={"flex justify-between items-center"}>
-                                                    Save resume
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                         fill="currentColor" className="bi bi-x-lg" viewBox="0 0 16 16" onClick={closeDialog} cursor={"pointer"}>
-                                                        <path
-                                                            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-                                                    </svg>
-                                                </div>
-                                            </DialogTitle>
-
-                                            <form onSubmit={resumeNameFormFormik.handleSubmit}>
-                                                <div className={"mb-4"}>
-                                                    <input
-                                                        id="resumeName"
-                                                        name="resumeName"
-                                                        type="text"
-                                                        placeholder="Resume Name"
-                                                        className={inputFieldClassName}
-                                                        onChange={resumeNameFormFormik.handleChange}
-                                                        value={resumeNameFormFormik?.values?.resumeName}
-                                                    />
-                                                    {resumeNameFormFormik.touched.resumeName && resumeNameFormFormik.errors.resumeName && (
-                                                        <span
-                                                            className="sm:text-sm text-red-600">Input a name for the resume</span>
-                                                    )}
-
-                                                    <span></span>
-                                                </div>
-                                                <Button
-                                                    type="submit"
-                                                    className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
-                                                    disabled={isSaveLoading}
-                                                >
-                                                    {isSaveLoading ? (
-                                                        <>
-                                                            <Spinner
-                                                                as="span"
-                                                                animation="border"
-                                                                size="sm"
-                                                                role="status"
-                                                                aria-hidden="true"
-                                                                className="me-2"
-                                                            />
-                                                            Saving...
-                                                        </>
-                                                    ) : (
-                                                        "Save"
-                                                    )}
-                                                </Button>
-                                            </form>
-                                            {/*<div className="mt-4">*/}
-                                            {/*    <Button*/}
-                                            {/*        className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"*/}
-                                            {/*        onClick={closeDialog}*/}
-                                            {/*    >*/}
-                                            {/*        Got it, thanks!*/}
-                                            {/*    </Button>*/}
-                                            {/*</div>*/}
-                                        </DialogPanel>
-                                    )}
-                                    {isSaveComplete && (
-                                        <DialogPanel
-                                            transition
-                                            className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
-                                        >
-                                            <DialogTitle as="h3" className="text-black font-medium mb-4">
-                                                Successful
-                                            </DialogTitle>
-                                            <text>The resume has been saved successfully</text>
-                                            <div className="mt-4">
-                                                <Button
-                                                    className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
-                                                    onClick={closeDialog}
-                                                >
-                                                    Close
-                                                </Button>
+                    <Dialog open={isDialogOpen} as="div" className="relative z-10 focus:outline-none"
+                            onClose={closeDialog}>
+                        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                            <div className="flex min-h-full items-center justify-center p-4">
+                                {!isSaveComplete && !isSaveFailed && (
+                                    <DialogPanel
+                                        transition
+                                        className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                                    >
+                                        <DialogTitle as="h3" className="text-black font-medium mb-4">
+                                            <div className={"flex justify-between items-center"}>
+                                                Save resume
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                     fill="currentColor" className="bi bi-x-lg" viewBox="0 0 16 16"
+                                                     onClick={closeDialog} cursor={"pointer"}>
+                                                    <path
+                                                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                                </svg>
                                             </div>
-                                        </DialogPanel>
-                                    )}
-                                </div>
+                                        </DialogTitle>
+
+                                        <form onSubmit={resumeNameFormFormik.handleSubmit}>
+                                            <div className={"mb-4"}>
+                                                <input
+                                                    id="resumeName"
+                                                    name="resumeName"
+                                                    type="text"
+                                                    placeholder="Resume Name"
+                                                    className={inputFieldClassName}
+                                                    onChange={resumeNameFormFormik.handleChange}
+                                                    value={resumeNameFormFormik?.values?.resumeName}
+                                                />
+                                                {resumeNameFormFormik.touched.resumeName && resumeNameFormFormik.errors.resumeName && (
+                                                    <span
+                                                        className="sm:text-sm text-red-600">Input a name for the resume</span>
+                                                )}
+
+                                                <span></span>
+                                            </div>
+                                            <Button
+                                                type="submit"
+                                                className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                                disabled={isSaveLoading}
+                                            >
+                                                {isSaveLoading ? (
+                                                    <>
+                                                        <Spinner
+                                                            as="span"
+                                                            animation="border"
+                                                            size="sm"
+                                                            role="status"
+                                                            aria-hidden="true"
+                                                            className="me-2"
+                                                        />
+                                                        Saving...
+                                                    </>
+                                                ) : (
+                                                    "Save"
+                                                )}
+                                            </Button>
+                                        </form>
+                                        {/*<div className="mt-4">*/}
+                                        {/*    <Button*/}
+                                        {/*        className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"*/}
+                                        {/*        onClick={closeDialog}*/}
+                                        {/*    >*/}
+                                        {/*        Got it, thanks!*/}
+                                        {/*    </Button>*/}
+                                        {/*</div>*/}
+                                    </DialogPanel>
+                                )}
+                                {isSaveComplete && (
+                                    <DialogPanel
+                                        transition
+                                        className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                                    >
+                                        <DialogTitle as="h3" className="text-black font-medium mb-4">
+                                            Successful
+                                        </DialogTitle>
+                                        <text>The resume has been saved successfully</text>
+                                        <div className="mt-4">
+                                            <Button
+                                                className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                                onClick={closeDialog}
+                                            >
+                                                Close
+                                            </Button>
+                                        </div>
+                                    </DialogPanel>
+                                )}
                             </div>
-                        </Dialog>
+                        </div>
+                    </Dialog>
+                    <Dialog open={isDeleteDialogOpen} as="div" className="relative z-10 focus:outline-none"
+                            onClose={closeDeleteDialog}>
+                        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                            <div className="flex min-h-full items-center justify-center p-4">
+                                <DialogPanel
+                                    transition
+                                    className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                                >
+                                    <div className={"flex justify-between items-center mb-4"}>
+                                        {`Delete CV: ${resumeToDelete?.data.resumeName}`}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             fill="currentColor" className="bi bi-x-lg" viewBox="0 0 16 16"
+                                             onClick={closeDeleteDialog} cursor={"pointer"}>
+                                            <path
+                                                d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                        </svg>
+                                    </div>
+                                    <text>Are you sure you want to delete this cv</text>
+                                    <div className="mt-4">
+                                        <Button
+                                            className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                            onClick={deleteResume}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </div>
+                                </DialogPanel>
+                            </div>
+                        </div>
+                    </Dialog>
                     {isResumesPanelOpen && (
                         <div
                             className="col-md-2 pb-4"
@@ -434,16 +505,16 @@ export const CreateCV: React.FC = () => {
                                                 }}
                                                 onMouseEnter={() => setCreateNewHover(true)}
                                                 onMouseLeave={() => setCreateNewHover(false)}
-                                                onClick={() =>{
+                                                onClick={() => {
                                                     handleCreateNewCV();
                                                     setIsBeingEditedIndex(-1)
                                                 }}
                                             >
-                                                +  <span className={"ml-4"}>Create New CV</span>
+                                                + <span className={"ml-4"}>Create New CV</span>
                                             </div>
 
                                             {resumeList.map((resume, index) => (
-                                                <div
+                                                <Row
                                                     key={resume.id}
                                                     style={{
                                                         display: "flex", // Enable flexbox
@@ -454,25 +525,30 @@ export const CreateCV: React.FC = () => {
                                                         borderBottom: "1px solid #ddd",
                                                         backgroundColor: index === isBeingEditedIndex ? "#F3F4F6" : "transparent",
                                                     }}
-                                                    onClick={() => {
-                                                        handleResumeClick(resume);
-                                                        setIsBeingEditedIndex(index); // Set the clicked index as the active index
-                                                    }}
-                                                    className={"hover:bg-gray-100"}
+                                                    className={"hover:bg-gray-100 mx-1"}
                                                 >
-                                                    <span>{resume.data.resumeName || "Untitled Resume"}</span>
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        width="16"
-                                                        height="16"
-                                                        fill="currentColor"
-                                                        className="bi bi-trash3"
-                                                        viewBox="0 0 16 16"
-                                                        onClick={() => handleDeleteResume(resume)}
-                                                    >
-                                                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
-                                                    </svg>
-                                                </div>
+
+                                                    <Col lg={10} onClick={() => {
+                                                        handleResumeClick(resume);
+                                                        setIsBeingEditedIndex(index);
+                                                    }}>
+                                                        {resume.data.resumeName || "Untitled Resume"}
+                                                    </Col>
+                                                    <Col lg={2}>
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="16"
+                                                            height="16"
+                                                            fill="currentColor"
+                                                            className="bi bi-trash3"
+                                                            viewBox="0 0 16 16"
+                                                            onClick={() => handleDeleteResume(resume)}
+                                                        >
+                                                            <path
+                                                                d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                                                        </svg>
+                                                    </Col>
+                                                </Row>
                                             ))}
 
                                         </>
@@ -492,7 +568,7 @@ export const CreateCV: React.FC = () => {
                         <div
                             style={{}}
                         >
-                        <Row style={{
+                            <Row style={{
                                 ...styles.leftColumn.titleRow,
                                 ...styles.borderTopStyle,
                                 ...styles.borderBottomStyle
@@ -624,7 +700,7 @@ export const CreateCV: React.FC = () => {
                                         }}
                                     >
                                         <ResumeStyleB resumeData={customResumeFormFormik.values}/>
-                                    </div >
+                                    </div>
                                 </div>
                             )}
                         </div>

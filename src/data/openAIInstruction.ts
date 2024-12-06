@@ -22,7 +22,7 @@ export const openAIInstruction: OpenAIInstruction = {
     responseFormat: "JSON",
     rules: [
         "Document title should be resumeInfo.firstName-resumeInfo-lastname-*company name",
-        "Add only company name, not description. e.g anthony-gibah-google-inc",
+        "Add only company name, not description. e.g john-doe-google-inc",
         "Do not alter profile",
         "Skills should not be too long. always include Java, C# and MySQL",
         "Company name should remain the same, but Job titles and roles should be based on job description",

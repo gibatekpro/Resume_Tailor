@@ -9,33 +9,34 @@ import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import {useNavigate} from "react-router-dom";
 import ROUTES from "../data/routes";
 import {LOCAL_STORAGE_APPLICATION_DATA} from "../data/applicationData";
+import {JobApplicationsResponse} from "../models/JobApplicationsResponse";
 
 export const MyJobApplications: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [today, setToday] = useState<JobApplicationInfo[]>([]);
-    const [thisWeek, setThisWeek] = useState<JobApplicationInfo[]>([]);
-    const [thisMonth, setThisMonth] = useState<JobApplicationInfo[]>([]);
-    const [thisYear, setThisYear] = useState<JobApplicationInfo[]>([]);
-    const [older, setOlder] = useState<JobApplicationInfo[]>([]);
-    const [selectedApplication, setSelectedApplication] = useState<JobApplicationInfo>();
+    const [today, setToday] = useState<JobApplicationsResponse[]>([]);
+    const [thisWeek, setThisWeek] = useState<JobApplicationsResponse[]>([]);
+    const [thisMonth, setThisMonth] = useState<JobApplicationsResponse[]>([]);
+    const [thisYear, setThisYear] = useState<JobApplicationsResponse[]>([]);
+    const [older, setOlder] = useState<JobApplicationsResponse[]>([]);
+    const [selectedApplication, setSelectedApplication] = useState<JobApplicationsResponse>();
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchApplications = async () => {
             setIsLoading(true);
             try {
-                const applications = await JobApplicationService.getAllJobApplications();
+                const applications: JobApplicationsResponse[] = await JobApplicationService.getAllJobApplications();
 
                 // Initialize empty arrays to hold the job applications for each category
-                const todayArr: JobApplicationInfo[] = [];
-                const thisWeekArr: JobApplicationInfo[] = [];
-                const thisMonthArr: JobApplicationInfo[] = [];
-                const thisYearArr: JobApplicationInfo[] = [];
-                const olderArr: JobApplicationInfo[] = [];
+                const todayArr: JobApplicationsResponse[] = [];
+                const thisWeekArr: JobApplicationsResponse[] = [];
+                const thisMonthArr: JobApplicationsResponse[] = [];
+                const thisYearArr: JobApplicationsResponse[] = [];
+                const olderArr: JobApplicationsResponse[] = [];
 
                 // Loop through the applications and categorize them
-                applications.forEach(({data}) => {
-                    const date = moment(data.date); // Convert the string to a moment object
+                applications.forEach((data) => {
+                    const date = moment(data.data.date);
 
                     // Check if the application is from today
                     const today = moment().startOf("day");
@@ -229,49 +230,104 @@ export const MyJobApplications: React.FC = () => {
 
                         <CustomAccordionStyleB title="Today">
                             {today.map((item, index) => (
-                                <div key={index} onClick={() => setSelectedApplication(item)}
-                                     style={{padding: 5, borderBottom: "1px solid lightgray", fontSize: 14}}>
-                                    {`${item.openAIJobTitle} - ${item.openAIJobCompanyName}`}
+                                <div
+                                    key={index}
+                                    onClick={() => setSelectedApplication(item)}
+                                    style={{
+                                        padding: 5,
+                                        borderBottom: "1px solid lightgray",
+                                        fontSize: 14,
+                                        backgroundColor: selectedApplication === item ? "gray" : "transparent", // Set background based on selection
+                                        color: selectedApplication === item ? "white" : "black", // Optional: change text color for better contrast
+                                        cursor: "pointer", // Optional: make it clear that items are clickable
+                                    }}
+                                >
+                                    {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}
                                 </div>
                             ))}
                         </CustomAccordionStyleB>
 
+
                         <CustomAccordionStyleB title="Last 7 Days">
                             {thisWeek.map((item, index) => (
-                                <div key={index} onClick={() => setSelectedApplication(item)}
-                                     style={{padding: 5, borderBottom: "1px solid lightgray", fontSize: 14}}>
-                                    {`${item.openAIJobTitle} - ${item.openAIJobCompanyName}`}
+                                <div
+                                    key={index}
+                                    onClick={() => setSelectedApplication(item)}
+                                    style={{
+                                        padding: 5,
+                                        borderBottom: "1px solid lightgray",
+                                        fontSize: 14,
+                                        backgroundColor: selectedApplication === item ? "gray" : "transparent", // Highlight selected item
+                                        color: selectedApplication === item ? "white" : "black", // Optional: change text color for readability
+                                        cursor: "pointer", // Optional: make items more interactive
+                                    }}
+                                >
+                                    {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}
                                 </div>
                             ))}
                         </CustomAccordionStyleB>
+
 
 
                         <CustomAccordionStyleB title="This Month">
                             {thisMonth.map((item, index) => (
-                                <div key={index} onClick={() => setSelectedApplication(item)}
-                                     style={{padding: 5, borderBottom: "1px solid lightgray", fontSize: 14}}>
-                                    {`${item.openAIJobTitle} - ${item.openAIJobCompanyName}`}
+                                <div
+                                    key={index}
+                                    onClick={() => setSelectedApplication(item)}
+                                    style={{
+                                        padding: 5,
+                                        borderBottom: "1px solid lightgray",
+                                        fontSize: 14,
+                                        backgroundColor: selectedApplication === item ? "gray" : "transparent", // Highlight selected item
+                                        color: selectedApplication === item ? "white" : "black", // Optional: improve readability
+                                        cursor: "pointer", // Optional: show interactivity
+                                    }}
+                                >
+                                    {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}
                                 </div>
                             ))}
                         </CustomAccordionStyleB>
+
 
                         <CustomAccordionStyleB title="This Year">
                             {thisYear.map((item, index) => (
-                                <div key={index} onClick={() => setSelectedApplication(item)}
-                                     style={{padding: 5, borderBottom: "1px solid lightgray", fontSize: 14}}>
-                                    {`${item.openAIJobTitle} - ${item.openAIJobCompanyName}`}
+                                <div
+                                    key={index}
+                                    onClick={() => setSelectedApplication(item)}
+                                    style={{
+                                        padding: 5,
+                                        borderBottom: "1px solid lightgray",
+                                        fontSize: 14,
+                                        backgroundColor: selectedApplication === item ? "gray" : "transparent", // Highlight selected item
+                                        color: selectedApplication === item ? "white" : "black", // Optional: text readability
+                                        cursor: "pointer", // Optional: make it interactive
+                                    }}
+                                >
+                                    {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}
                                 </div>
                             ))}
                         </CustomAccordionStyleB>
 
+
                         <CustomAccordionStyleB title="Older">
                             {older.map((item, index) => (
-                                <div key={index} onClick={() => setSelectedApplication(item)}
-                                     style={{padding: 5, borderBottom: "1px solid lightgray", fontSize: 14}}>
-                                    {`${item.openAIJobTitle} - ${item.openAIJobCompanyName}`}
+                                <div
+                                    key={index}
+                                    onClick={() => setSelectedApplication(item)}
+                                    style={{
+                                        padding: 5,
+                                        borderBottom: "1px solid lightgray",
+                                        fontSize: 14,
+                                        backgroundColor: selectedApplication === item ? "gray" : "transparent", // Highlight selected item
+                                        color: selectedApplication === item ? "white" : "black", // Optional: improve readability
+                                        cursor: "pointer", // Optional: show interactivity
+                                    }}
+                                >
+                                    {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}
                                 </div>
                             ))}
                         </CustomAccordionStyleB>
+
 
                     </div>
 
@@ -282,31 +338,31 @@ export const MyJobApplications: React.FC = () => {
                                 <div className="row align-items-baseline">
                                     <div className="col-12 col-sm">
                                         <div style={styles.jobInfo.header}>
-                                            {selectedApplication.openAIJobTitle} - {selectedApplication.openAIJobCompanyName}
+                                            {selectedApplication.data.openAIJobTitle} - {selectedApplication.data.openAIJobCompanyName}
                                         </div>
                                     </div>
 
                                     <div className="col-12 col-sm-auto text-sm-end">
                                         <div style={styles.jobInfo.normalText}>
                                             <strong>Application
-                                                Date:</strong> {moment(selectedApplication.date).format("MMMM Do YYYY, h:mm A")}
+                                                Date:</strong> {moment(selectedApplication.data.date).format("MMMM Do YYYY, h:mm A")}
                                         </div>
                                     </div>
                                 </div>
                                 <div style={styles.jobInfo.normalText}>
-                                    <strong>Location:</strong> {selectedApplication.openAIJobLocation}
+                                    <strong>Location:</strong> {selectedApplication.data.openAIJobLocation}
                                 </div>
                                 <div style={styles.jobInfo.normalText}>
-                                    <strong>Expected Salary:</strong> {selectedApplication.openAIExpectedSalary}
+                                    <strong>Expected Salary:</strong> {selectedApplication.data.openAIExpectedSalary}
                                 </div>
                                 <div style={styles.jobInfo.normalText}>
-                                    <strong>Summary:</strong> {selectedApplication.openAISimpleJobDescription}
+                                    <strong>Summary:</strong> {selectedApplication.data.openAISimpleJobDescription}
                                 </div>
                             </div>
                         ) : (
                             <div>Select a job application to view details.</div>
                         )}
-                        {selectedApplication?.resumeInfo && (
+                        {selectedApplication?.data.resumeInfo && (
                             <Button onClick={() => handleNavigate(ROUTES.RESUME_PRINT_PAGE)} className="mb-1 mt-5"
                                     style={{
                                         backgroundColor: '#ccc',
@@ -324,15 +380,15 @@ export const MyJobApplications: React.FC = () => {
                                 Download CV
                             </Button>
                         )}
-                        {selectedApplication?.resumeInfo && (
+                        {selectedApplication?.data.resumeInfo && (
                             <div className="p-2" style={{
                                 border: "1px solid #0f5a73",
                                 borderRadius: "5px",
-                                // display: "inline-block",
-                                // width: "fit-content",
-                                // height: "fit-content",
+                                display: "inline-block",
+                                width: "fit-content",
+                                height: "fit-content",
                             }}>
-                                <ResumeStyleB resumeData={selectedApplication?.resumeInfo}/>
+                                <ResumeStyleB resumeData={selectedApplication?.data.resumeInfo}/>
                             </div>
                         )}
                     </div>

@@ -57,7 +57,7 @@ export const HomePage: React.FC = () => {
                                 Get started
                             </a>
                             <a onClick={handleNavigateToInput} className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
-                                Generate CV <span aria-hidden="true">→</span>
+                                Tailor CV <span aria-hidden="true">→</span>
                             </a>
                         </div>
                     </div>

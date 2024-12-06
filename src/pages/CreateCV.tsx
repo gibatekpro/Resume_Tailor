@@ -663,9 +663,9 @@ export const CreateCV: React.FC = () => {
                                         style={{
                                             border: "1px solid #0f5a73",
                                             borderRadius: "5px",
-                                            display: "inline-block", // Adjust width and height to fit child content
-                                            width: "fit-content",   // Ensure width adjusts to child content
-                                            height: "fit-content",  // Ensure height adjusts to child content
+                                            display: "inline-block",
+                                            width: "fit-content",
+                                            height: "fit-content",
                                         }}
                                     >
                                         <ResumeStyleB resumeData={customResumeFormFormik.values}/>

@@ -19,9 +19,10 @@ import {ResetPasswordPage} from "./pages/auth/ResetPasswordPage";
 import {RequireAuth} from "./context/auth/RequireAuth";
 import {APP_TITLE, firebaseConfig, LOCAL_STORAGE_APP_TITLE} from "./data/applicationData";
 import {JobApplicationPreviewPage} from "./pages/JobApplicationPreviewPage";
-import {ResumeInfoPage} from "./pages/ResumeInfoPage";
+import {TailorResumePage} from "./pages/TailorResumePage";
 import {MyJobApplications} from "./pages/MyJobApplications";
 import {Row} from "react-bootstrap";
+import {CreateCV} from "./pages/CreateCV";
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -51,7 +52,7 @@ function App() {
                                 <Route path={ROUTES.RESUME_INPUT_PAGE}
                                        element={
                                            <RequireAuth>
-                                               <ResumeInfoPage/>
+                                               <TailorResumePage/>
                                            </RequireAuth>
                                        }>
                                 </Route>
@@ -68,6 +69,13 @@ function App() {
                                            <RequireAuth>
                                                <ResumePrintPage setHideNavbar={setHideNavbar}
                                                                 setAppTitle={setAppTitle}/>
+                                           </RequireAuth>
+                                       }>
+                                </Route>
+                                <Route path={ROUTES.NEW_CV_PAGE}
+                                       element={
+                                           <RequireAuth>
+                                               <CreateCV/>
                                            </RequireAuth>
                                        }>
                                 </Route>

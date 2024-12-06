@@ -21,7 +21,7 @@ import {CustomAccordion} from "../custom_tags/CustomAccordion";
 import {openAIInstruction} from "../data/openAIInstruction";
 import moment from "moment";
 
-export const ResumeInfoPage: React.FC = () => {
+export const TailorResumePage: React.FC = () => {
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
     const [jobApplicationInfo, setJobApplicationInfo] = useState<JobApplicationInfo>();
     const {resumeData, setResumeData} = useResumeProvider();
@@ -185,6 +185,7 @@ export const ResumeInfoPage: React.FC = () => {
                         <CustomAccordion isOpen={isGeneratedFormOpen} setIsOpen={setIsGeneratedFormOpen}
                                          children={<ResumeForm
                                              hasSubmitButton={true}
+                                             buttonTitle={"Preview Application"}
                                              resumeFormFormik={generatedResumeFormFormik}
                                          />}
                         />

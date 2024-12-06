@@ -23,28 +23,34 @@ import {ResumeInfo} from "../../models/ResumeInfo";
 
 export const ResumeStyleB: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =>{
 
-    // const [hasProjects, setHasProjects] = useState(false);
-    // const [hasSkills, setHasSkills] = useState(false);
-    // const [hasWorkExperience, setHasWorkExperience] = useState(false);
-    // const [hasEducation, setHasEducation] = useState(false);
-    //
-    // useEffect(() => {
-    //     // Update state for sections visibility
-    //
-    //     setHasProjects(!!resumeDataOpenAI.projects && resumeDataOpenAI.projects.length > 0);
-    //     setHasSkills(!!resumeDataOpenAI.skills && resumeDataOpenAI.skills.length > 0);
-    //     setHasWorkExperience(!!resumeDataOpenAI.workExperience && resumeDataOpenAI.workExperience.length > 0);
-    //     setHasEducation(!!resumeDataOpenAI.education && resumeDataOpenAI.education.length > 0);
-    // }, []);
+    const [hasProjects, setHasProjects] = useState(!!resumeData.projects && resumeData.projects.length > 0);
+    const [hasLanguage, setHasLanguage] = useState(!!resumeData.languages && resumeData.languages.length > 0);
+    const [hasSummary, setHasSummary] = useState(!!resumeData.profile?.summary);
+    const [hasSkills, setHasSkills] = useState(!!resumeData.skills && resumeData.skills.length > 0);
+    const [hasWorkExperience, setHasWorkExperience] = useState(!!resumeData.workExperience && resumeData.workExperience.length > 0);
+    const [hasEducation, setHasEducation] = useState(!!resumeData.education && resumeData.education.length > 0);
+    const [hasContactInfo, setHasContactInfo] = useState(!!resumeData.contactInfo && resumeData.contactInfo.length > 0);
+
+    useEffect(() => {
+        // Update state for sections visibility
+
+        setHasProjects(!!resumeData.projects && resumeData.projects.length > 0);
+        setHasLanguage(!!resumeData.languages && resumeData.languages.length > 0);
+        setHasSkills(!!resumeData.skills && resumeData.skills.length > 0);
+        setHasWorkExperience(!!resumeData.workExperience && resumeData.workExperience.length > 0);
+        setHasEducation(!!resumeData.education && resumeData.education.length > 0);
+        setHasContactInfo(!!resumeData.contactInfo && resumeData.contactInfo.length > 0);
+    }, [resumeData]);
 
     return(
         <div className={"style-b-main-container"} style={{
-            ...DESIGN_BORDER,
+            // ...DESIGN_BORDER,
             borderColor: "#015a84"
         }}>
             <Row className={"main-row"} style={{
+                border: '1px solid #015a84',
                 paddingLeft: "0",
-                margin:"0"
+                margin:"0",
             }}>
                 <CustomCol className={"left-col"} isLeft={true}
                     style={{
@@ -52,13 +58,19 @@ export const ResumeStyleB: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =
                         // backgroundColor: "#015a84"
                     }}>
                     <AvatarSection/>
-                    <ContactInfoSection
-                        resumeData={resumeData}
-                    />
-                    <SkillsSection
-                        resumeData={resumeData}/>
-                    <LanguageSection
-                        resumeData={resumeData}/>
+                    {hasContactInfo && (
+                        <ContactInfoSection
+                            resumeData={resumeData}
+                        />
+                    )}
+                    {hasSkills && (
+                        <SkillsSection
+                            resumeData={resumeData}/>
+                    )}
+                    {hasLanguage && (
+                        <LanguageSection
+                            resumeData={resumeData}/>
+                    )}
                 </CustomCol>
                 <CustomCol className={"right-col"} isLeft={false}
                     style={{
@@ -69,12 +81,18 @@ export const ResumeStyleB: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =
                     <div className={"sub-right-col"}>
                         <SummarySection
                             resumeData={resumeData}/>
-                        <WorkExperienceSection
-                            resumeData={resumeData}/>
-                        <EducationSection
-                            resumeData={resumeData}/>
-                        <ProjectsSection
-                            resumeData={resumeData}/>
+                        {hasWorkExperience && (
+                            <WorkExperienceSection
+                                resumeData={resumeData}/>
+                        )}
+                        {hasEducation && (
+                            <EducationSection
+                                resumeData={resumeData}/>
+                        )}
+                        {hasProjects && (
+                            <ProjectsSection
+                                resumeData={resumeData}/>
+                        )}
                     </div>
                 </CustomCol>
             </Row>

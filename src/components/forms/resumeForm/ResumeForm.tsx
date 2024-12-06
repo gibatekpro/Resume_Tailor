@@ -15,9 +15,10 @@ import {Button, Spinner} from "react-bootstrap";
 interface ResumeFormProps {
     resumeFormFormik: any;
     hasSubmitButton?: boolean;
+    buttonTitle?: string;
 }
 
-const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButton = false}) => {
+const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButton = false, buttonTitle}) => {
     const isLoading = false;
     const inputFieldClassName =
         "mt-1 block w-full px-3 py-2 focus:outline-none " +
@@ -39,6 +40,18 @@ const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButto
                 endYear: "",
                 duties: [""],
             };
+        } else if (section === "education") {
+            newItem = {
+                institutionName: "",
+                degree: "",
+                course: "",
+                startMonth: "",
+                startYear: "",
+                endMonth: "",
+                endYear: "",
+                current: false,
+                link: ""
+            };
         } else if (section === "projects") {
             newItem = {
                 projectName: "",
@@ -51,7 +64,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButto
                 endMonth: "",
                 endYear: "",
                 current: false,
-                link: "https://github.com/gibatekpro"
+                link: ""
             };
         } else if (section === "languages") {
             newItem = {
@@ -64,6 +77,8 @@ const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButto
                 infoDetails: "",
                 infoLink: ""
             }
+        } else if (section === "skills") {
+            newItem = ""
         } else {
             console.error(`Add to section not implemented for section: ${section}`);
             return;
@@ -77,6 +92,8 @@ const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButto
     const removeSection = (section: string) => {
         resumeFormFormik.setFieldValue(section, null);
     }
+
+
 
     return (
         <div className="flex justify-center items-center sm:px-2">
@@ -119,7 +136,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButto
                         title={"Skill"}
                         addToSection={() => addToSection("skills")}
                         removeSection={() => removeSection("skills")}
-                        hasAddIcon={false}
+                        hasAddIcon={true}
                         hasDeleteIcon={true}
                     />
                 }
@@ -226,7 +243,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButto
                                 Generating...
                             </>
                         ) : (
-                            "Print CV"
+                            buttonTitle
                         )}
                     </Button>
                 )}

@@ -9,7 +9,7 @@ interface CustomAccordionProps {
 
 export const CustomAccordion: React.FC<CustomAccordionProps> = ({ isOpen, setIsOpen, children }) => {
     return (
-        <div className="mx-2 p-0 border-1 border-blue-500 rounded-lg mt-4">
+        <div className="mx-2 p-0 border-1 border-blue-500 rounded-lg mt-4 bg-gray-100">
             <Button
                 type="button"
                 className="w-full mt-0 bg-blue-500 text-white hover:bg-blue-600 flex items-center justify-between"

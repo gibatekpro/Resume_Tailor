@@ -20,7 +20,6 @@ export const MyJobApplications: React.FC = () => {
     const [selectedApplication, setSelectedApplication] = useState<JobApplicationInfo>();
     const navigate = useNavigate();
 
-    // Fetch and group applications
     useEffect(() => {
         const fetchApplications = async () => {
             setIsLoading(true);
@@ -231,8 +230,8 @@ export const MyJobApplications: React.FC = () => {
                         <CustomAccordionStyleB title="Today">
                             {today.map((item, index) => (
                                 <div key={index} onClick={() => setSelectedApplication(item)}
-                                     style={{padding: 5, borderBottom: "1px solid lightgray"}}>
-                                    {item.openAIJobTitle}
+                                     style={{padding: 5, borderBottom: "1px solid lightgray", fontSize: 14}}>
+                                    {`${item.openAIJobTitle} - ${item.openAIJobCompanyName}`}
                                 </div>
                             ))}
                         </CustomAccordionStyleB>
@@ -240,8 +239,8 @@ export const MyJobApplications: React.FC = () => {
                         <CustomAccordionStyleB title="Last 7 Days">
                             {thisWeek.map((item, index) => (
                                 <div key={index} onClick={() => setSelectedApplication(item)}
-                                     style={{padding: 5, borderBottom: "1px solid lightgray"}}>
-                                    {item.openAIJobTitle}
+                                     style={{padding: 5, borderBottom: "1px solid lightgray", fontSize: 14}}>
+                                    {`${item.openAIJobTitle} - ${item.openAIJobCompanyName}`}
                                 </div>
                             ))}
                         </CustomAccordionStyleB>
@@ -250,8 +249,8 @@ export const MyJobApplications: React.FC = () => {
                         <CustomAccordionStyleB title="This Month">
                             {thisMonth.map((item, index) => (
                                 <div key={index} onClick={() => setSelectedApplication(item)}
-                                     style={{padding: 5, borderBottom: "1px solid lightgray"}}>
-                                    {item.openAIJobTitle}
+                                     style={{padding: 5, borderBottom: "1px solid lightgray", fontSize: 14}}>
+                                    {`${item.openAIJobTitle} - ${item.openAIJobCompanyName}`}
                                 </div>
                             ))}
                         </CustomAccordionStyleB>
@@ -259,8 +258,8 @@ export const MyJobApplications: React.FC = () => {
                         <CustomAccordionStyleB title="This Year">
                             {thisYear.map((item, index) => (
                                 <div key={index} onClick={() => setSelectedApplication(item)}
-                                     style={{padding: 5, borderBottom: "1px solid lightgray"}}>
-                                    {item.openAIJobTitle}
+                                     style={{padding: 5, borderBottom: "1px solid lightgray", fontSize: 14}}>
+                                    {`${item.openAIJobTitle} - ${item.openAIJobCompanyName}`}
                                 </div>
                             ))}
                         </CustomAccordionStyleB>
@@ -268,8 +267,8 @@ export const MyJobApplications: React.FC = () => {
                         <CustomAccordionStyleB title="Older">
                             {older.map((item, index) => (
                                 <div key={index} onClick={() => setSelectedApplication(item)}
-                                     style={{padding: 5, borderBottom: "1px solid lightgray"}}>
-                                    {item.openAIJobTitle}
+                                     style={{padding: 5, borderBottom: "1px solid lightgray", fontSize: 14}}>
+                                    {`${item.openAIJobTitle} - ${item.openAIJobCompanyName}`}
                                 </div>
                             ))}
                         </CustomAccordionStyleB>
@@ -326,9 +325,15 @@ export const MyJobApplications: React.FC = () => {
                             </Button>
                         )}
                         {selectedApplication?.resumeInfo && (
-                            <Card className="justify-center align-items-center p-2">
+                            <div className="p-2" style={{
+                                border: "1px solid #0f5a73",
+                                borderRadius: "5px",
+                                // display: "inline-block",
+                                // width: "fit-content",
+                                // height: "fit-content",
+                            }}>
                                 <ResumeStyleB resumeData={selectedApplication?.resumeInfo}/>
-                            </Card>
+                            </div>
                         )}
                     </div>
                 </div>

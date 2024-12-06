@@ -9,10 +9,11 @@ import {WorkExperienceSection} from "./WorkExperienceSection";
 import {EducationSection} from "./EducationSection";
 import {ProjectsSection} from "./ProjectsSection";
 import {useResumeProvider} from "../../context/ResumeContext";
+import {ResumeInfo} from "../../models/ResumeInfo";
 
 
-export const ResumeStyleA: React.FC = () =>{
-    const {resumeData, setResumeData} = useResumeProvider();
+export const ResumeStyleA: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =>{
+
     const [hasProjects, setHasProjects] = useState(false);
     const [hasSkills, setHasSkills] = useState(false);
     const [hasWorkExperience, setHasWorkExperience] = useState(false);
@@ -28,16 +29,23 @@ export const ResumeStyleA: React.FC = () =>{
 
     return(
         <div>
-            <HeaderSection/>
-            <SummarySection/>
-            <ContactInfoSection/>
+            <HeaderSection
+                resumeData={resumeData}/>
+            <SummarySection
+                resumeData={resumeData}/>
+            <ContactInfoSection
+                resumeData={resumeData}/>
             <Container style={{
                 // ...DESIGN_BORDER
             }} className={"subSections-container"}>
-                {hasSkills && <SkillsSection />}
-                {hasWorkExperience && <WorkExperienceSection/>}
-                {hasEducation && <EducationSection/>}
-                {hasProjects && <ProjectsSection/>}
+                {hasSkills && <SkillsSection
+                    resumeData={resumeData}/>}
+                {hasWorkExperience && <WorkExperienceSection
+                    resumeData={resumeData}/>}
+                {hasEducation && <EducationSection
+                    resumeData={resumeData}/>}
+                {hasProjects && <ProjectsSection
+                    resumeData={resumeData}/>}
             </Container>
             {/*<EducationSection/>*/}
             {/*<CertificationsSection/>*/}

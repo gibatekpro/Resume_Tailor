@@ -65,20 +65,18 @@
     background-color: #F0F0F0;
 }
 
-.style-b-main-container .main-row{
-    /*height: 11in;*/
+.style-b-main-container .main-row {
+    width: 920px;
 }
 
-.style-b-main-container .main-row .left-col{
+.style-b-main-container .main-row .left-col {
+    /*width: 30%;*/
     background-color: var(--styleB-main-row-left-col-background);
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 33px;
+    padding: 33px 20px 0 20px;
 }
 
-.style-b-main-container .main-row .right-col{
-    padding-left: 10px;
-    padding-right: 10px;
+.style-b-main-container .main-row .right-col {
+    /*width: 70%;*/
 }
 
 .style-b-main-container .main-row .right-col .sub-right-col{

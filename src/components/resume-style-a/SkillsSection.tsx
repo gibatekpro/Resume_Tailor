@@ -3,9 +3,9 @@ import { Row} from 'react-bootstrap';
 import {useResumeProvider} from "../../context/ResumeContext";
 import {CustomCol} from "../../custom_tags/CustomCol";
 import '../../styles/resumeStyleA.css';
+import {ResumeInfo} from "../../models/ResumeInfo";
 
-export const SkillsSection: React.FC = () => {
-    const {resumeData, setResumeData} = useResumeProvider();
+export const SkillsSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
     const skillsTextDecoration = {
         borderBottom: '2px solid #b8adfb',
         marginRight: '20px'

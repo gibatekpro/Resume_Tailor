@@ -3,10 +3,10 @@ import { Row } from 'react-bootstrap';
 import {useResumeProvider} from "../../context/ResumeContext";
 import {CustomCol} from "../../custom_tags/CustomCol";
 import '../../styles/resumeStyleA.css';
+import {ResumeInfo} from "../../models/ResumeInfo";
 
 
-export const WorkExperienceSection: React.FC = () => {
-    const {resumeData, setResumeData} = useResumeProvider();
+export const WorkExperienceSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
 
     useEffect(()=>{
 

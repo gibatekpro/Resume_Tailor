@@ -1,9 +1,9 @@
 import React, {useEffect} from 'react';
 import {useResumeProvider} from "../../context/ResumeContext";
 import '../../styles/resumeStyleA.css';
+import {ResumeInfo} from "../../models/ResumeInfo";
 
-export const HeaderSection: React.FC = () => {
-    const {resumeData, setResumeData} = useResumeProvider();
+export const HeaderSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
 
     useEffect(() => {
     }, [resumeData]);

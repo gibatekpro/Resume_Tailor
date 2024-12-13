@@ -14,6 +14,7 @@ import {JobApplicationsResponse} from "../models/JobApplicationsResponse";
 export const MyJobApplications: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [today, setToday] = useState<JobApplicationsResponse[]>([]);
+    const [yesterday, setYesterday] = useState<JobApplicationsResponse[]>([]);
     const [thisWeek, setThisWeek] = useState<JobApplicationsResponse[]>([]);
     const [thisMonth, setThisMonth] = useState<JobApplicationsResponse[]>([]);
     const [thisYear, setThisYear] = useState<JobApplicationsResponse[]>([]);
@@ -29,6 +30,7 @@ export const MyJobApplications: React.FC = () => {
 
                 // Initialize empty arrays to hold the job applications for each category
                 const todayArr: JobApplicationsResponse[] = [];
+                const yesterdayArr: JobApplicationsResponse[] = [];
                 const thisWeekArr: JobApplicationsResponse[] = [];
                 const thisMonthArr: JobApplicationsResponse[] = [];
                 const thisYearArr: JobApplicationsResponse[] = [];
@@ -43,6 +45,15 @@ export const MyJobApplications: React.FC = () => {
                     if (date.isSame(today, "day")) {
                         todayArr.push(data);
                     }
+
+                    // Check if the application is from yesterday
+                    const yesterday = moment().subtract(1, "day").startOf("day");
+                    if (date.isSame(yesterday, "day")) {
+                        if (!todayArr.includes(data)) {
+                            yesterdayArr.push(data); // Add to yesterdayArr array if not already added as today
+                        }
+                    }
+
 
                     const startOfWeek = moment().subtract(7, 'days').startOf("day");
                     if (date.isSameOrAfter(startOfWeek, "day")) {
@@ -75,6 +86,7 @@ export const MyJobApplications: React.FC = () => {
 
                 // Update the state with categorized arrays
                 setToday(todayArr);
+                setYesterday(yesterdayArr);
                 setThisWeek(thisWeekArr);
                 setThisMonth(thisMonthArr);
                 setThisYear(thisYearArr);
@@ -83,6 +95,7 @@ export const MyJobApplications: React.FC = () => {
                 if (selectedApplication == null) {
                     setSelectedApplication(
                         today?.length > 0 ? today[0] :
+                            yesterday?.length > 0 ? yesterday[0] :
                             thisWeek?.length > 0 ? thisWeek[0] :
                                 thisMonth?.length > 0 ? thisMonth[0] :
                                     thisYear?.length > 0 ? thisYear[0] :
@@ -230,6 +243,26 @@ export const MyJobApplications: React.FC = () => {
 
                         <CustomAccordionStyleB title="Today">
                             {today.map((item, index) => (
+                                <div
+                                    key={index}
+                                    onClick={() => setSelectedApplication(item)}
+                                    style={{
+                                        padding: 5,
+                                        borderBottom: "1px solid lightgray",
+                                        fontSize: 14,
+                                        backgroundColor: selectedApplication === item ? "gray" : "transparent", // Set background based on selection
+                                        color: selectedApplication === item ? "white" : "black", // Optional: change text color for better contrast
+                                        cursor: "pointer", // Optional: make it clear that items are clickable
+                                    }}
+                                >
+                                    {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}
+                                </div>
+                            ))}
+                        </CustomAccordionStyleB>
+
+
+                        <CustomAccordionStyleB title="Yesterday">
+                            {yesterday.map((item, index) => (
                                 <div
                                     key={index}
                                     onClick={() => setSelectedApplication(item)}

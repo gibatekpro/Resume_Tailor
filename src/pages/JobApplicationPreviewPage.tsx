@@ -212,7 +212,7 @@ export const JobApplicationPreviewPage: React.FC<{
                                         type="text"
                                         placeholder="e.g Electrician"
                                         onChange={jobApplicationFormFormik.handleChange}
-                                        defaultValue={jobApplicationFormFormik.values.openAIDocumentTitle || ""}
+                                        defaultValue={jobApplicationFormFormik.values.openAIJobTitle || ""}
                                     />
                                     {jobApplicationFormFormik.touched.openAIJobTitle && jobApplicationFormFormik.errors.openAIJobTitle && (
                                         <span

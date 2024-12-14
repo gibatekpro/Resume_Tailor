@@ -189,7 +189,7 @@ export const MyJobApplications: React.FC = () => {
     };
 
     const handleNavigate = (path: string) => {
-        localStorage.setItem(LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(selectedApplication))
+        localStorage.setItem(LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(selectedApplication?.data))
         navigate(path)
     }
 

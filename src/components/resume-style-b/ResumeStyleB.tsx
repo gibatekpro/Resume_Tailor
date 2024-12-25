@@ -14,8 +14,6 @@ import {EducationSection} from "./EducationSection";
 import {ProjectsSection} from "./ProjectsSection";
 import {AvatarSection} from "./AvatarSection";
 import {LanguageSection} from "./LanguageSection";
-import {DefaultResumeData} from "../../data/defaultResumeData";
-import {LOCAL_STORAGE_RESUME_DATA} from "../../data/applicationData";
 import html2canvas from "html2canvas";
 import {jsPDF} from "jspdf";
 import {ResumeInfo} from "../../models/ResumeInfo";

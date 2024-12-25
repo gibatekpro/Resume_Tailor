@@ -7,9 +7,6 @@ import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
 import JobApplicationService from "../services/JobApplicationService";
 import {
     APP_TITLE,
-    LOCAL_STORAGE_APP_TITLE,
-    LOCAL_STORAGE_APPLICATION_DATA,
-    LOCAL_STORAGE_RESUME_DATA
 } from "../data/applicationData";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import ROUTES from "../data/routes";
@@ -18,6 +15,7 @@ import {Button, Col, Form, Row} from "react-bootstrap";
 import {useFormik} from "formik";
 import {resumeData} from "../data/resumeData";
 import * as Yup from "yup";
+import STORAGE from "../data/storage";
 
 export const JobApplicationPreviewPage: React.FC<{
     setHideNavbar: (hide: boolean) => void,
@@ -25,17 +23,17 @@ export const JobApplicationPreviewPage: React.FC<{
 }> = ({setHideNavbar, setAppTitle}) => {
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
     const [isLoading, setIsLoading] = useState(false);
-    const [applicationData, setApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(LOCAL_STORAGE_APPLICATION_DATA) || "{}"));
-    const [theAppTitle, setTheAppTitle] = useState<string>(JSON.parse(localStorage.getItem(LOCAL_STORAGE_APPLICATION_DATA) || "{}").openAIDocumentTitle);
+    const [applicationData, setApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}"));
+    const [theAppTitle, setTheAppTitle] = useState<string>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}").openAIDocumentTitle);
     const navigate = useNavigate();
-    const [saved, setSaved] = useState(localStorage.getItem(LOCAL_STORAGE_RESUME_DATA));
-    const [savedApplicationData, setSavedApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(LOCAL_STORAGE_APPLICATION_DATA) || JSON.parse("{}")));
+    const [saved, setSaved] = useState(localStorage.getItem(STORAGE.LOCAL_STORAGE_RESUME_DATA));
+    const [savedApplicationData, setSavedApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || JSON.parse("{}")));
     const resumeDataOpenAI = saved ? JSON.parse(saved) : DefaultResumeData;
 
     const saveAndPrint = async () => {
         setIsLoading(true);
         try {
-            const theApplicationData: JobApplicationInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_APPLICATION_DATA) || "{}");
+            const theApplicationData: JobApplicationInfo = JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}");
             await JobApplicationService.saveJobApplication(
                 user ?? "", theApplicationData
             );
@@ -71,12 +69,12 @@ export const JobApplicationPreviewPage: React.FC<{
 
     useEffect(() => {
         const updateApplicationData = () => {
-            const storedData: JobApplicationInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_APPLICATION_DATA) || "{}");
+            const storedData: JobApplicationInfo = JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}");
             const updatedData = {
                 ...storedData,
                 ...jobApplicationFormFormik.values, // Merge form values into the stored data
             };
-            localStorage.setItem(LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(updatedData)); // Save updated data back to localStorage
+            localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(updatedData)); // Save updated data back to localStorage
         };
 
         updateApplicationData();

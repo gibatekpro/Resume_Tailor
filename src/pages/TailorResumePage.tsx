@@ -11,7 +11,6 @@ import {fetchOpenAIResponse} from "../services/OpenAIService";
 import InstructionForm from "../components/forms/instructionForm/InstructionForm";
 import {useNavigate} from "react-router-dom";
 import {useResumeProvider} from "../context/ResumeContext";
-import {LOCAL_STORAGE_APPLICATION_DATA, LOCAL_STORAGE_RESUME_DATA} from "../data/applicationData";
 import ROUTES from "../data/routes";
 import JobApplicationService from "../services/JobApplicationService";
 import {useAuth} from "../context/auth/AuthProvider";
@@ -20,6 +19,7 @@ import {ResumeInfo} from "../models/ResumeInfo";
 import {CustomAccordion} from "../custom_tags/CustomAccordion";
 import {openAIInstruction} from "../data/openAIInstruction";
 import moment from "moment";
+import STORAGE from "../data/storage";
 
 export const TailorResumePage: React.FC = () => {
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
@@ -27,7 +27,7 @@ export const TailorResumePage: React.FC = () => {
     const {resumeData, setResumeData} = useResumeProvider();
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    const saved = localStorage.getItem(LOCAL_STORAGE_RESUME_DATA);
+    const saved = localStorage.getItem(STORAGE.LOCAL_STORAGE_RESUME_DATA);
     const SavedResumeDataOpenAI = saved ? JSON.parse(saved) : DefaultResumeData;
     const [isCustomFormOpen, setIsCustomFormOpen] = useState(false);
     const [isGeneratedFormOpen, setIsGeneratedFormOpen] = useState(false);
@@ -133,7 +133,7 @@ export const TailorResumePage: React.FC = () => {
     //     resumeInfo?: ResumeInfo,
 
     useEffect(() => {
-        localStorage.setItem(LOCAL_STORAGE_RESUME_DATA, JSON.stringify(generatedResumeFormFormik.values));
+        localStorage.setItem(STORAGE.LOCAL_STORAGE_RESUME_DATA, JSON.stringify(generatedResumeFormFormik.values));
         const savedJobApplicationInfo = {
             date: moment(new Date(), "YYYY-MM-DD HH:mm"),
             openAIDocumentTitle: jobApplicationInfo?.openAIDocumentTitle,
@@ -144,7 +144,7 @@ export const TailorResumePage: React.FC = () => {
             openAISimpleJobDescription: jobApplicationInfo?.openAISimpleJobDescription,
             resumeInfo: generatedResumeFormFormik.values,
         }
-        localStorage.setItem(LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(savedJobApplicationInfo));
+        localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(savedJobApplicationInfo));
     }, [generatedResumeFormFormik]);
 
     return (

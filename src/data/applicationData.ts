@@ -41,7 +41,4 @@ export const firebaseConfig = {
 
 
 export const appName = "Resume Tailor"
-
-export const LOCAL_STORAGE_RESUME_DATA: string = "LOCAL_STORAGE_RESUME_DATA"
-export const LOCAL_STORAGE_APPLICATION_DATA: string = "LOCAL_STORAGE_APPLICATION_DATA"
 export const LOCAL_STORAGE_APP_TITLE: string = "Resume Tailor"

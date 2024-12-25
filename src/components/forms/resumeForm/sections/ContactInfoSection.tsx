@@ -32,7 +32,7 @@ export const ContactInfoSection: React.FC<ContactInfoSectionProps> = ({
             row row-cols-4 row-cols-sm-4 row-cols-md-4 row-cols-lg-12
             row-gap-3 row-gap-sm-3 row-gap-md-3 row-gap-lg-0
             ">
-                <Col lg={3}>
+                <Col lg={2}>
                     <label className="flex items-center mr-4 sm:text-sm">
                         <input
                             id={`contactInfo-${index}-infoTitle-email`}
@@ -46,7 +46,7 @@ export const ContactInfoSection: React.FC<ContactInfoSectionProps> = ({
                         Email
                     </label>
                 </Col>
-                <Col lg={3}>
+                <Col lg={2}>
                     <label className="flex items-center mr-4 sm:text-sm">
                         <input
                             id={`contactInfo-${index}-infoTitle-phone`}
@@ -74,7 +74,7 @@ export const ContactInfoSection: React.FC<ContactInfoSectionProps> = ({
                         Location
                     </label>
                 </Col>
-                <Col lg={3}>
+                <Col lg={2}>
                     <label className="flex items-center mr-4 sm:text-sm">
                         <input
                             id={`contactInfo-${index}-infoTitle-github`}
@@ -86,6 +86,20 @@ export const ContactInfoSection: React.FC<ContactInfoSectionProps> = ({
                             checked={contactInfo.infoTitle === "GitHub"}
                         />
                         GitHub
+                    </label>
+                </Col>
+                <Col lg={3}>
+                    <label className="flex items-center mr-4 sm:text-sm">
+                        <input
+                            id={`contactInfo-${index}-infoTitle-linkedin`}
+                            name={`contactInfo.${index}.infoTitle`}
+                            type="radio"
+                            className="mr-2"
+                            onChange={resumeFormFormik.handleChange}
+                            value="LinkedIn"
+                            checked={contactInfo.infoTitle === "LinkedIn"}
+                        />
+                        LinkedIn
                     </label>
                 </Col>
             </Row>

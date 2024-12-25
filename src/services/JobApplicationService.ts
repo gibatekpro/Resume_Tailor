@@ -2,7 +2,7 @@ import {doc, getFirestore, setDoc, deleteDoc, updateDoc} from "firebase/firestor
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import {initializeApp} from "firebase/app";
 import {firebaseConfig} from "../data/applicationData";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import {addDoc, collection, getDocs, getDoc} from "firebase/firestore";
 import {getAuth} from "firebase/auth";
 import {ResumeInfo} from "../models/ResumeInfo";
 import {JobApplicationsResponse} from "../models/JobApplicationsResponse";
@@ -180,7 +180,54 @@ class JobApplicationService {
         }
     }
 
+    async saveRules(uid: string, rules: string[]): Promise<void> {
+        const db = getFirestore();
+        const userRulesDocPath = `rules/${uid}/rules/rulesList`;
 
+        if (!uid) {
+            throw new Error("User ID (uid) is required.");
+        }
+
+        if (!Array.isArray(rules)) {
+            throw new Error("Rules must be an array.");
+        }
+
+        try {
+            const userRulesDocRef = doc(db, userRulesDocPath);
+            await setDoc(userRulesDocRef, { rules });
+
+            console.log(`Rules for user ${uid} have been saved successfully.`);
+        } catch (error) {
+            console.error("Error saving user rules:", error);
+            throw new Error("Failed to save user rules.");
+        }
+    }
+
+
+    async getRules(uid: string): Promise<string[]> {
+        const db = getFirestore();
+        const userRulesDocPath = `rules/${uid}/rules/rulesList`;
+
+        if (!uid) {
+            throw new Error("User ID (uid) is required.");
+        }
+
+        try {
+            const userRulesDocRef = doc(db, userRulesDocPath);
+            const docSnapshot = await getDoc(userRulesDocRef);
+
+            if (docSnapshot.exists()) {
+                const data = docSnapshot.data() as { rules: string[] };
+                return data.rules || [];
+            } else {
+                console.log(`No rules document found for user ${uid}.`);
+                return [];
+            }
+        } catch (error) {
+            console.error(`Error retrieving rules for user ${uid}:`, error);
+            throw new Error("Failed to retrieve user rules.");
+        }
+    }
 
 }
 

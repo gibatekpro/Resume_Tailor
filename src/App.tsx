@@ -19,7 +19,7 @@ import {ResetPasswordPage} from "./pages/auth/ResetPasswordPage";
 import {RequireAuth} from "./context/auth/RequireAuth";
 import {APP_TITLE, firebaseConfig, LOCAL_STORAGE_APP_TITLE} from "./data/applicationData";
 import {JobApplicationPreviewPage} from "./pages/JobApplicationPreviewPage";
-import {TailorResumePage} from "./pages/TailorResumePage";
+import {TailorResumePageB} from "./pages/TailorResumePageB";
 import {MyJobApplications} from "./pages/MyJobApplications";
 import {Row} from "react-bootstrap";
 import {CreateCV} from "./pages/CreateCV";
@@ -52,7 +52,7 @@ function App() {
                                 <Route path={ROUTES.RESUME_INPUT_PAGE}
                                        element={
                                            <RequireAuth>
-                                               <TailorResumePage/>
+                                               <TailorResumePageB/>
                                            </RequireAuth>
                                        }>
                                 </Route>

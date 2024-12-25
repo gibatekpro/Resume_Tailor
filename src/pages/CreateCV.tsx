@@ -8,7 +8,6 @@ import JobApplicationService from "../services/JobApplicationService";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import {useNavigate} from "react-router-dom";
 import ROUTES from "../data/routes";
-import {APP_TITLE, LOCAL_STORAGE_APPLICATION_DATA} from "../data/applicationData";
 import {CustomAccordion} from "../custom_tags/CustomAccordion";
 import ResumeForm from "../components/forms/resumeForm/ResumeForm";
 import {useFormik} from "formik";
@@ -21,6 +20,7 @@ import * as Yup from "yup";
 import {ResumeInfo} from "../models/ResumeInfo";
 import {SavedResumesResponse} from "../models/SavedResumesResponse";
 import {fontSize} from "html2canvas/dist/types/css/property-descriptors/font-size";
+import STORAGE from "../data/storage";
 
 
 export const CreateCV: React.FC = () => {
@@ -146,7 +146,7 @@ export const CreateCV: React.FC = () => {
     };
 
     const handleNavigate = (path: string) => {
-        localStorage.setItem(LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(selectedApplication))
+        localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(selectedApplication))
         navigate(path)
     }
 

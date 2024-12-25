@@ -1,5 +1,6 @@
 import {OpenAIInstruction} from "../models/OpenAIInstruction";
 import {openAIInstruction} from "./openAIInstruction";
+import STORAGE from "./storage";
 
 export const InstructionResumeData: OpenAIInstruction = {
     prompt: openAIInstruction.prompt || [],
@@ -7,5 +8,5 @@ export const InstructionResumeData: OpenAIInstruction = {
     rules: openAIInstruction.rules || [
         ""
     ],
-    jobDescriptionData: openAIInstruction.jobDescriptionData || "",
+    jobDescriptionData: localStorage.getItem(STORAGE.JOB_DESCRIPTION) || "",
 };

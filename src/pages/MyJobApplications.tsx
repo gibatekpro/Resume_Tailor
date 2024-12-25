@@ -8,8 +8,8 @@ import JobApplicationService from "../services/JobApplicationService";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import {useNavigate} from "react-router-dom";
 import ROUTES from "../data/routes";
-import {LOCAL_STORAGE_APPLICATION_DATA} from "../data/applicationData";
 import {JobApplicationsResponse} from "../models/JobApplicationsResponse";
+import STORAGE from "../data/storage";
 
 export const MyJobApplications: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -189,7 +189,7 @@ export const MyJobApplications: React.FC = () => {
     };
 
     const handleNavigate = (path: string) => {
-        localStorage.setItem(LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(selectedApplication?.data))
+        localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(selectedApplication?.data))
         navigate(path)
     }
 

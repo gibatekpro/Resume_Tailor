@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {v4 as uuidv4} from "uuid";
 
-export const SkillInput: React.FC<{
+export const  SkillInput: React.FC<{
     skillIndex: number
     resumeFormFormik: any;
     inputFieldClassName: string

@@ -41,7 +41,7 @@ export const ProjectDetailInput: React.FC<{
 
             {isIconVisible && (
                 <div className="flex items-center">
-                    {projectDetails.length - 1 === projectIndex && (
+                    {projectDetails.length - 1 === projectDetailIndex && (
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"

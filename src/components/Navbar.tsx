@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import { Dialog, DialogPanel } from "@headlessui/react";
-import { useNavigate } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {Bars3Icon, XMarkIcon} from "@heroicons/react/24/outline";
+import {Dialog, DialogPanel} from "@headlessui/react";
+import {useNavigate} from "react-router-dom";
 import ROUTES from "../data/routes";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import {Col, Row} from "react-bootstrap";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
 
-export const Navbar: React.FC<{ hide?: boolean }> = ({ hide }) => {
+export const Navbar: React.FC<{ hide?: boolean }> = ({hide}) => {
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [loggedIn, setLoggedIn] = useState<boolean>(false);
@@ -17,9 +16,9 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({ hide }) => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             setLoggedIn(!!user); // Set loggedIn state based on user presence
             if (user) {
-                setEmail(user.email || "");
+                setEmail(user.email || ""); // Set the email if user exists
             } else {
-                setEmail("");
+                setEmail(""); // Clear email if no user
             }
         });
 
@@ -27,9 +26,9 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({ hide }) => {
     }, []);
 
     const navigation = [
-        { name: "Tailor CV", path: ROUTES.RESUME_INPUT_PAGE },
-        { name: "My Job Applications", path: ROUTES.MY_JOB_APPLICATIONS },
-        { name: "My CVs", path: ROUTES.NEW_CV_PAGE },
+        {name: "Tailor CV", path: ROUTES.RESUME_INPUT_PAGE},
+        {name: "My Job Applications", path: ROUTES.MY_JOB_APPLICATIONS},
+        {name: "My CVs", path: ROUTES.NEW_CV_PAGE},
     ];
 
     const handleNavigate = (path: string) => {
@@ -66,7 +65,7 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({ hide }) => {
                         onClick={() => setMobileMenuOpen(true)}
                     >
                         <span className="sr-only">Open main menu</span>
-                        <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+                        <Bars3Icon className="h-6 w-6" aria-hidden="true"/>
                     </button>
                 </div>
 
@@ -83,11 +82,6 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({ hide }) => {
                     ))}
                 </div>
 
-                <Row>
-                    <Col>
-
-                    </Col>
-                </Row>
                 {/* Auth Links (Desktop) */}
                 {!loggedIn && (
                     <div className="hidden lg:flex lg:flex-1 lg:justify-end">
@@ -173,12 +167,31 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({ hide }) => {
                                         Log in
                                     </a>
                                 ) : (
-                                    <a
-                                        onClick={performLogout}
-                                        className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                                    >
-                                        Log out
-                                    </a>
+                                    <>
+                                        <button
+                                            style={{
+                                                backgroundColor: "white",
+                                                border: "1px solid darkgray",
+                                                color: "black",
+                                                paddingLeft: "4px",
+                                                padding: "4px",
+                                                borderRadius: "4px",
+                                                cursor: "text",
+                                                fontSize: 12,
+                                                transition: "background-color 0.3s, color 0.3s",
+                                            }}
+                                            className={"mx-4"}
+                                        >
+                                            {email}
+                                        </button>
+                                        <a
+                                            onClick={performLogout}
+                                            className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                                        >
+                                            Log out
+                                        </a>
+                                    </>
+
                                 )}
                             </div>
                         </div>

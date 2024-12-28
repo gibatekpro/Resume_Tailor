@@ -189,6 +189,7 @@ export const TailorResumePageB: React.FC = () => {
                     resumeInfo: customResumeFormFormik.values,
                 };
 
+                console.log(JSON.stringify(openAIInstruction));
                 // Save rules (if applicable)
                 if (openAIInstruction.rules && user) {
                     await saveInstructionRules(user, openAIInstruction.rules);

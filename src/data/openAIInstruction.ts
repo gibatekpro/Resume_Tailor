@@ -5,6 +5,8 @@ export const openAIInstruction: OpenAIInstruction = {
         "Modify the resumeInfo object based on the provided job description and instructions.",
         "Use the following guidelines strictly:",
         "- DO NOT INCLUDE backticks or the ```json annotation.",
+        "- Ensure you read through the full job descriptions and highlight their skiil and experience requirements before doing anything",
+        "- Use as many of the highlighted keywords as possible",
         "- Fill missing objects labeled 'openAI' using the job description.",
         "- Document title format: `resumeInfo.firstName-resumeInfo.lastName-*company name`.",
         "- Use only the company name, e.g., 'john-doe-google-inc'.",

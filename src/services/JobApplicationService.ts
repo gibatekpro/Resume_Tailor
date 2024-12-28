@@ -45,6 +45,32 @@ class JobApplicationService {
         }
     }
 
+    async deleteJobApplication(uid: string, jobApplicationId: string): Promise<void> {
+        const db = getFirestore();
+
+        if (!uid) {
+            throw new Error("User ID (uid) is required.");
+        }
+
+        if (!jobApplicationId) {
+            throw new Error("Job Application ID is required.");
+        }
+
+        try {
+            // Reference to the specific document in the user's job applications sub-collection
+            const jobApplicationDocRef = doc(db, `jobApplications/${uid}/applications/${jobApplicationId}`);
+
+            // Delete the document
+            await deleteDoc(jobApplicationDocRef);
+
+            console.log(`Job application with ID ${jobApplicationId} for user ${uid} has been deleted successfully.`);
+        } catch (error) {
+            console.error("Error deleting job application:", error);
+            throw new Error("Failed to delete job application.");
+        }
+    }
+
+
     async getAllJobApplications(): Promise<JobApplicationsResponse[]> {
         const db = getFirestore();
         const auth = getAuth();

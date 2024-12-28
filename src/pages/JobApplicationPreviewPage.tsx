@@ -33,19 +33,32 @@ export const JobApplicationPreviewPage: React.FC<{
     const saveAndPrint = async () => {
         setIsLoading(true);
         try {
-            const theApplicationData: JobApplicationInfo = JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}");
-            await JobApplicationService.saveJobApplication(
-                user ?? "", theApplicationData
+            // Save current form values to localStorage
+            const storedData: JobApplicationInfo = JSON.parse(
+                localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}"
             );
-            setAppTitle(theApplicationData.openAIDocumentTitle || APP_TITLE)
+            const updatedData = {
+                ...storedData,
+                ...jobApplicationFormFormik.values,
+            };
+            localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(updatedData));
+
+            // Save job application to the server
+            await JobApplicationService.saveJobApplication(user ?? "", updatedData);
+
+            // Update the app title if available
+            setAppTitle(updatedData.openAIDocumentTitle || APP_TITLE);
+
+            // Navigate to the resume print page
             setIsLoading(false);
-            setHideNavbar(true); // Ensure Navbar is hidden before navigating
+            setHideNavbar(true);
             navigate(ROUTES.RESUME_PRINT_PAGE);
         } catch (error) {
+            console.error("Error saving and printing:", error);
             setIsLoading(false);
         }
+    };
 
-    }
 
     const jobApplicationFormFormik = useFormik({
         initialValues: {
@@ -55,6 +68,7 @@ export const JobApplicationPreviewPage: React.FC<{
             openAIDocumentTitle: savedApplicationData.openAIDocumentTitle || "",
             openAISimpleJobDescription: savedApplicationData.openAISimpleJobDescription || "",
         },
+        enableReinitialize: true,
         validationSchema: () => Yup.object().shape({
             openAIJobTitle: Yup.string().min(4).required(),
             openAIJobCompanyName: Yup.string().min(4).required(),
@@ -68,17 +82,22 @@ export const JobApplicationPreviewPage: React.FC<{
     });
 
     useEffect(() => {
-        const updateApplicationData = () => {
-            const storedData: JobApplicationInfo = JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}");
-            const updatedData = {
-                ...storedData,
-                ...jobApplicationFormFormik.values, // Merge form values into the stored data
-            };
-            localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(updatedData)); // Save updated data back to localStorage
-        };
+        console.log("JobApplicationPreviewPage", savedApplicationData.openAIJobTitle);
+    }, []);
 
-        updateApplicationData();
-    }, [jobApplicationFormFormik.values]);
+    // useEffect(() => {
+    //     const updateApplicationData = () => {
+    //         const storedData: JobApplicationInfo = JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}");
+    //         console.log("savedApplicationData" + JSON.stringify(storedData));
+    //         const updatedData = {
+    //             ...storedData,
+    //             ...jobApplicationFormFormik.values,
+    //         };
+    //         localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(updatedData)); // Save updated data back to localStorage
+    //     };
+    //
+    //     updateApplicationData();
+    // }, [jobApplicationFormFormik.values]);
 
 
     const styles = {
@@ -189,9 +208,9 @@ export const JobApplicationPreviewPage: React.FC<{
                         }}
                     >
                         <Col xs={4} className={"flex justify-end"}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
                                  stroke="currentColor" className="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
+                                <path strokeLinecap="round" strokeLinejoin="round"
                                       d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
                             </svg>
 

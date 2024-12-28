@@ -10,6 +10,8 @@ import {useNavigate} from "react-router-dom";
 import ROUTES from "../data/routes";
 import {JobApplicationsResponse} from "../models/JobApplicationsResponse";
 import STORAGE from "../data/storage";
+import {Dialog, DialogPanel} from "@headlessui/react";
+import {SavedResumesResponse} from "../models/SavedResumesResponse";
 
 export const MyJobApplications: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +21,11 @@ export const MyJobApplications: React.FC = () => {
     const [thisMonth, setThisMonth] = useState<JobApplicationsResponse[]>([]);
     const [thisYear, setThisYear] = useState<JobApplicationsResponse[]>([]);
     const [older, setOlder] = useState<JobApplicationsResponse[]>([]);
+    const [jobApplicationsList, setJobApplicationsList] = useState<JobApplicationsResponse[]>([]);
     const [selectedApplication, setSelectedApplication] = useState<JobApplicationsResponse>();
+    const [jobApplicationToDelete, setJobApplicationToDelete] = useState<JobApplicationsResponse>();
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -27,6 +33,8 @@ export const MyJobApplications: React.FC = () => {
             setIsLoading(true);
             try {
                 const applications: JobApplicationsResponse[] = await JobApplicationService.getAllJobApplications();
+
+                setJobApplicationsList(applications);
 
                 // Initialize empty arrays to hold the job applications for each category
                 const todayArr: JobApplicationsResponse[] = [];
@@ -114,6 +122,92 @@ export const MyJobApplications: React.FC = () => {
         fetchApplications();
     }, []);
 
+    useEffect(() => {
+        try {
+
+            // Initialize empty arrays to hold the job applications for each category
+            const todayArr: JobApplicationsResponse[] = [];
+            const yesterdayArr: JobApplicationsResponse[] = [];
+            const thisWeekArr: JobApplicationsResponse[] = [];
+            const thisMonthArr: JobApplicationsResponse[] = [];
+            const thisYearArr: JobApplicationsResponse[] = [];
+            const olderArr: JobApplicationsResponse[] = [];
+
+            // Loop through the applications and categorize them
+            jobApplicationsList.forEach((data) => {
+                const date = moment(data.data.date);
+
+                // Check if the application is from today
+                const today = moment().startOf("day");
+                if (date.isSame(today, "day")) {
+                    todayArr.push(data);
+                }
+
+                // Check if the application is from yesterday
+                const yesterday = moment().subtract(1, "day").startOf("day");
+                if (date.isSame(yesterday, "day")) {
+                    if (!todayArr.includes(data)) {
+                        yesterdayArr.push(data); // Add to yesterdayArr array if not already added as today
+                    }
+                }
+
+
+                const startOfWeek = moment().subtract(7, 'days').startOf("day");
+                if (date.isSameOrAfter(startOfWeek, "day")) {
+                    if (!todayArr.includes(data)) {
+                        thisWeekArr.push(data); // Add to thisWeek array if not already added as today
+                    }
+                }
+
+                // Check if the application is from this month
+                const startOfMonth = moment().startOf("month");
+                if (date.isSameOrAfter(startOfMonth, "day")) {
+                    if (!todayArr.includes(data)) {
+                        thisMonthArr.push(data); // Add to thisMonth array if not already added as today
+                    }
+                }
+
+                // Check if the application is from this year
+                const startOfYear = moment().startOf("year");
+                if (date.isSameOrAfter(startOfYear, "day")) {
+                    if (!todayArr.includes(data) && !thisMonthArr.includes(data) && !thisWeekArr.includes(data)) {
+                        thisYearArr.push(data); // Add to thisYear array if not already added as today or this month
+                    }
+                }
+
+                // For applications older than this year
+                if (date.isBefore(startOfYear, "day")) {
+                    olderArr.push(data);
+                }
+            });
+
+            // Update the state with categorized arrays
+            setToday(todayArr);
+            setYesterday(yesterdayArr);
+            setThisWeek(thisWeekArr);
+            setThisMonth(thisMonthArr);
+            setThisYear(thisYearArr);
+            setOlder(olderArr);
+
+            if (selectedApplication == null) {
+                setSelectedApplication(
+                    today?.length > 0 ? today[0] :
+                        yesterday?.length > 0 ? yesterday[0] :
+                            thisWeek?.length > 0 ? thisWeek[0] :
+                                thisMonth?.length > 0 ? thisMonth[0] :
+                                    thisYear?.length > 0 ? thisYear[0] :
+                                        older?.length > 0 ? older[0] : undefined
+                );
+            }
+
+
+            setIsLoading(false);
+        } catch (error) {
+            console.error("Error fetching job applications:", error);
+            setIsLoading(false);
+        }
+    }, [jobApplicationsList]);
+
     const styles = {
         leftColumn: {
             padding: {
@@ -193,6 +287,45 @@ export const MyJobApplications: React.FC = () => {
         navigate(path)
     }
 
+    const handleDeleteJobApplication = (jobApplication: JobApplicationsResponse) => {
+        setJobApplicationToDelete(jobApplication)
+        openDeleteDialog()
+    }
+
+    const closeDeleteDialog = () => {
+        setIsDeleteDialogOpen(false);
+    }
+
+
+    const openDeleteDialog = () => {
+        setIsDeleteDialogOpen(true);
+    }
+
+    const deleteJobApplication = async () => {
+        try {
+            await JobApplicationService.deleteJobApplication(user ?? "", jobApplicationToDelete?.id || "")
+            const fetchResumes = async () => {
+                setIsLoading(true);
+                try {
+                    const applications: JobApplicationsResponse[] = await JobApplicationService.getAllJobApplications();
+
+                    setJobApplicationsList(applications);
+
+                    setIsLoading(false);
+                } catch (error) {
+                    console.error("Error fetching job applications:", error);
+                    setIsLoading(false);
+                }
+            };
+
+            fetchResumes();
+
+        } catch (error) {
+            console.log(error)
+        }
+        setIsDeleteDialogOpen(false)
+    }
+
     return (
         <div className="py-0 my-2">
             {isLoading && (
@@ -204,7 +337,7 @@ export const MyJobApplications: React.FC = () => {
                 <div className="row g-1 p-2 p-md-0">
                     {/* Left Column */}
                     <div
-                        className="col-md-2 pb-4"
+                        className="col-md-3 pb-4"
                         style={{
                             ...styles.rightBorderStyle,
                             ...styles.leftColumn.padding,
@@ -241,131 +374,160 @@ export const MyJobApplications: React.FC = () => {
                             </Row>
                         </div>
 
-                        <CustomAccordionStyleB title="Today">
-                            {today.map((item, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => setSelectedApplication(item)}
-                                    style={{
-                                        padding: 5,
-                                        borderBottom: "1px solid lightgray",
-                                        fontSize: 14,
-                                        backgroundColor: selectedApplication === item ? "gray" : "transparent", // Set background based on selection
-                                        color: selectedApplication === item ? "white" : "black", // Optional: change text color for better contrast
-                                        cursor: "pointer", // Optional: make it clear that items are clickable
-                                    }}
-                                >
-                                    {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}
-                                </div>
-                            ))}
-                        </CustomAccordionStyleB>
+                        <CustomAccordionStyleB
+                            title="Today"
+                            items={today}
+                            selectedItem={selectedApplication}
+                            onSelectItem={(item) => setSelectedApplication(item)}
+                            onDeleteItem={(item) => handleDeleteJobApplication(item)}
+                        />
+
+                        <CustomAccordionStyleB
+                            title="Yesterday"
+                            items={yesterday}
+                            selectedItem={selectedApplication}
+                            onSelectItem={(item) => setSelectedApplication(item)}
+                            onDeleteItem={(item) => handleDeleteJobApplication(item)}
+                        />
+
+                        <CustomAccordionStyleB
+                            title="Last 7 Days"
+                            items={thisWeek}
+                            selectedItem={selectedApplication}
+                            onSelectItem={(item) => setSelectedApplication(item)}
+                            onDeleteItem={(item) => handleDeleteJobApplication(item)}
+                        />
+
+                        <CustomAccordionStyleB
+                            title="This Month"
+                            items={thisMonth}
+                            selectedItem={selectedApplication}
+                            onSelectItem={(item) => setSelectedApplication(item)}
+                            onDeleteItem={(item) => handleDeleteJobApplication(item)}
+                        />
+
+                        <CustomAccordionStyleB
+                            title="This Year"
+                            items={thisYear}
+                            selectedItem={selectedApplication}
+                            onSelectItem={(item) => setSelectedApplication(item)}
+                            onDeleteItem={(item) => handleDeleteJobApplication(item)}
+                        />
+
+                        <CustomAccordionStyleB
+                            title="Older"
+                            items={older}
+                            selectedItem={selectedApplication}
+                            onSelectItem={(item) => setSelectedApplication(item)}
+                            onDeleteItem={(item) => handleDeleteJobApplication(item)}
+                        />
 
 
-                        <CustomAccordionStyleB title="Yesterday">
-                            {yesterday.map((item, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => setSelectedApplication(item)}
-                                    style={{
-                                        padding: 5,
-                                        borderBottom: "1px solid lightgray",
-                                        fontSize: 14,
-                                        backgroundColor: selectedApplication === item ? "gray" : "transparent", // Set background based on selection
-                                        color: selectedApplication === item ? "white" : "black", // Optional: change text color for better contrast
-                                        cursor: "pointer", // Optional: make it clear that items are clickable
-                                    }}
-                                >
-                                    {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}
-                                </div>
-                            ))}
-                        </CustomAccordionStyleB>
+                        {/*<CustomAccordionStyleB title="Yesterday">*/}
+                        {/*    {yesterday.map((item, index) => (*/}
+                        {/*        <div*/}
+                        {/*            key={index}*/}
+                        {/*            onClick={() => setSelectedApplication(item)}*/}
+                        {/*            style={{*/}
+                        {/*                padding: 5,*/}
+                        {/*                borderBottom: "1px solid lightgray",*/}
+                        {/*                fontSize: 14,*/}
+                        {/*                backgroundColor: selectedApplication === item ? "gray" : "transparent", // Set background based on selection*/}
+                        {/*                color: selectedApplication === item ? "white" : "black", // Optional: change text color for better contrast*/}
+                        {/*                cursor: "pointer", // Optional: make it clear that items are clickable*/}
+                        {/*            }}*/}
+                        {/*        >*/}
+                        {/*            {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}*/}
+                        {/*        </div>*/}
+                        {/*    ))}*/}
+                        {/*</CustomAccordionStyleB>*/}
 
 
-                        <CustomAccordionStyleB title="Last 7 Days">
-                            {thisWeek.map((item, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => setSelectedApplication(item)}
-                                    style={{
-                                        padding: 5,
-                                        borderBottom: "1px solid lightgray",
-                                        fontSize: 14,
-                                        backgroundColor: selectedApplication === item ? "gray" : "transparent", // Highlight selected item
-                                        color: selectedApplication === item ? "white" : "black", // Optional: change text color for readability
-                                        cursor: "pointer", // Optional: make items more interactive
-                                    }}
-                                >
-                                    {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}
-                                </div>
-                            ))}
-                        </CustomAccordionStyleB>
+                        {/*<CustomAccordionStyleB title="Last 7 Days">*/}
+                        {/*    {thisWeek.map((item, index) => (*/}
+                        {/*        <div*/}
+                        {/*            key={index}*/}
+                        {/*            onClick={() => setSelectedApplication(item)}*/}
+                        {/*            style={{*/}
+                        {/*                padding: 5,*/}
+                        {/*                borderBottom: "1px solid lightgray",*/}
+                        {/*                fontSize: 14,*/}
+                        {/*                backgroundColor: selectedApplication === item ? "gray" : "transparent", // Highlight selected item*/}
+                        {/*                color: selectedApplication === item ? "white" : "black", // Optional: change text color for readability*/}
+                        {/*                cursor: "pointer", // Optional: make items more interactive*/}
+                        {/*            }}*/}
+                        {/*        >*/}
+                        {/*            {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}*/}
+                        {/*        </div>*/}
+                        {/*    ))}*/}
+                        {/*</CustomAccordionStyleB>*/}
 
 
 
-                        <CustomAccordionStyleB title="This Month">
-                            {thisMonth.map((item, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => setSelectedApplication(item)}
-                                    style={{
-                                        padding: 5,
-                                        borderBottom: "1px solid lightgray",
-                                        fontSize: 14,
-                                        backgroundColor: selectedApplication === item ? "gray" : "transparent", // Highlight selected item
-                                        color: selectedApplication === item ? "white" : "black", // Optional: improve readability
-                                        cursor: "pointer", // Optional: show interactivity
-                                    }}
-                                >
-                                    {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}
-                                </div>
-                            ))}
-                        </CustomAccordionStyleB>
+                        {/*<CustomAccordionStyleB title="This Month">*/}
+                        {/*    {thisMonth.map((item, index) => (*/}
+                        {/*        <div*/}
+                        {/*            key={index}*/}
+                        {/*            onClick={() => setSelectedApplication(item)}*/}
+                        {/*            style={{*/}
+                        {/*                padding: 5,*/}
+                        {/*                borderBottom: "1px solid lightgray",*/}
+                        {/*                fontSize: 14,*/}
+                        {/*                backgroundColor: selectedApplication === item ? "gray" : "transparent", // Highlight selected item*/}
+                        {/*                color: selectedApplication === item ? "white" : "black", // Optional: improve readability*/}
+                        {/*                cursor: "pointer", // Optional: show interactivity*/}
+                        {/*            }}*/}
+                        {/*        >*/}
+                        {/*            {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}*/}
+                        {/*        </div>*/}
+                        {/*    ))}*/}
+                        {/*</CustomAccordionStyleB>*/}
 
 
-                        <CustomAccordionStyleB title="This Year">
-                            {thisYear.map((item, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => setSelectedApplication(item)}
-                                    style={{
-                                        padding: 5,
-                                        borderBottom: "1px solid lightgray",
-                                        fontSize: 14,
-                                        backgroundColor: selectedApplication === item ? "gray" : "transparent", // Highlight selected item
-                                        color: selectedApplication === item ? "white" : "black", // Optional: text readability
-                                        cursor: "pointer", // Optional: make it interactive
-                                    }}
-                                >
-                                    {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}
-                                </div>
-                            ))}
-                        </CustomAccordionStyleB>
+                        {/*<CustomAccordionStyleB title="This Year">*/}
+                        {/*    {thisYear.map((item, index) => (*/}
+                        {/*        <div*/}
+                        {/*            key={index}*/}
+                        {/*            onClick={() => setSelectedApplication(item)}*/}
+                        {/*            style={{*/}
+                        {/*                padding: 5,*/}
+                        {/*                borderBottom: "1px solid lightgray",*/}
+                        {/*                fontSize: 14,*/}
+                        {/*                backgroundColor: selectedApplication === item ? "gray" : "transparent", // Highlight selected item*/}
+                        {/*                color: selectedApplication === item ? "white" : "black", // Optional: text readability*/}
+                        {/*                cursor: "pointer", // Optional: make it interactive*/}
+                        {/*            }}*/}
+                        {/*        >*/}
+                        {/*            {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}*/}
+                        {/*        </div>*/}
+                        {/*    ))}*/}
+                        {/*</CustomAccordionStyleB>*/}
 
 
-                        <CustomAccordionStyleB title="Older">
-                            {older.map((item, index) => (
-                                <div
-                                    key={index}
-                                    onClick={() => setSelectedApplication(item)}
-                                    style={{
-                                        padding: 5,
-                                        borderBottom: "1px solid lightgray",
-                                        fontSize: 14,
-                                        backgroundColor: selectedApplication === item ? "gray" : "transparent", // Highlight selected item
-                                        color: selectedApplication === item ? "white" : "black", // Optional: improve readability
-                                        cursor: "pointer", // Optional: show interactivity
-                                    }}
-                                >
-                                    {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}
-                                </div>
-                            ))}
-                        </CustomAccordionStyleB>
+                        {/*<CustomAccordionStyleB title="Older">*/}
+                        {/*    {older.map((item, index) => (*/}
+                        {/*        <div*/}
+                        {/*            key={index}*/}
+                        {/*            onClick={() => setSelectedApplication(item)}*/}
+                        {/*            style={{*/}
+                        {/*                padding: 5,*/}
+                        {/*                borderBottom: "1px solid lightgray",*/}
+                        {/*                fontSize: 14,*/}
+                        {/*                backgroundColor: selectedApplication === item ? "gray" : "transparent", // Highlight selected item*/}
+                        {/*                color: selectedApplication === item ? "white" : "black", // Optional: improve readability*/}
+                        {/*                cursor: "pointer", // Optional: show interactivity*/}
+                        {/*            }}*/}
+                        {/*        >*/}
+                        {/*            {`${item.data.openAIJobTitle} - ${item.data.openAIJobCompanyName}`}*/}
+                        {/*        </div>*/}
+                        {/*    ))}*/}
+                        {/*</CustomAccordionStyleB>*/}
 
 
                     </div>
 
                     {/* Right Column */}
-                    <div className="col-md-10 px-2">
+                    <div className="col-md-9 px-2">
                         {selectedApplication ? (
                             <div>
                                 <div className="row align-items-baseline">
@@ -425,6 +587,40 @@ export const MyJobApplications: React.FC = () => {
                             </div>
                         )}
                     </div>
+                </div>
+            )}
+            {!isLoading && (
+                <div className="row g-1 p-2 p-md-0">
+                    <Dialog open={isDeleteDialogOpen} as="div" className="relative z-10 focus:outline-none"
+                            onClose={closeDeleteDialog}>
+                        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                            <div className="flex min-h-full items-center justify-center p-4">
+                                <DialogPanel
+                                    transition
+                                    className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                                >
+                                    <div className={"flex justify-between items-center mb-4"}>
+                                        {`Delete CV: ${jobApplicationToDelete?.data.openAIJobTitle} - ${jobApplicationToDelete?.data.openAIJobCompanyName}`}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             fill="currentColor" className="bi bi-x-lg" viewBox="0 0 16 16"
+                                             onClick={closeDeleteDialog} cursor={"pointer"}>
+                                            <path
+                                                d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                        </svg>
+                                    </div>
+                                    <text>Are you sure you want to delete this cv</text>
+                                    <div className="mt-4">
+                                        <Button
+                                            className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                        onClick={deleteJobApplication}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </div>
+                                </DialogPanel>
+                            </div>
+                        </div>
+                    </Dialog>
                 </div>
             )}
         </div>

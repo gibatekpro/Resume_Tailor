@@ -12,12 +12,12 @@ export interface ResumeInfo {
         profession?: string;
         summary?: string;
     },
+    contactInfo?: ContactInfo[],
     skills?: string[],
-    education?: Education[],
     workExperience?: WorkExperience[],
-    languages?: Language[],
     projects?: Project[],
-    contactInfo?: ContactInfo[]
+    education?: Education[],
+    languages?: Language[],
     hobbies?: string[],
     otherInterests?: string[],
 

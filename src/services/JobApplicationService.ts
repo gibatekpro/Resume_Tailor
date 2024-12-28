@@ -222,7 +222,7 @@ class JobApplicationService {
             const userRulesDocRef = doc(db, userRulesDocPath);
             await setDoc(userRulesDocRef, { rules });
 
-            console.log(`Rules for user ${uid} have been saved successfully.`);
+            // console.log(`Rules for user ${uid} have been saved successfully.`);
         } catch (error) {
             console.error("Error saving user rules:", error);
             throw new Error("Failed to save user rules.");

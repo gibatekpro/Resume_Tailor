@@ -86,7 +86,6 @@ export const TailorResumePageB: React.FC = () => {
     }
 
     const handleResumeClick = (resume: SavedResumesResponse) => {
-        console.log(resume)
         setIsBeingEdited(resume)
         customResumeFormFormik.setValues(resume.data);
     };
@@ -176,6 +175,7 @@ export const TailorResumePageB: React.FC = () => {
     const instructionFormFormik = useFormik({
         initialValues: {
             ...InstructionResumeData,
+            jobDescriptionData: localStorage.getItem(STORAGE.JOB_DESCRIPTION) || "",
             rules: savedRules || InstructionResumeData.rules,
         },
         validationSchema: () => Yup.object().shape({
@@ -189,9 +189,9 @@ export const TailorResumePageB: React.FC = () => {
                     resumeInfo: customResumeFormFormik.values,
                 };
 
-                console.log(JSON.stringify(openAIInstruction));
                 // Save rules (if applicable)
                 if (openAIInstruction.rules && user) {
+                    localStorage.setItem(STORAGE.JOB_DESCRIPTION, values.jobDescriptionData || "");
                     await saveInstructionRules(user, openAIInstruction.rules);
                 }
 
@@ -200,6 +200,8 @@ export const TailorResumePageB: React.FC = () => {
 
                 if (response) {
                     const parsedResponse = response;
+                    console.log(parsedResponse);
+                    localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(parsedResponse) || "{}");
                     setJobApplicationInfo(parsedResponse);
                     await generatedResumeFormFormik.setValues(parsedResponse.resumeInfo);
                 }
@@ -272,7 +274,6 @@ export const TailorResumePageB: React.FC = () => {
             openAISimpleJobDescription: jobApplicationInfo?.openAISimpleJobDescription,
             resumeInfo: generatedResumeFormFormik.values,
         }
-        localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(savedJobApplicationInfo));
     }, [generatedResumeFormFormik]);
 
     useEffect(() => {
@@ -424,8 +425,6 @@ export const TailorResumePageB: React.FC = () => {
                                                     <Col
                                                         lg={12}
                                                         onClick={() => {
-                                                            console.log("index" + index)
-                                                            console.log("isBeingEditedIndex" + isBeingEditedIndex)
                                                             handleResumeClick(resume);
                                                             setIsBeingEditedIndex(index);
                                                         }}

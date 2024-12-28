@@ -81,10 +81,6 @@ export const JobApplicationPreviewPage: React.FC<{
         },
     });
 
-    useEffect(() => {
-        console.log("JobApplicationPreviewPage", savedApplicationData.openAIJobTitle);
-    }, []);
-
     // useEffect(() => {
     //     const updateApplicationData = () => {
     //         const storedData: JobApplicationInfo = JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}");

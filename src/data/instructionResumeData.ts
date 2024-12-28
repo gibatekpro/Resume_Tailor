@@ -8,5 +8,4 @@ export const InstructionResumeData: OpenAIInstruction = {
     rules: openAIInstruction.rules || [
         ""
     ],
-    jobDescriptionData: localStorage.getItem(STORAGE.JOB_DESCRIPTION) || "",
 };

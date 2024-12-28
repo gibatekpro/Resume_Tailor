@@ -183,40 +183,34 @@ export const TailorResumePageB: React.FC = () => {
         }),
         onSubmit: async (values) => {
             setIsLoading(true);
-            const openAIInstruction: OpenAIInstruction = {
-                ...values,
-                resumeInfo: customResumeFormFormik.values
-            }
-            if (openAIInstruction.rules !== undefined && user !== null) {
-                await saveInstructionRules(user, openAIInstruction.rules);
-            }
-            const response = await getOpenAIResponse(JSON.stringify(openAIInstruction));
+            try {
+                const openAIInstruction: OpenAIInstruction = {
+                    ...values,
+                    resumeInfo: customResumeFormFormik.values,
+                };
 
-            if (response) {
-                const parsedResponse = JSON.parse(response);
-                setJobApplicationInfo(parsedResponse);
-                await generatedResumeFormFormik.setValues(parsedResponse.resumeInfo);
-            }
+                // Save rules (if applicable)
+                if (openAIInstruction.rules && user) {
+                    await saveInstructionRules(user, openAIInstruction.rules);
+                }
 
-            setIsLoading(false);
-        },
+                // Fetch OpenAI Response
+                const response = await fetchOpenAIResponse(openAIInstruction);
+
+                if (response) {
+                    const parsedResponse = response;
+                    setJobApplicationInfo(parsedResponse);
+                    await generatedResumeFormFormik.setValues(parsedResponse.resumeInfo);
+                }
+            } catch (error) {
+                console.error("Error during resume generation:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
     });
 
-    const getOpenAIResponse = async (prompt: string): Promise<string | null> => {
-        try {
-            const response = await fetchOpenAIResponse(prompt);
-
-            // Assuming `response.choices` structure
-            let jsonContent = response.choices[0]?.message?.content;
-
-            console.log("Parsed JSON Response:", prompt);
-
-            return jsonContent || null;
-        } catch (error) {
-            console.error("Error parsing JSON response:", error);
-            return null;
-        }
-    };
 
     const saveInstructionRules = async (uid: string, rules: string[]) => {
         try {
@@ -288,9 +282,10 @@ export const TailorResumePageB: React.FC = () => {
 
                 setResumeList(savedResumes);
 
-                if (resumeList.length > 0){
+                if (savedResumes.length > 0){
 
-                    setIsBeingEdited(resumeList[0])
+                    setIsBeingEdited(savedResumes[0])
+                    setIsBeingEditedIndex(0);
 
                 }
 
@@ -299,7 +294,6 @@ export const TailorResumePageB: React.FC = () => {
                 setIsLoading(false);
             }
         };
-
 
         const fetchSavedInstructionRules = async () => {
             try {
@@ -323,6 +317,10 @@ export const TailorResumePageB: React.FC = () => {
             instructionFormFormik.setFieldValue('rules', savedRules);
         }
     }, [savedRules]);
+
+    useEffect(() => {
+        isBeingEdited != null ? customResumeFormFormik.setValues(isBeingEdited?.data) : customResumeFormFormik.setValues(DefaultResumeData)
+    }, [isBeingEdited]);
 
     return (
 
@@ -534,7 +532,7 @@ export const TailorResumePageB: React.FC = () => {
                                     ...styles.borderTopStyle,
                                     ...styles.borderBottomStyle
                                 }}>
-                                    <Col xs={3} sm={3} md={3} lg={3} xl={3} className="flex">
+                                    <Col xs={4} sm={4} md={4} lg={4} xl={4} className="flex">
                                         <button
                                             onClick={() => {
                                                 console.log("Template button clicked!");
@@ -548,7 +546,7 @@ export const TailorResumePageB: React.FC = () => {
                                                 padding: "4px",
                                                 borderRadius: "4px",
                                                 cursor: "pointer",
-                                                fontSize: 14,
+                                                fontSize: 12,
                                                 transition: "background-color 0.3s, color 0.3s",
                                             }}
                                             onMouseEnter={(e) => {
@@ -564,10 +562,10 @@ export const TailorResumePageB: React.FC = () => {
                                         </button>
                                     </Col>
 
-                                    <Col xs={6} sm={6} md={6} lg={6} xl={6} style={styles.rightBorderStyle} className={"pl-2"}>
+                                    <Col xs={5} sm={5} md={5} lg={5} xl={5} style={styles.rightBorderStyle} className={"pl-2"}>
                                         AI Generated Output
                                     </Col>
-                                    <Col xs={3} sm={3} md={3} lg={3} xl={3}
+                                    <Col xs={2} sm={2} md={2} lg={2} xl={2}
                                          style={{alignItems: "center", textAlign: "center"}}>
                                         <button type="button" className="btn" data-bs-toggle="tooltip"
                                                 data-bs-placement="top" title="Add Section">

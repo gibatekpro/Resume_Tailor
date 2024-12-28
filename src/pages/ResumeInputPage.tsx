@@ -54,7 +54,7 @@ export const ResumeInputPage: React.FC = () => {
         try {
             const parsedData = JSON.parse(pastedData);
             setResumeData(parsedData);
-            await getResponse();
+            // await getResponse(); //TODO:
             showToastNotification("Resume data submitted!"); // Show toast on submit
         } catch (error) {
             console.error('Failed to submit data. Invalid JSON:', error);
@@ -75,11 +75,11 @@ export const ResumeInputPage: React.FC = () => {
     const getResponse = async () => {
         try {
             const prompt = instructionData + jobDescriptionData;
-            const response = await fetchOpenAIResponse(prompt);
-
-            let jsonContent = response.choices[0]?.message?.content;
-
-            console.log("Parsed JSON Response:", jsonContent);
+            // const response = await fetchOpenAIResponse(prompt);//TODO:
+            //
+            // let jsonContent = response.choices[0]?.message?.content;
+            //
+            // console.log("Parsed JSON Response:", jsonContent);
         } catch (error) {
             console.error("Error parsing JSON response:", error);
         }

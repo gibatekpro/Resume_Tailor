@@ -118,7 +118,7 @@ class JobApplicationService {
                 data: doc.data() as ResumeInfo,
             }));
 
-            console.log("Resumes fetched successfully:", savedResumes);
+            // console.log("Resumes fetched successfully:", savedResumes);
             return savedResumes;
         } catch (error) {
             console.error("Error fetching resumes:", error);

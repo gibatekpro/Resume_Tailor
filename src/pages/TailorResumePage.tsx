@@ -74,33 +74,33 @@ export const TailorResumePage: React.FC = () => {
                 ...values,
                 resumeInfo: customResumeFormFormik.values
             }
-            const response = await getOpenAIResponse(JSON.stringify(openAIInstruction));
-
-            if (response) {
-                const parsedResponse = JSON.parse(response);
-                setJobApplicationInfo(parsedResponse);
-                await generatedResumeFormFormik.setValues(parsedResponse.resumeInfo);
-            }
+            // const response = await getOpenAIResponse(JSON.stringify(openAIInstruction));
+            //
+            // if (response) {
+            //     const parsedResponse = JSON.parse(response);
+            //     setJobApplicationInfo(parsedResponse);
+            //     await generatedResumeFormFormik.setValues(parsedResponse.resumeInfo);
+            // }
 
             setIsLoading(false);
         },
     });
 
-    const getOpenAIResponse = async (prompt: string): Promise<string | null> => {
-        try {
-            const response = await fetchOpenAIResponse(prompt);
-
-            // Assuming `response.choices` structure
-            let jsonContent = response.choices[0]?.message?.content;
-
-            console.log("Parsed JSON Response:", jsonContent);
-
-            return jsonContent || null;
-        } catch (error) {
-            console.error("Error parsing JSON response:", error);
-            return null;
-        }
-    };
+    // const getOpenAIResponse = async (prompt: string): Promise<string | null> => {
+    //     try {
+    //         const response = await fetchOpenAIResponse(prompt);
+    //
+    //         // Assuming `response.choices` structure
+    //         let jsonContent = response.choices[0]?.message?.content;
+    //
+    //         console.log("Parsed JSON Response:", jsonContent);
+    //
+    //         return jsonContent || null;
+    //     } catch (error) {
+    //         console.error("Error parsing JSON response:", error);
+    //         return null;
+    //     }
+    // };
 
     const overlayStyle = {
         position: "fixed" as const,

@@ -1,19 +1,20 @@
 import axios from "axios";
+import {OpenAIInstruction} from "../models/OpenAIInstruction";
 
-export const fetchOpenAIResponse = async (prompt: string): Promise<any> => {
-
+export const fetchOpenAIResponse = async (instruction: OpenAIInstruction): Promise<any> => {
     const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
     const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+
     if (!OPENAI_API_KEY) {
-        console.error("OPENAI_API_KEY is not defined in the environment");
-        throw new Error("API key is missing");
+        throw new Error("OpenAI API key is missing. Please check your environment variables.");
     }
+
     try {
         const response = await axios.post(
             OPENAI_API_URL,
             {
-                model: "gpt-4o-2024-08-06", // Replace with the desired model
-                messages: [{ role: "user", content: prompt }],
+                model: "gpt-4", // Use the latest or appropriate model
+                messages: [{ role: "user", content: JSON.stringify(instruction) }],
             },
             {
                 headers: {
@@ -23,10 +24,15 @@ export const fetchOpenAIResponse = async (prompt: string): Promise<any> => {
             }
         );
 
-        // Returning JSON response
-        return response.data;
-    }catch (error) {
-        console.error("Error fetching OpenAI response:", error);
+        // Validate and parse response
+        if (response.data?.choices?.length > 0) {
+            const content = response.data.choices[0].message.content;
+            return JSON.parse(content);
+        } else {
+            throw new Error("Invalid response from OpenAI.");
+        }
+    } catch (error) {
+        console.error("Error fetching OpenAI response:", error || "Details of Error not returned");
         throw error;
     }
 };

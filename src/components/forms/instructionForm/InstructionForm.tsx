@@ -5,6 +5,7 @@ import {useResumeProvider} from "../../../context/ResumeContext";
 import * as Yup from "yup";
 import {fetchOpenAIResponse} from "../../../services/OpenAIService";
 import {RulesInput} from "./RulesInput";
+import {openAIInstruction} from "../../../data/openAIInstruction";
 
 interface InstructionFormProps {
     instructionFormFormik: any
@@ -41,6 +42,11 @@ const InstructionForm: React.FC<InstructionFormProps> = ({instructionFormFormik,
         instructionFormFormik.setFieldValue(field, "");
     };
 
+    const resetRules = () => {
+        // console.log("Resetting rules to:", openAIInstruction?.rules);
+        instructionFormFormik.setFieldValue("rules", openAIInstruction?.rules);
+    };
+
     return (
         <div className="mt-0 mt-md-4">
             <div className="flex justify-center items-center">
@@ -50,8 +56,6 @@ const InstructionForm: React.FC<InstructionFormProps> = ({instructionFormFormik,
                             title={"Job Description"}
                             pasteItem={() => pasteItem("jobDescriptionData")}
                             clearField={() => clearField("jobDescriptionData")}
-                            hasAddIcon={false}
-                            hasDeleteIcon={false}
                             hasPasteIcon={true}
                             hasClearIcon={true}
                         />
@@ -73,10 +77,8 @@ const InstructionForm: React.FC<InstructionFormProps> = ({instructionFormFormik,
                     <div className={"mt-5"}></div>
                     <SectionHeader
                         title={"OpenAI Instructions"}
-                        hasAddIcon={false}
-                        hasDeleteIcon={false}
-                        hasPasteIcon={false}
-                        hasClearIcon={false}
+                        reset={resetRules}
+                        hasResetButton={true}
                     />
                     <div className="bg-white mb-1">
                         {instructionFormFormik?.values?.rules?.map((_: string, index: number) => (

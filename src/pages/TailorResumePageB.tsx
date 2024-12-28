@@ -203,7 +203,7 @@ export const TailorResumePageB: React.FC = () => {
                     await generatedResumeFormFormik.setValues(parsedResponse.resumeInfo);
                 }
             } catch (error) {
-                console.error("Error during resume generation:", error);
+                console.error("Error during resume generation:");
             } finally {
                 setIsLoading(false);
             }
@@ -510,7 +510,7 @@ export const TailorResumePageB: React.FC = () => {
                     </div>
 
 
-                    <div className="col-md-4">
+                    <div className="col-md-4 px-2">
                         <InstructionForm
                             isLoading={isLoading}
                             instructionFormFormik={instructionFormFormik}/>
@@ -535,7 +535,6 @@ export const TailorResumePageB: React.FC = () => {
                                     <Col xs={4} sm={4} md={4} lg={4} xl={4} className="flex">
                                         <button
                                             onClick={() => {
-                                                console.log("Template button clicked!");
                                                 setIsBeingEditedIndex(-1);
                                                 customResumeFormFormik.setValues(generatedResumeFormFormik.values);
                                             }}

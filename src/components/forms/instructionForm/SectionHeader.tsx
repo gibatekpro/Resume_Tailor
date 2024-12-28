@@ -6,22 +6,26 @@ interface SectionHeaderProps {
     removeSection?: () => void;
     pasteItem?: () => void;
     clearField?: () => void;
-    hasAddIcon: boolean;
-    hasDeleteIcon: boolean;
-    hasPasteIcon: boolean;
-    hasClearIcon: boolean;
+    reset?: () => void;
+    hasAddIcon?: boolean;
+    hasDeleteIcon?: boolean;
+    hasPasteIcon?: boolean;
+    hasClearIcon?: boolean;
+    hasResetButton?: boolean;
 }
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
                                                                 title,
                                                                 addToSection,
                                                                 removeSection,
-                                                                hasAddIcon,
-                                                                hasDeleteIcon,
-                                                                hasPasteIcon,
+                                                                hasAddIcon = false,
+                                                                hasDeleteIcon = false,
+                                                                hasPasteIcon = false,
+                                                                reset,
                                                                 pasteItem,
                                                                 clearField,
-                                                                hasClearIcon,
+                                                                hasClearIcon = false,
+                                                                hasResetButton = false
                                                             }) => {
     return (
         <div className="flex justify-between items-center mb-4">
@@ -101,6 +105,40 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
                     </button>
 
                 }
+
+                {hasResetButton &&
+                    <button
+                        onClick={(event) => {
+                            event.preventDefault();
+                            if (reset) {
+                                // console.log("Resetting rules ");
+                                reset();
+                            }
+                        }}
+                        style={{
+                            backgroundColor: "white",
+                            border: "1px solid darkgray",
+                            color: "black",
+                            padding: "4px",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: 12,
+                            transition: "background-color 0.3s, color 0.3s",
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "darkgray";
+                            e.currentTarget.style.color = "white";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "white";
+                            e.currentTarget.style.color = "black";
+                        }}
+                        className={"mx-4"}
+                    >
+                        Reset
+                    </button>
+                }
+
             </div>
         </div>
     );

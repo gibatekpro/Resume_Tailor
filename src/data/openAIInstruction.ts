@@ -8,7 +8,7 @@ export const openAIInstruction: OpenAIInstruction = {
         "- Fill missing objects labeled 'openAI' using the job description.",
         "- Document title format: `resumeInfo.firstName-resumeInfo.lastName-*company name`.",
         "- Use only the company name, e.g., 'john-doe-google-inc'.",
-        "- Skills: Include Java, C#, MySQL, and relevant job-specific skills.",
+        // "- Skills: Include Java, C#, MySQL, and relevant job-specific skills.",
         "- Job title and roles must align with the job description.",
         "- Use clear, concise language for roles. Avoid unnecessary buzzwords.",
         "Return a JSON object of this type:\n" +
@@ -34,6 +34,9 @@ export const openAIInstruction: OpenAIInstruction = {
         // "The roles must be based on job description. Do not use .NET roles for JAVA",
         // "Change roles to match the given job description",
         // "Luv2Shop E-commerce Website Project name should be the same, but its project details should be based on job description",
+        "Do not alter first name, last name and profession",
+        "Profile summary must match job description",
+        "My work experience must match job description",
         "Ensure job title and roles match the description.",
         "Keep the company name where I worked unchanged.",
         "Profile section should remain unaltered.",

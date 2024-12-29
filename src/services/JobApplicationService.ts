@@ -36,9 +36,9 @@ class JobApplicationService {
             // Add a new document with auto-generated ID in the user's sub-collection
             const docRef = await addDoc(userJobApplicationsRef, jobApplication);
 
-            console.log(
-                `Job application for user ${uid} has been saved successfully with ID: ${docRef.id}`
-            );
+            // console.log(
+            //     `Job application for user ${uid} has been saved successfully with ID: ${docRef.id}`
+            // );
         } catch (error) {
             console.error("Error saving job application:", error);
             throw new Error("Failed to save job application.");
@@ -63,7 +63,7 @@ class JobApplicationService {
             // Delete the document
             await deleteDoc(jobApplicationDocRef);
 
-            console.log(`Job application with ID ${jobApplicationId} for user ${uid} has been deleted successfully.`);
+            // console.log(`Job application with ID ${jobApplicationId} for user ${uid} has been deleted successfully.`);
         } catch (error) {
             console.error("Error deleting job application:", error);
             throw new Error("Failed to delete job application.");
@@ -90,7 +90,7 @@ class JobApplicationService {
                 data: doc.data() as JobApplicationInfo,
             }));
 
-            console.log("Job applications fetched successfully:", jobApplications);
+            // console.log("Job applications fetched successfully:", jobApplications);
             return jobApplications;
         } catch (error) {
             console.error("Error fetching job applications:", error);
@@ -115,10 +115,10 @@ class JobApplicationService {
 
             // Add a new document with auto-generated ID in the user's sub-collection
             const docRef = await addDoc(userResumeDataRef, resumeData);
-
-            console.log(
-                `Resume data for user ${uid} has been saved successfully with ID: ${docRef.id}`
-            );
+            //
+            // console.log(
+            //     `Resume data for user ${uid} has been saved successfully with ID: ${docRef.id}`
+            // );
         } catch (error) {
             console.error("Error saving resume data:", error);
             throw new Error("Failed to save resume data.");
@@ -170,7 +170,7 @@ class JobApplicationService {
             // Delete the document
             await deleteDoc(resumeDocRef);
 
-            console.log(`Resume with ID ${resumeId} for user ${uid} has been deleted successfully.`);
+            // console.log(`Resume with ID ${resumeId} for user ${uid} has been deleted successfully.`);
         } catch (error) {
             console.error("Error deleting resume data:", error);
             throw new Error("Failed to delete resume data.");
@@ -199,7 +199,7 @@ class JobApplicationService {
             // Replace the entire document with the new data
             await setDoc(resumeDocRef, updatedData);
 
-            console.log(`Resume with ID ${resumeId} for user ${uid} has been updated successfully.`);
+            // console.log(`Resume with ID ${resumeId} for user ${uid} has been updated successfully.`);
         } catch (error) {
             console.error("Error updating resume data:", error);
             throw new Error("Failed to update resume data.");

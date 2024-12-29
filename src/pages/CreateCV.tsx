@@ -169,12 +169,10 @@ export const CreateCV: React.FC = () => {
             setIsSaveFailed(false);
             try {
                 if (isBeingEdited?.id) {
-                    console.log("Is being edited " + isBeingEdited?.id + isBeingEdited?.data);
                     await JobApplicationService.editResume(
                         user ?? "", isBeingEdited?.id || "", isBeingEdited!.data
                     )
                 } else {
-                    console.log("Is New CV");
                     const theResumeData: ResumeInfo = customResumeFormFormik.values;
                     theResumeData.resumeName = values.resumeName;
                     await JobApplicationService.saveResume(
@@ -282,7 +280,6 @@ export const CreateCV: React.FC = () => {
     }
 
     const handleResumeClick = (resume: SavedResumesResponse) => {
-        console.log(resume)
         setIsBeingEdited(resume)
         customResumeFormFormik.setValues(resume.data);
         resumeNameFormFormik.setValues({

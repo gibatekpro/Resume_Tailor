@@ -200,7 +200,6 @@ export const TailorResumePageB: React.FC = () => {
 
                 if (response) {
                     const parsedResponse = response;
-                    console.log(parsedResponse);
                     localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(parsedResponse) || "{}");
                     setJobApplicationInfo(parsedResponse);
                     await generatedResumeFormFormik.setValues(parsedResponse.resumeInfo);

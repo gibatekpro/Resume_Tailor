@@ -20,8 +20,9 @@ import {CustomAccordion} from "../custom_tags/CustomAccordion";
 import {openAIInstruction} from "../data/openAIInstruction";
 import moment from "moment";
 import {SavedResumesResponse} from "../models/SavedResumesResponse";
-import {Col, Row} from "react-bootstrap";
+import {Button, Col, Row} from "react-bootstrap";
 import STORAGE from "../data/storage";
+import {Dialog, DialogPanel} from "@headlessui/react";
 
 export const TailorResumePageB: React.FC = () => {
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
@@ -48,6 +49,7 @@ export const TailorResumePageB: React.FC = () => {
     const [resumePreviewClassName, setResumePreviewClassName] = useState("col-md-8 px-2");
     const [isResumesPanelOpen, setIsResumesPanelOpen] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [generateHasError, setGenerateHasError] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [resumeList, setResumeList] = useState<SavedResumesResponse[]>([])
     const [activeTab, setActiveTab] = useState("link-1");
@@ -57,19 +59,21 @@ export const TailorResumePageB: React.FC = () => {
         setIsDeleteDialogOpen(false);
     }
 
+    const openDialog = (hasError: boolean) => {
+        setIsLoading(false);
+        if (hasError) {
+            setIsDialogOpen(true);
+            setGenerateHasError(true)
+        } else {
+            setIsDialogOpen(true);
+            setGenerateHasError(false);
+        }
 
-    const handleSave = () => {
-        openDialog()
-    }
-
-    const openDialog = () => {
-        setIsDialogOpen(true);
     }
 
     const closeDialog = () => {
         setIsDialogOpen(false);
-        setIsSaveComplete(false);
-        setIsSaveFailed(false);
+        setGenerateHasError(false);
     }
 
 
@@ -166,6 +170,17 @@ export const TailorResumePageB: React.FC = () => {
             //     alert("Job application saved successfully.");
             // } catch (error) {
             // }
+            const jobAppInfo: JobApplicationInfo | undefined = jobApplicationInfo;
+            if (jobAppInfo != null || jobAppInfo !== undefined) {
+                const updatedData: JobApplicationInfo = {
+                    ...jobAppInfo,
+                    resumeInfo: {
+                        resumeName: jobAppInfo?.resumeInfo?.resumeName,
+                        ...values
+                    }
+                }
+                localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(updatedData) || "{}");
+            }
             navigate(ROUTES.APPLICATION_PREVIEW);
             setIsLoading(false)
             // navigate(ROUTES.RESUME_INPUT_PAGE);
@@ -195,14 +210,17 @@ export const TailorResumePageB: React.FC = () => {
                     await saveInstructionRules(user, openAIInstruction.rules);
                 }
 
-                // Fetch OpenAI Response
+                //Fetch OpenAI Response
                 const response = await fetchOpenAIResponse(openAIInstruction);
-
                 if (response) {
+                    openDialog(false);
                     const parsedResponse = response;
                     localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(parsedResponse) || "{}");
+                    console.log(parsedResponse);
                     setJobApplicationInfo(parsedResponse);
                     await generatedResumeFormFormik.setValues(parsedResponse.resumeInfo);
+                } else {
+                    openDialog(true);
                 }
             } catch (error) {
                 console.error("Error during resume generation:");
@@ -283,7 +301,7 @@ export const TailorResumePageB: React.FC = () => {
 
                 setResumeList(savedResumes);
 
-                if (savedResumes.length > 0){
+                if (savedResumes.length > 0) {
 
                     setIsBeingEdited(savedResumes[0])
                     setIsBeingEditedIndex(0);
@@ -331,6 +349,46 @@ export const TailorResumePageB: React.FC = () => {
                 <div style={overlayStyle}>
                     <div style={loadingMessageStyle}>Loading, please wait...</div>
                 </div>
+            )}
+            {isDialogOpen && (
+                <Dialog open={isDialogOpen} as="div" className="relative z-0 focus:outline-none" style={overlayStyle}
+                        onClose={closeDialog}>
+                    <div className="fixed inset-0 z-0 w-screen overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4">
+                            <DialogPanel
+                                transition
+                                className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                            >
+                                <div className={"flex justify-between items-center mb-4"}>
+                                    {generateHasError ? (
+                                        "Failed"
+                                    ) : (
+                                        "Successful"
+                                    )}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                         fill="currentColor" className="bi bi-x-lg" viewBox="0 0 16 16"
+                                         onClick={closeDeleteDialog} cursor={"pointer"}>
+                                        <path
+                                            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                    </svg>
+                                </div>
+                                {generateHasError ? (
+                                    <text>Failed to generate an output. Check logs for details.</text>
+                                ) : (
+                                    <text>Successfully generated an resume</text>
+                                )}
+                                <div className="mt-4">
+                                    <Button
+                                        className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                        onClick={closeDialog}
+                                    >
+                                        ok
+                                    </Button>
+                                </div>
+                            </DialogPanel>
+                        </div>
+                    </div>
+                </Dialog>
             )}
 
             <div style={isLoading ? blurredStyle : {}}>
@@ -560,7 +618,8 @@ export const TailorResumePageB: React.FC = () => {
                                         </button>
                                     </Col>
 
-                                    <Col xs={5} sm={5} md={5} lg={5} xl={5} style={styles.rightBorderStyle} className={"pl-2"}>
+                                    <Col xs={5} sm={5} md={5} lg={5} xl={5} style={styles.rightBorderStyle}
+                                         className={"pl-2"}>
                                         AI Generated Output
                                     </Col>
                                     <Col xs={2} sm={2} md={2} lg={2} xl={2}

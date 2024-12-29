@@ -13,7 +13,7 @@ export const fetchOpenAIResponse = async (instruction: OpenAIInstruction): Promi
         const response = await axios.post(
             OPENAI_API_URL,
             {
-                model: "gpt-4", // Use the latest or appropriate model
+                model: "gpt-4o", // Use the latest or appropriate model
                 messages: [{ role: "user", content: JSON.stringify(instruction) }],
             },
             {

@@ -567,7 +567,7 @@ export const TailorResumePageB: React.FC = () => {
                     </div>
 
 
-                    <div className="col-md-4 px-2">
+                    <div className="col-md-4 px-2 mb-4 pb-4">
                         <InstructionForm
                             isLoading={isLoading}
                             instructionFormFormik={instructionFormFormik}/>

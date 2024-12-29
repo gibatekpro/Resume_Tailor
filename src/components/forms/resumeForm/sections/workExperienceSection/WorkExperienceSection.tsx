@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Col, Row } from "react-bootstrap";
-import {MONTHS} from "../../../../../data/applicationData";
+import {MONTHS, YEARS} from "../../../../../data/applicationData";
 import {DutyInput} from "./DutyInput";
 
 interface WorkExperienceSectionProps {
@@ -112,6 +112,7 @@ export const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
                             value={workExperienceList[index]?.startMonth || ""}
+                            defaultValue={MONTHS[0]}
                         >
                             {MONTHS.map((month) => (
                                 <option key={month} value={month}>
@@ -127,8 +128,9 @@ export const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
                             value={workExperienceList[index]?.startYear || ""}
+                            defaultValue={YEARS[0]}
                         >
-                            {Array.from({length: 50}, (_, i) => new Date().getFullYear() - i).map((year) => (
+                            {YEARS.map((year) => (
                                 <option key={year} value={year}>
                                     {year}
                                 </option>
@@ -151,6 +153,7 @@ export const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
                             value={workExperienceList[index]?.endMonth || ""}
+                            defaultValue={MONTHS[0]}
                         >
                             {MONTHS.map((month) => (
                                 <option key={month} value={month}>
@@ -166,8 +169,9 @@ export const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
                             value={workExperienceList[index]?.endYear || ""}
+                            defaultValue={YEARS[0]}
                         >
-                            {Array.from({length: 50}, (_, i) => new Date().getFullYear() - i).map((year) => (
+                            {YEARS.map((year) => (
                                 <option key={year} value={year}>
                                     {year}
                                 </option>

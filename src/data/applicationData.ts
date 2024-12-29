@@ -15,7 +15,6 @@ export interface ApplicationData{
 export const APP_TITLE:string = "Resume Tailor"
 
 export const MONTHS = [
-    "Select",
     "January",
     "February",
     "March",
@@ -29,6 +28,11 @@ export const MONTHS = [
     "November",
     "December",
 ];
+
+export const YEARS = Array.from(
+    { length: 50 },
+    (_, i) => new Date().getFullYear() - i
+);
 
 export const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,

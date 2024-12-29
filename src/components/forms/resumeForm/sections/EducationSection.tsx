@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {MONTHS} from "../../../../data/applicationData";
+import {MONTHS, YEARS} from "../../../../data/applicationData";
 import {Col, Row} from "react-bootstrap";
 
 interface EducationSectionProps {
@@ -115,6 +115,7 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
                             value={educationList[index]?.startMonth || ""}
+                            defaultValue={MONTHS[0]}
                         >
                             {MONTHS.map((month) => (
                                 <option key={month} value={month}>
@@ -130,8 +131,9 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
                             value={educationList[index]?.startYear || ""}
+                            defaultValue={YEARS[0]}
                         >
-                            {Array.from({length: 50}, (_, i) => new Date().getFullYear() - i).map((year) => (
+                            {YEARS.map((year) => (
                                 <option key={year} value={year}>
                                     {year}
                                 </option>
@@ -155,6 +157,7 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
                             value={educationList[index]?.endMonth || ""}
+                            defaultValue={MONTHS[0]}
                         >
                             {MONTHS.map((month) => (
                                 <option key={month} value={month}>
@@ -170,8 +173,9 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
                             value={educationList[index]?.endYear || ""}
+                            defaultValue={YEARS[0]}
                         >
-                            {Array.from({length: 50}, (_, i) => new Date().getFullYear() - i).map((year) => (
+                            {YEARS.map((year) => (
                                 <option key={year} value={year}>
                                     {year}
                                 </option>

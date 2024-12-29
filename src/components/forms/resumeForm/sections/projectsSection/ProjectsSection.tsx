@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import {ProjectDetailInput} from "./ProjectDetailInput";
-import {MONTHS} from "../../../../../data/applicationData";
+import {MONTHS, YEARS} from "../../../../../data/applicationData";
 
 interface ProjectsSectionProps {
     resumeFormFormik: any; // Replace 'any' with the type from your Formik configuration.
@@ -116,6 +116,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
                             value={projectList[index]?.startMonth || ""}
+                            defaultValue={MONTHS[0]}
                         >
                             {MONTHS.map((month) => (
                                 <option key={month} value={month}>
@@ -131,8 +132,9 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
                             value={projectList[index]?.startYear || ""}
+                            defaultValue={YEARS[0]}
                         >
-                            {Array.from({length: 50}, (_, i) => new Date().getFullYear() - i).map((year) => (
+                            {YEARS.map((year) => (
                                 <option key={year} value={year}>
                                     {year}
                                 </option>
@@ -155,6 +157,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
                             value={projectList[index]?.endMonth || ""}
+                            defaultValue={MONTHS[0]}
                         >
                             {MONTHS.map((month) => (
                                 <option key={month} value={month}>
@@ -170,8 +173,9 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                             className={inputFieldClassName + " sm:text-sm"}
                             onChange={resumeFormFormik.handleChange}
                             value={projectList[index]?.endYear || ""}
+                            defaultValue={YEARS[0]}
                         >
-                            {Array.from({length: 50}, (_, i) => new Date().getFullYear() - i).map((year) => (
+                            {YEARS.map((year) => (
                                 <option key={year} value={year}>
                                     {year}
                                 </option>

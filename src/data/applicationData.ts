@@ -15,6 +15,7 @@ export interface ApplicationData{
 export const APP_TITLE:string = "Resume Tailor"
 
 export const MONTHS = [
+    "Select",
     "January",
     "February",
     "March",

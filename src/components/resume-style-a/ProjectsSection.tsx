@@ -37,8 +37,10 @@ export const ProjectsSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}
                         <text>{project.startMonth + project.startYear} - {project.endMonth + project.endYear}</text>
                     </CustomCol>
                     <CustomCol isLeft={false}>
-                        <h4>{project.role}</h4>
-                        <ul>
+                        <text  style={{
+                            fontWeight: 'bold'
+                        }}>{project.role}</text>
+                        <ul className="list-disc pl-5 mb-0">
                             {project.projectDetails.map((detail, detailIndex) => (
                                 <li key={detailIndex}>{detail}</li>
                             ))}

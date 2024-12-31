@@ -29,6 +29,11 @@ export const MONTHS = [
     "December",
 ];
 
+export const RESUME_STYLES = [
+    "StyleA",
+    "StyleB",
+];
+
 export const YEARS = Array.from(
     { length: 50 },
     (_, i) => new Date().getFullYear() - i

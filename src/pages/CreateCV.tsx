@@ -47,12 +47,6 @@ export const CreateCV: React.FC = () => {
         "mt-1 block w-full px-3 py-2 focus:outline-none " +
         "focus:ring-0 focus:border-black focus:border-2 sm:text-sm";
 
-    const designBorder = {
-        border: '1px solid black',
-        // border: 'none',
-    };    //Current date
-
-
     useEffect(() => {
         const fetchResumes = async () => {
             setIsLoading(true);
@@ -139,16 +133,6 @@ export const CreateCV: React.FC = () => {
         color: "#333",
         fontWeight: "bold" as const,
     };
-
-    const blurredStyle = {
-        filter: "blur(3px)",
-        pointerEvents: "none" as const,
-    };
-
-    const handleNavigate = (path: string) => {
-        localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(selectedApplication))
-        navigate(path)
-    }
 
     const customResumeFormFormik = useFormik({
         initialValues: isBeingEdited?.data || DefaultResumeData,
@@ -246,11 +230,9 @@ export const CreateCV: React.FC = () => {
         setIsDeleteDialogOpen(false)
     }
 
-
     const closeDeleteDialog = () => {
         setIsDeleteDialogOpen(false);
     }
-
 
     const handleSave = () => {
         openDialog()
@@ -265,7 +247,6 @@ export const CreateCV: React.FC = () => {
         setIsSaveComplete(false);
         setIsSaveFailed(false);
     }
-
 
     const openResumesPanel = () => {
         setResumeFormClassName("col-md-4 pb-4");
@@ -619,10 +600,10 @@ export const CreateCV: React.FC = () => {
                     <div className={resumePreviewClassName}>
                         <Nav fill variant="tabs" activeKey={activeTab} onSelect={handleSelect}>
                             <Nav.Item>
-                                <Nav.Link eventKey="link-1">Design A</Nav.Link>
+                                <Nav.Link eventKey="link-1">Style A</Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link eventKey="link-2">Design B</Nav.Link>
+                                <Nav.Link eventKey="link-2">Style B</Nav.Link>
                             </Nav.Item>
                         </Nav>
 
@@ -665,7 +646,7 @@ export const CreateCV: React.FC = () => {
                                             height: "fit-content",
                                         }}
                                     >
-                                        <ResumeStyleB resumeData={customResumeFormFormik.values}/>
+                                        <ResumeStyleA resumeData={customResumeFormFormik.values}/>
                                     </div>
                                 </div>
                             )}

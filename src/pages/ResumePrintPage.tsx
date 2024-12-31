@@ -8,6 +8,7 @@ import {APP_TITLE, LOCAL_STORAGE_APP_TITLE} from "../data/applicationData";
 import { useReactToPrint } from "react-to-print";
 import {ResumeInfo} from "../models/ResumeInfo";
 import STORAGE from "../data/storage";
+import {renderResumeStyle} from "../utils/HelperFunctions";
 
 export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void, setAppTitle:React.Dispatch<React.SetStateAction<string>> }> = ({ setHideNavbar, setAppTitle }) => {
     const [applicationData, setApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}"));
@@ -51,7 +52,7 @@ export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void,
         <div className={"print-page-container"}>
             <div ref={contentRef} className="pdf-container">
                 {/*<ResumeStyleA/>*/}
-                <ResumeStyleB resumeData={applicationData.resumeInfo || {}}/>
+                {renderResumeStyle(applicationData?.resumeInfo || {}, applicationData.resumeStyle)}
             </div>
         </div>
     );

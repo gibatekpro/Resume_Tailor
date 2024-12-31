@@ -12,6 +12,8 @@ import {JobApplicationsResponse} from "../models/JobApplicationsResponse";
 import STORAGE from "../data/storage";
 import {Dialog, DialogPanel} from "@headlessui/react";
 import {SavedResumesResponse} from "../models/SavedResumesResponse";
+import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
+import {renderResumeStyle} from "../utils/HelperFunctions";
 
 export const MyJobApplications: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -481,7 +483,7 @@ export const MyJobApplications: React.FC = () => {
                                 width: "fit-content",
                                 height: "fit-content",
                             }}>
-                                <ResumeStyleB resumeData={selectedApplication?.data.resumeInfo}/>
+                                {renderResumeStyle(selectedApplication?.data.resumeInfo, selectedApplication.data.resumeStyle)}
                             </div>
                         )}
                     </div>

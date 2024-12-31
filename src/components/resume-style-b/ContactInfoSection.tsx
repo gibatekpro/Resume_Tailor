@@ -54,7 +54,7 @@ export const ContactInfoSection: React.FC<{resumeData: ResumeInfo}> = ({resumeDa
                             rel="noopener noreferrer"
                             className="text-blue-500 underline p-0 m-0"
                         >
-                            {info.infoTitle}
+                            {info.infoLink}
                         </a>
                     </p>
                 ) : (

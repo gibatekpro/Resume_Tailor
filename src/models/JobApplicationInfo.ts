@@ -10,5 +10,6 @@ export interface JobApplicationInfo {
     openAIExpectedSalary?: string,
     openAIJobLocation?: string,
     openAISimpleJobDescription?: string,
+    resumeStyle?: string,
     resumeInfo?: ResumeInfo,
 }

@@ -13,11 +13,16 @@ export const ContactInfoSection: React.FC<{resumeData: ResumeInfo}> = ({resumeDa
                         <span key={index}>
                             {/* eslint-disable-next-line eqeqeq */}
                         {index !== 0 ? " | " : ""} <a href={info.infoLink} target="_blank"
-                                             rel="noopener noreferrer">{info.infoTitle}</a>
+                                                      rel="noopener noreferrer"><text style={{
+                            fontWeight: "bold",
+                        }}>{info.infoTitle}: </text> 
+                            {info.infoLink}</a>
                     </span>
                     ) : (
                         <span key={index}>
-                        {index !== 0 ? " | " : ""} {info.infoTitle}: {info.infoDetails}
+                            {index !== 0 ? " | " : ""} <text style={{
+                                fontWeight: "bold",
+                        }}>{info.infoTitle}: </text> {info.infoDetails}
                     </span>
                     )
                 ))}

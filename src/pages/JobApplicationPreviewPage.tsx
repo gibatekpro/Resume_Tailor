@@ -6,7 +6,7 @@ import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
 import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
 import JobApplicationService from "../services/JobApplicationService";
 import {
-    APP_TITLE,
+    APP_TITLE, RESUME_STYLES,
 } from "../data/applicationData";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import ROUTES from "../data/routes";
@@ -16,6 +16,8 @@ import {useFormik} from "formik";
 import {resumeData} from "../data/resumeData";
 import * as Yup from "yup";
 import STORAGE from "../data/storage";
+import {ResumeInfo} from "../models/ResumeInfo";
+import {renderResumeStyle} from "../utils/HelperFunctions";
 
 export const JobApplicationPreviewPage: React.FC<{
     setHideNavbar: (hide: boolean) => void,
@@ -29,11 +31,17 @@ export const JobApplicationPreviewPage: React.FC<{
     const [saved, setSaved] = useState(localStorage.getItem(STORAGE.LOCAL_STORAGE_RESUME_DATA));
     const [savedApplicationData, setSavedApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || JSON.parse("{}")));
     const resumeDataOpenAI = saved ? JSON.parse(saved) : DefaultResumeData;
+    const [selectedResumeStyle, setSelectedResumeStyle] = useState(RESUME_STYLES[0])
+
+    const imageStyles: { [key: string]: any } = {
+        StyleA: require('../assets/images/resume_styles/StyleA.png'),
+        StyleB: require('../assets/images/resume_styles/StyleB.png'),
+    };
 
     const saveAndPrint = async () => {
         setIsLoading(true);
         try {
-            // Save current form values to localStorage
+            //Save current form values to localStorage
             const storedData: JobApplicationInfo = JSON.parse(
                 localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}"
             );
@@ -41,15 +49,18 @@ export const JobApplicationPreviewPage: React.FC<{
                 ...storedData,
                 ...jobApplicationFormFormik.values,
             };
+
+            setIsLoading(false);
+
             localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(updatedData));
 
-            // Save job application to the server
+            //Save job application to the server
             await JobApplicationService.saveJobApplication(user ?? "", updatedData);
 
-            // Update the app title if available
+            //Update the app title if available
             setAppTitle(updatedData.openAIDocumentTitle || APP_TITLE);
 
-            // Navigate to the resume print page
+            //Navigate to the resume print page
             setIsLoading(false);
             setHideNavbar(true);
             navigate(ROUTES.RESUME_PRINT_PAGE);
@@ -67,6 +78,7 @@ export const JobApplicationPreviewPage: React.FC<{
             openAIJobLocation: savedApplicationData.openAIJobLocation || "",
             openAIDocumentTitle: savedApplicationData.openAIDocumentTitle || "",
             openAISimpleJobDescription: savedApplicationData.openAISimpleJobDescription || "",
+            resumeStyle: selectedResumeStyle
         },
         enableReinitialize: true,
         validationSchema: () => Yup.object().shape({
@@ -80,21 +92,6 @@ export const JobApplicationPreviewPage: React.FC<{
             saveAndPrint();
         },
     });
-
-    // useEffect(() => {
-    //     const updateApplicationData = () => {
-    //         const storedData: JobApplicationInfo = JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}");
-    //         console.log("savedApplicationData" + JSON.stringify(storedData));
-    //         const updatedData = {
-    //             ...storedData,
-    //             ...jobApplicationFormFormik.values,
-    //         };
-    //         localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(updatedData)); // Save updated data back to localStorage
-    //     };
-    //
-    //     updateApplicationData();
-    // }, [jobApplicationFormFormik.values]);
-
 
     const styles = {
         leftColumn: {
@@ -165,6 +162,11 @@ export const JobApplicationPreviewPage: React.FC<{
         fontWeight: "bold" as const,
     };
 
+
+    useEffect(() => {
+        setSelectedResumeStyle(jobApplicationFormFormik.values.resumeStyle);
+    }, [jobApplicationFormFormik.values.resumeStyle]);
+
     return (
         <div className="row g-1 p-2 p-md-0">
             {isLoading && (
@@ -185,7 +187,7 @@ export const JobApplicationPreviewPage: React.FC<{
                     height: "fit-content",
                     padding: "10px"
                 }}>
-                    <ResumeStyleB resumeData={resumeDataOpenAI}/>
+                    {renderResumeStyle(resumeDataOpenAI, selectedResumeStyle)}
                 </div>
             </div>
             <div
@@ -197,11 +199,11 @@ export const JobApplicationPreviewPage: React.FC<{
             >
                 <div>
                     <Row className={"row row-cols-2"}
-                        style={{
-                            ...styles.leftColumn.titleRow,
-                            ...styles.borderTopStyle,
-                            ...styles.borderBottomStyle,
-                        }}
+                         style={{
+                             ...styles.leftColumn.titleRow,
+                             ...styles.borderTopStyle,
+                             ...styles.borderBottomStyle,
+                         }}
                     >
                         <Col xs={4} className={"flex justify-end"}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
@@ -291,6 +293,64 @@ export const JobApplicationPreviewPage: React.FC<{
                                         className="sm:text-sm text-red-600">Required</span>
                                 )}
                             </Form.Group>
+                            <Form.Group className="mb-3" controlId="resumeStyle">
+                                <Form.Label>Select a style</Form.Label>
+                                <Row>
+                                    {RESUME_STYLES.map((style, index) => (
+                                        <Col key={index}>
+                                            {/* Hidden Radio Input */}
+                                            <Form.Check
+                                                type="radio"
+                                                name="resumeInfo.resumeStyle"
+                                                id={`resumeStyle-${index}`}
+                                                value={style}
+                                                checked={jobApplicationFormFormik.values.resumeStyle === style}
+                                                onChange={(e) =>
+                                                    jobApplicationFormFormik.setFieldValue(
+                                                        "resumeStyle",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="d-none"
+                                            />
+                                            {/* Custom Label */}
+                                            <label
+                                                htmlFor={`resumeStyle-${index}`}
+                                                style={{
+                                                    display: "flex",
+                                                    cursor: "pointer",
+                                                    border:
+                                                        jobApplicationFormFormik.values.resumeStyle === style
+                                                            ? "2px solid #000"
+                                                            : "1px solid #ccc",
+                                                    borderRadius: "5px",
+                                                    padding: "10px",
+                                                    textAlign: "center",
+                                                    justifyContent: "center",
+                                                    transition: "border-color 0.2s ease-in-out",
+                                                }}
+                                            >
+                                                <img
+                                                    src={imageStyles[style]}
+                                                    alt={`Placeholder for ${style}`}
+                                                    style={{
+                                                        width: "100px",
+                                                        height: "100px",
+                                                        objectFit: "fill",
+                                                        marginBottom: "10px",
+                                                    }}
+                                                />
+                                            </label>
+                                        </Col>
+                                    ))}
+                                </Row>
+                                {/* Error Message */}
+                                {!jobApplicationFormFormik.values.resumeStyle && (
+                                    <span className="sm:text-sm text-red-600">Required</span>
+                                )}
+                            </Form.Group>
+
+
                             <Button variant="primary" type="submit" className="fancy-btn w-full">
                                 Save and Print
                             </Button>
@@ -299,32 +359,6 @@ export const JobApplicationPreviewPage: React.FC<{
 
                 </div>
             </div>
-            {/*<div className="col-md-6 mt-10 mt-md-0">*/}
-            {/*    <div*/}
-            {/*        className="position-sticky d-flex justify-content-center align-items-center"*/}
-            {/*        style={{*/}
-            {/*            top: "2rem",*/}
-            {/*            height: "100vh" // Ensures the div takes the full viewport height for centering*/}
-            {/*        }}*/}
-            {/*    >*/}
-            {/*        <button*/}
-            {/*            style={{*/}
-            {/*                backgroundColor: "green",*/}
-            {/*                color: "white",*/}
-            {/*                border: "none",*/}
-            {/*                borderRadius: "50%",*/}
-            {/*                width: "100px",*/}
-            {/*                height: "100px",*/}
-            {/*                fontSize: "16px",*/}
-            {/*                cursor: "pointer"*/}
-            {/*            }}*/}
-            {/*            onClick={saveAndPrint}*/}
-            {/*        >*/}
-            {/*            Save Application*/}
-            {/*        </button>*/}
-            {/*    </div>*/}
-            {/*</div>*/}
-
         </div>
     );
 };

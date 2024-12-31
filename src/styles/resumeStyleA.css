@@ -5,10 +5,10 @@
     /*//////////////////////*/
     --large-text-color-rw: #232e53;
     --sections-text-color-rw: #232e53;
-    --sections-spacing: 10px;
-    --main-row-top-spacing: 30px;
-    --main-row-bottom-spacing: 8px;
-    --sub-row-spacing: 15px;
+    --sections-spacing: 5px;
+    --main-row-top-spacing: 20px;
+    --main-row-bottom-spacing: 2px;
+    --sub-row-spacing: 10px;
 }
 
 header {

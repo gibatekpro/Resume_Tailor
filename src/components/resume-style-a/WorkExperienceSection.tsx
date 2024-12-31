@@ -20,7 +20,9 @@ export const WorkExperienceSection: React.FC<{resumeData: ResumeInfo}> = ({resum
             }}>
                 <CustomCol isLeft={true}>
                     {/* Content for the first column */}
-                    <h2>Work Experience</h2>
+                    <h2 style={{
+                        marginBottom: '2px'
+                    }}>Work Experience</h2>
                 </CustomCol>
                 <CustomCol isLeft={false}>
 
@@ -35,8 +37,10 @@ export const WorkExperienceSection: React.FC<{resumeData: ResumeInfo}> = ({resum
                         <text>{experience.startMonth + experience.startYear} - {experience.endMonth + experience.endYear}</text>
                     </CustomCol>
                     <CustomCol isLeft={false}>
-                        <h4>{experience.jobTitle}</h4>
-                        <ul>
+                        <text  style={{
+                            fontWeight: 'bold'
+                        }}>{experience.jobTitle}</text>
+                        <ul className="list-disc pl-5 mb-0">
                             {experience.duties.map((role, roleIndex) => (
                                 <li key={roleIndex}>{role}</li>
                             ))}
@@ -49,6 +53,4 @@ export const WorkExperienceSection: React.FC<{resumeData: ResumeInfo}> = ({resum
     );
 };
 
-WorkExperienceSection.propTypes = {
-
-}
+WorkExperienceSection.propTypes = {}

@@ -11,16 +11,19 @@
 //     SM: 12,
 // };
 
+const spacingLeft = 4;
+const spacingRight = 8;
+
 export const LEFT_COL_BREAKPOINTS = {
-    LG: 3,
-    MD: 3,
-    SM: 3,
-    XS: 3,
+    LG: spacingLeft,
+    MD: spacingLeft,
+    SM: spacingLeft,
+    XS: spacingLeft,
 };
 
 export const RIGHT_COL_BREAKPOINTS = {
-    LG: 9,
-    MD: 9,
-    SM: 9,
-    XS: 9,
+    LG: spacingRight,
+    MD: spacingRight,
+    SM: spacingRight,
+    XS: spacingRight,
 };

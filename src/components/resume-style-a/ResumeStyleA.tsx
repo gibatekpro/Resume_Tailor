@@ -28,16 +28,19 @@ export const ResumeStyleA: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =
     }, [resumeData]);
 
     return(
-        <div>
+        <div style={{
+            border: '1px solid #b8adfb',
+            borderRadius: '5px',
+            padding: '20px'
+        }}>
             <HeaderSection
                 resumeData={resumeData}/>
             <SummarySection
                 resumeData={resumeData}/>
             <ContactInfoSection
                 resumeData={resumeData}/>
-            <Container style={{
-                // ...DESIGN_BORDER
-            }} className={"subSections-container"}>
+
+            <>
                 {hasSkills && <SkillsSection
                     resumeData={resumeData}/>}
                 {hasWorkExperience && <WorkExperienceSection
@@ -46,7 +49,7 @@ export const ResumeStyleA: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =
                     resumeData={resumeData}/>}
                 {hasProjects && <ProjectsSection
                     resumeData={resumeData}/>}
-            </Container>
+            </>
             {/*<EducationSection/>*/}
             {/*<CertificationsSection/>*/}
         </div>

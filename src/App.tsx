@@ -5,10 +5,7 @@ import {ResumeProvider} from "./context/ResumeContext";
 import {Route, BrowserRouter as Router, Routes} from "react-router-dom";
 import {HomePage} from "./pages/HomePage";
 import {initializeApp} from "firebase/app";
-import {getAnalytics} from "firebase/analytics";
-import {getFirestore} from "firebase/firestore";
 import 'firebase/compat/auth';
-import {getAuth} from "firebase/auth";
 import "firebase/firestore";
 import {AuthProvider} from "./context/auth/AuthProvider";
 import {Navbar} from "./components/Navbar";
@@ -19,7 +16,7 @@ import {ResetPasswordPage} from "./pages/auth/ResetPasswordPage";
 import {RequireAuth} from "./context/auth/RequireAuth";
 import {APP_TITLE, firebaseConfig, LOCAL_STORAGE_APP_TITLE} from "./data/applicationData";
 import {JobApplicationPreviewPage} from "./pages/JobApplicationPreviewPage";
-import {TailorResumePageB} from "./pages/TailorResumePageB";
+import {TailorResumePage} from "./pages/TailorResumePage";
 import {MyJobApplications} from "./pages/MyJobApplications";
 import {Row} from "react-bootstrap";
 import {CreateCV} from "./pages/CreateCV";
@@ -52,7 +49,7 @@ function App() {
                                 <Route path={ROUTES.RESUME_INPUT_PAGE}
                                        element={
                                            <RequireAuth>
-                                               <TailorResumePageB/>
+                                               <TailorResumePage/>
                                            </RequireAuth>
                                        }>
                                 </Route>

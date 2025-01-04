@@ -18,7 +18,7 @@ class JobApplicationService {
      * @returns A promise indicating the save operation's success or failure.
      */
 
-    async saveJobApplication(uid: string, jobApplication?: JobApplicationInfo): Promise<void> {
+    async saveJobApplication(uid: string, jobApplication?: any): Promise<void> {
         const db = getFirestore();
 
         if (!uid) {

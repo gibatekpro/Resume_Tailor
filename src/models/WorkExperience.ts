@@ -4,6 +4,7 @@ export interface WorkExperience {
     companyName: string;
     jobTitle: string;
     duties: string[];
+    description?: string;
     startMonth: string;
     startYear: string;
     endMonth: string;

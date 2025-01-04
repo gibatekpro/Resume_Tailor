@@ -3,8 +3,9 @@ import {ResumeInfo} from "./ResumeInfo";
 import moment from "moment";
 
 export interface JobApplicationInfo {
+    date?: string,
+    jobPostingUrl?: string,
     openAIDocumentTitle?: string,
-    date?: moment.Moment,
     openAIJobTitle?: string,
     openAIJobCompanyName?: string,
     openAIExpectedSalary?: string,

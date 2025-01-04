@@ -32,6 +32,7 @@ export const MONTHS = [
 export const RESUME_STYLES = [
     "StyleA",
     "StyleB",
+    "StyleC",
 ];
 
 export const YEARS = Array.from(

@@ -18,6 +18,7 @@ import * as Yup from "yup";
 import STORAGE from "../data/storage";
 import {ResumeInfo} from "../models/ResumeInfo";
 import {renderResumeStyle} from "../utils/HelperFunctions";
+import moment, {now} from "moment";
 
 export const JobApplicationPreviewPage: React.FC<{
     setHideNavbar: (hide: boolean) => void,
@@ -36,6 +37,7 @@ export const JobApplicationPreviewPage: React.FC<{
     const imageStyles: { [key: string]: any } = {
         StyleA: require('../assets/images/resume_styles/StyleA.png'),
         StyleB: require('../assets/images/resume_styles/StyleB.png'),
+        StyleC: require('../assets/images/resume_styles/StyleC.png'),
     };
 
     const saveAndPrint = async () => {
@@ -48,6 +50,7 @@ export const JobApplicationPreviewPage: React.FC<{
             const updatedData = {
                 ...storedData,
                 ...jobApplicationFormFormik.values,
+                date: moment().toISOString(),
             };
 
             setIsLoading(false);
@@ -78,6 +81,7 @@ export const JobApplicationPreviewPage: React.FC<{
             openAIJobLocation: savedApplicationData.openAIJobLocation || "",
             openAIDocumentTitle: savedApplicationData.openAIDocumentTitle || "",
             openAISimpleJobDescription: savedApplicationData.openAISimpleJobDescription || "",
+            jobPostingUrl: savedApplicationData.jobPostingUrl || "",
             resumeStyle: selectedResumeStyle
         },
         enableReinitialize: true,
@@ -279,6 +283,15 @@ export const JobApplicationPreviewPage: React.FC<{
                                     )}
                                 </Form.Group>
                             </Row>
+                            <Form.Group className="mb-3" controlId="jobPostingUrl">
+                                <Form.Label>Job Posting Link <span style={{color: 'grey'}}>(Optional)</span></Form.Label>
+                                <Form.Control
+                                    type="url"
+                                    placeholder="https://indeed.com"
+                                    onChange={jobApplicationFormFormik.handleChange}
+                                    defaultValue={jobApplicationFormFormik.values.jobPostingUrl || ""}
+                                />
+                            </Form.Group>
                             <Form.Group className="mb-3" controlId="openAISimpleJobDescription">
                                 <Form.Label>Simple Job Description</Form.Label>
                                 <Form.Control

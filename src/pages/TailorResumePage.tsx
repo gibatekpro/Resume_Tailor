@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import '../styles/resumeInput.css';
 import ResumeForm from "../components/forms/resumeForm/ResumeForm";
 import {useFormik} from "formik";
 import {DefaultResumeData} from "../data/defaultResumeData";

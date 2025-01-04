@@ -328,6 +328,14 @@ export const MyJobApplications: React.FC = () => {
         setIsDeleteDialogOpen(false)
     }
 
+    const handleViewJobPosting = (jobPostingUrl: string | undefined) => {
+        if (!jobPostingUrl) {
+            console.error("Job posting URL is undefined");
+            return;
+        }
+        window.open(jobPostingUrl, "_blank", "noopener,noreferrer");
+    };
+
     return (
         <div className="py-0 my-2">
             {isLoading && (
@@ -434,6 +442,24 @@ export const MyJobApplications: React.FC = () => {
                                     <div className="col-12 col-sm">
                                         <div style={styles.jobInfo.header}>
                                             {selectedApplication.data.openAIJobTitle} - {selectedApplication.data.openAIJobCompanyName}
+                                            {selectedApplication.data.jobPostingUrl && (
+                                                <button
+                                                    style={{
+                                                        backgroundColor: "transparent",
+                                                        border: "none",
+                                                        color: "#007bff", // Link-like color
+                                                        textDecoration: "underline",
+                                                        cursor: "pointer",
+                                                        fontSize: "15px",
+                                                        padding: 0,
+                                                        marginLeft: "12px", // Adds some spacing
+                                                    }}
+                                                    onClick={() => handleViewJobPosting(selectedApplication.data.jobPostingUrl)}
+                                                    aria-label="View job posting"
+                                                >
+                                                    View job posting
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
 

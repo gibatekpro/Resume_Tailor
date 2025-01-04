@@ -1,5 +1,5 @@
 import {CSSProperties} from "react";
-import {textColor} from "../../../utils/ApplicationProperties";
+import {textColor} from "../../../data/applicationData";
 
 export const ResumeStyleCStyle: {
     mainContainer: CSSProperties;

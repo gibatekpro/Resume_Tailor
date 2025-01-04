@@ -53,3 +53,5 @@ export const firebaseConfig = {
 
 export const appName = "Resume Tailor"
 export const LOCAL_STORAGE_APP_TITLE: string = "Resume Tailor"
+
+export const textColor = '#232e53';

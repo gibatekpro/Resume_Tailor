@@ -22,11 +22,22 @@ export const SkillsSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) 
                 ...ResumeStyleCStyle.initialCaps
             }}>Core Skills</h2>
             {resumeData?.skills?.map((skill, index) => (
-                <span key={index} style={{
-                    ...ResumeStyleCStyle.text,
-                    ...ResumeStyleCStyle.semiBoldText
-                }}>{skill}, <span style={{marginRight: '5px'}}>   </span></span>
+                <span
+                    key={index}
+                    style={{
+                        ...ResumeStyleCStyle.text,
+                        ...ResumeStyleCStyle.semiBoldText
+                    }}
+                >
+                {skill}
+                    {index === resumeData?.skills!.length - 1 ? (
+                        <span style={{ marginRight: '5px' }}> </span>
+                    ) : (
+                        <>, <span style={{ marginRight: '5px' }}> </span></>
+                    )}
+            </span>
             ))}
         </div>
     );
+
 };

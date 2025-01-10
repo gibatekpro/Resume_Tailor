@@ -57,6 +57,8 @@ export const JobApplicationPreviewPage: React.FC<{
 
             localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(updatedData));
 
+            console.log("Updated Data >>>>>: " + updatedData.jobPostingUrl);
+
             //Save job application to the server
             await JobApplicationService.saveJobApplication(user ?? "", updatedData);
 
@@ -87,6 +89,7 @@ export const JobApplicationPreviewPage: React.FC<{
         enableReinitialize: true,
         validationSchema: () => Yup.object().shape({
             openAIJobTitle: Yup.string().min(4).required(),
+            jobPostingUrl: Yup.string().min(4).required(),
             openAIJobCompanyName: Yup.string().min(4).required(),
             openAIJobLocation: Yup.string().min(4).required(),
             openAIDocumentTitle: Yup.string().min(4).required(),
@@ -286,11 +289,15 @@ export const JobApplicationPreviewPage: React.FC<{
                             <Form.Group className="mb-3" controlId="jobPostingUrl">
                                 <Form.Label>Job Posting Link <span style={{color: 'grey'}}>(Optional)</span></Form.Label>
                                 <Form.Control
-                                    type="url"
-                                    placeholder="https://indeed.com"
+                                    type="text"
+                                    placeholder="e.g https://indeed.com"
                                     onChange={jobApplicationFormFormik.handleChange}
                                     defaultValue={jobApplicationFormFormik.values.jobPostingUrl || ""}
                                 />
+                                {jobApplicationFormFormik.touched.jobPostingUrl && jobApplicationFormFormik.errors.jobPostingUrl && (
+                                    <span
+                                        className="sm:text-sm text-red-600">Required</span>
+                                )}
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="openAISimpleJobDescription">
                                 <Form.Label>Simple Job Description</Form.Label>

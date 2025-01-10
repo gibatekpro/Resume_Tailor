@@ -30,6 +30,9 @@ export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void,
     });
 
     useEffect(() => {
+
+        console.log("Print === Updated Data >>>>>: " + applicationData.jobPostingUrl);
+
         setHideNavbar(true); // Hide Navbar when this page is loaded
 
         // Dynamically set the document title

@@ -20,6 +20,7 @@ import {TailorResumePage} from "./pages/TailorResumePage";
 import {MyJobApplications} from "./pages/MyJobApplications";
 import {Row} from "react-bootstrap";
 import {CreateCV} from "./pages/CreateCV";
+import AnimatedInput from "./delete/animated-input/AnimatedInput";
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -42,7 +43,7 @@ function App() {
                         <Navbar hide={hideNavbar}/>
                         <ResumeProvider>
                             <Routes>
-                                <Route path={ROUTES.HOME} element={<HomePage/>}/>
+                                <Route path={ROUTES.HOME} element={<AnimatedInput/>}/>
                                 <Route path={ROUTES.LOGIN} element={<LoginPage/>}/>
                                 <Route path={ROUTES.REGISTER} element={<RegisterPage/>}/>
                                 <Route path={ROUTES.PASSWORD_RESET} element={<ResetPasswordPage/>}/>

@@ -1,19 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ResumeProvider, useResumeProvider } from "../context/ResumeContext";
-import { useNavigate } from "react-router-dom";
-import { ResumeStyleA } from "../components/resume-style-a/ResumeStyleA";
-import { ResumeStyleB } from "../components/resume-style-b/ResumeStyleB";
 import { JobApplicationInfo } from "../models/JobApplicationInfo";
-import {APP_TITLE, LOCAL_STORAGE_APP_TITLE} from "../data/applicationData";
+import {APP_TITLE, LOCAL_STORAGE_APP_TITLE} from "../utils/applicationData";
 import { useReactToPrint } from "react-to-print";
-import {ResumeInfo} from "../models/ResumeInfo";
-import STORAGE from "../data/storage";
+import STORAGE from "../utils/storage";
 import {renderResumeStyle} from "../utils/HelperFunctions";
 
 export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void, setAppTitle:React.Dispatch<React.SetStateAction<string>> }> = ({ setHideNavbar, setAppTitle }) => {
     const [applicationData, setApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}"));
     const contentRef = useRef<HTMLDivElement>(null);
-    const navigate = useNavigate();
 
     const handlePrint = useReactToPrint({
         content: () => contentRef.current,

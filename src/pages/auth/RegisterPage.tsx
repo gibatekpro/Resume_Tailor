@@ -7,9 +7,8 @@ import Row from 'react-bootstrap/Row';
 import * as Yup from 'yup';
 import {Link, Navigate, useLocation, useNavigate} from "react-router-dom";
 import {Col} from "react-bootstrap";
-import {bool} from "yup";
 import {useAuth} from "../../context/auth/AuthProvider";
-import {appName} from "../../data/applicationData";
+import {appName} from "../../utils/applicationData";
 
 
 interface valuesType {

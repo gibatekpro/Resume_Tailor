@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import {ProjectDetailInput} from "./ProjectDetailInput";
-import {MONTHS, YEARS} from "../../../../../data/applicationData";
+import {MONTHS, YEARS} from "../../../../../utils/applicationData";
 
 interface ProjectsSectionProps {
     resumeFormFormik: any; // Replace 'any' with the type from your Formik configuration.

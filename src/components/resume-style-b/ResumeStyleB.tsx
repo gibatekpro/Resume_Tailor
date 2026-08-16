@@ -1,9 +1,6 @@
 import React, {useEffect, useState} from "react";
 import '../../styles/resumeStyleB.css';
-import {useResumeProvider} from "../../context/ResumeContext";
-import {DESIGN_BORDER} from "../../constants/DesignConstants";
-import {CertificationsSection} from "./CertificationsSection";
-import {Col, Row} from "react-bootstrap";
+import {Row} from "react-bootstrap";
 import {CustomCol} from "../../custom_tags/CustomCol";
 import {SkillsSection} from "./SkillsSection";
 import {ContactInfoSection} from "./ContactInfoSection";
@@ -14,8 +11,6 @@ import {EducationSection} from "./EducationSection";
 import {ProjectsSection} from "./ProjectsSection";
 import {AvatarSection} from "./AvatarSection";
 import {LanguageSection} from "./LanguageSection";
-import html2canvas from "html2canvas";
-import {jsPDF} from "jspdf";
 import {ResumeInfo} from "../../models/ResumeInfo";
 
 
@@ -23,7 +18,6 @@ export const ResumeStyleB: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =
 
     const [hasProjects, setHasProjects] = useState(!!resumeData.projects && resumeData.projects.length > 0);
     const [hasLanguage, setHasLanguage] = useState(!!resumeData.languages && resumeData.languages.length > 0);
-    const [hasSummary, setHasSummary] = useState(!!resumeData.profile?.summary);
     const [hasSkills, setHasSkills] = useState(!!resumeData.skills && resumeData.skills.length > 0);
     const [hasWorkExperience, setHasWorkExperience] = useState(!!resumeData.workExperience && resumeData.workExperience.length > 0);
     const [hasEducation, setHasEducation] = useState(!!resumeData.education && resumeData.education.length > 0);

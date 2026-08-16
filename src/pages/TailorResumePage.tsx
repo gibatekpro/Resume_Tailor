@@ -3,46 +3,34 @@ import ResumeForm from "../components/forms/resumeForm/ResumeForm";
 import {useFormik} from "formik";
 import {DefaultResumeData} from "../data/defaultResumeData";
 import {OpenAIInstruction} from "../models/OpenAIInstruction";
-import {CustomResumeData} from "../data/customResumeData";
 import {InstructionResumeData} from "../data/instructionResumeData";
 import * as Yup from "yup";
 import {fetchOpenAIResponse} from "../services/OpenAIService";
 import InstructionForm from "../components/forms/instructionForm/InstructionForm";
 import {useNavigate} from "react-router-dom";
-import {useResumeProvider} from "../context/ResumeContext";
-import ROUTES from "../data/routes";
+import ROUTES from "../utils/routes";
 import JobApplicationService from "../services/JobApplicationService";
-import {useAuth} from "../context/auth/AuthProvider";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
-import {ResumeInfo} from "../models/ResumeInfo";
 import {CustomAccordion} from "../custom_tags/CustomAccordion";
 import {openAIInstruction} from "../data/openAIInstruction";
 import moment from "moment";
 import {SavedResumesResponse} from "../models/SavedResumesResponse";
 import {Button, Col, Row} from "react-bootstrap";
-import STORAGE from "../data/storage";
+import STORAGE from "../utils/storage";
 import {Dialog, DialogPanel} from "@headlessui/react";
 
 export const TailorResumePage: React.FC = () => {
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
     const [jobApplicationInfo, setJobApplicationInfo] = useState<JobApplicationInfo>();
-    const {resumeData, setResumeData} = useResumeProvider();
     const [savedRules, setSavedRules] = useState<string[]>(openAIInstruction.rules || []);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const saved = localStorage.getItem(STORAGE.LOCAL_STORAGE_RESUME_DATA);
     const SavedResumeDataOpenAI = saved ? JSON.parse(saved) : DefaultResumeData;
-    const [isCustomFormOpen, setIsCustomFormOpen] = useState(false);
     const [isGeneratedFormOpen, setIsGeneratedFormOpen] = useState(false);
-
-
     const [createNewHover, setCreateNewHover] = useState(false);
     const [isBeingEdited, setIsBeingEdited] = useState<SavedResumesResponse>();
-    const [resumeToDelete, setResumeToDelete] = useState<SavedResumesResponse>();
     const [isBeingEditedIndex, setIsBeingEditedIndex] = useState<number>(-1);
-    const [isSaveComplete, setIsSaveComplete] = useState(false);
-    const [isSaveFailed, setIsSaveFailed] = useState(false);
-    const [isSaveLoading, setIsSaveLoading] = useState(false);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [resumeFormClassName, setResumeFormClassName] = useState("col-md-4 pb-4");
     const [resumePreviewClassName, setResumePreviewClassName] = useState("col-md-8 px-2");
@@ -51,8 +39,6 @@ export const TailorResumePage: React.FC = () => {
     const [generateHasError, setGenerateHasError] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [resumeList, setResumeList] = useState<SavedResumesResponse[]>([])
-    const [activeTab, setActiveTab] = useState("link-1");
-
 
     const closeDeleteDialog = () => {
         setIsDeleteDialogOpen(false);
@@ -155,7 +141,6 @@ export const TailorResumePage: React.FC = () => {
         initialValues: SavedResumeDataOpenAI || DefaultResumeData,
         onSubmit: async (values) => {
             setIsLoading(true);
-            setResumeData(values);
             if (!user) {
                 alert("You must be logged in to save your job application.");
                 return;
@@ -342,13 +327,13 @@ export const TailorResumePage: React.FC = () => {
                 </div>
             )}
             {isDialogOpen && (
-                <Dialog open={isDialogOpen} as="div" className="relative z-0 focus:outline-none" style={overlayStyle}
+                <Dialog open={isDialogOpen} as="div" className="relative z-0 focus:outline-hidden" style={overlayStyle}
                         onClose={closeDialog}>
                     <div className="fixed inset-0 z-0 w-screen overflow-y-auto">
                         <div className="flex min-h-full items-center justify-center p-4">
                             <DialogPanel
                                 transition
-                                className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                                className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
                             >
                                 <div className={"flex justify-between items-center mb-4"}>
                                     {generateHasError ? (
@@ -370,7 +355,7 @@ export const TailorResumePage: React.FC = () => {
                                 )}
                                 <div className="mt-4">
                                     <Button
-                                        className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                        className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
                                         onClick={closeDialog}
                                     >
                                         ok

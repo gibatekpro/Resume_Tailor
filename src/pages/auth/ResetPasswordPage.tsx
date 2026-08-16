@@ -7,7 +7,7 @@ import Row from "react-bootstrap/Row";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
 import {useAuth} from "../../context/auth/AuthProvider";
-import {appName} from "../../data/applicationData";
+import {appName} from "../../utils/applicationData";
 
 export const ResetPasswordPage: React.FC = () => {
     window.scroll(0, 0);

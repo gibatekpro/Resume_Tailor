@@ -8,7 +8,7 @@ import Button from "react-bootstrap/Button";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {Formik} from "formik";
 import {useAuth} from "../../context/auth/AuthProvider";
-import {appName} from "../../data/applicationData";
+import {appName} from "../../utils/applicationData";
 
 
 export const LoginPage:React.FC = () => {
@@ -30,7 +30,7 @@ export const LoginPage:React.FC = () => {
             // Call the login function with email and password
             await auth?.login(values.email, values.password, (user: string) => {
                 // Navigate back to the previous location or to the home page if no location is available
-                const from = (location.state as any)?.from?.pathname || "/";
+                const from = location.state?.from?.pathname || "/";
                 navigate(from, { replace: true });
             });
         } catch (error) {

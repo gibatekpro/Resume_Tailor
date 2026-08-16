@@ -7,9 +7,9 @@ import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
 import JobApplicationService from "../services/JobApplicationService";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import {useNavigate} from "react-router-dom";
-import ROUTES from "../data/routes";
+import ROUTES from "../utils/routes";
 import {JobApplicationsResponse} from "../models/JobApplicationsResponse";
-import STORAGE from "../data/storage";
+import STORAGE from "../utils/storage";
 import {Dialog, DialogPanel} from "@headlessui/react";
 import {SavedResumesResponse} from "../models/SavedResumesResponse";
 import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
@@ -517,13 +517,13 @@ export const MyJobApplications: React.FC = () => {
             )}
             {!isLoading && (
                 <div className="row g-1 p-2 p-md-0">
-                    <Dialog open={isDeleteDialogOpen} as="div" className="relative z-10 focus:outline-none"
+                    <Dialog open={isDeleteDialogOpen} as="div" className="relative z-10 focus:outline-hidden"
                             onClose={closeDeleteDialog}>
                         <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
                             <div className="flex min-h-full items-center justify-center p-4">
                                 <DialogPanel
                                     transition
-                                    className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                                    className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
                                 >
                                     <div className={"flex justify-between items-center mb-4"}>
                                         {`Delete CV: ${jobApplicationToDelete?.data.openAIJobTitle} - ${jobApplicationToDelete?.data.openAIJobCompanyName}`}
@@ -537,7 +537,7 @@ export const MyJobApplications: React.FC = () => {
                                     <text>Are you sure you want to delete this cv</text>
                                     <div className="mt-4">
                                         <Button
-                                            className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                            className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
                                         onClick={deleteJobApplication}
                                         >
                                             Delete

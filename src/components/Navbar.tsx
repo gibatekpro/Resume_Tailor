@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Bars3Icon, XMarkIcon} from "@heroicons/react/24/outline";
 import {Dialog, DialogPanel} from "@headlessui/react";
 import {useNavigate} from "react-router-dom";
-import ROUTES from "../data/routes";
+import ROUTES from "../utils/routes";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
 
 export const Navbar: React.FC<{ hide?: boolean }> = ({hide}) => {
@@ -44,7 +44,7 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({hide}) => {
     if (hide) return null;
 
     return (
-        <header className="sticky top-0 z-50 bg-white shadow-sm">
+        <header className="sticky top-0 z-50 bg-white shadow-2xs">
             <nav className="flex items-center justify-between p-3 lg:px-8" aria-label="Global">
                 {/* Logo */}
                 <div className="flex lg:flex-1">

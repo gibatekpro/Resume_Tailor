@@ -1,6 +1,5 @@
 import React from 'react';
 import { Row } from 'react-bootstrap';
-import {useResumeProvider} from "../../context/ResumeContext";
 import {CustomCol} from "../../custom_tags/CustomCol";
 import '../../styles/resumeStyleA.css';
 import {ResumeInfo} from "../../models/ResumeInfo";
@@ -34,12 +33,12 @@ export const ProjectsSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}
                                 project.projectName
                             )}
                         </h3>
-                        <text>{project.startMonth + project.startYear} - {project.endMonth + project.endYear}</text>
+                        <span>{project.startMonth + project.startYear} - {project.endMonth + project.endYear}</span>
                     </CustomCol>
                     <CustomCol isLeft={false}>
-                        <text  style={{
+                        <span  style={{
                             fontWeight: 'bold'
-                        }}>{project.role}</text>
+                        }}>{project.role}</span>
                         <ul className="list-disc pl-5 mb-0">
                             {project.projectDetails.map((detail, detailIndex) => (
                                 <li key={detailIndex}>{detail}</li>

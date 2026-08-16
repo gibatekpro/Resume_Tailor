@@ -1,7 +1,5 @@
 import React, {useEffect} from 'react';
 import '../../styles/resumeStyleB.css';
-import {useResumeProvider} from "../../context/ResumeContext";
-import {CustomCol} from "../../custom_tags/CustomCol";
 import {ResumeInfo} from "../../models/ResumeInfo";
 
 export const LanguageSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {

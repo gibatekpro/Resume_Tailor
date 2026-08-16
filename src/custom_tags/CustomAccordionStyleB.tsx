@@ -62,7 +62,7 @@ export const CustomAccordionStyleB: React.FC<CustomAccordionProps & {
                                 className="bi bi-trash3"
                                 viewBox="0 0 16 16"
                                 onClick={(e) => {
-                                    e.stopPropagation(); // Prevent triggering the row's onClick
+                                    e.stopPropagation();
                                     onDeleteItem(item);
                                 }}
                                 style={{ cursor: "pointer" }}

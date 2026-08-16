@@ -1,5 +1,4 @@
 import React from 'react';
-import {useResumeProvider} from "../../context/ResumeContext";
 import '../../styles/resumeStyleA.css';
 import {ResumeInfo} from "../../models/ResumeInfo";
 
@@ -20,9 +19,9 @@ export const ContactInfoSection: React.FC<{resumeData: ResumeInfo}> = ({resumeDa
                     </span>
                     ) : (
                         <span key={index}>
-                            {index !== 0 ? " | " : ""} <text style={{
+                            {index !== 0 ? " | " : ""} <span style={{
                                 fontWeight: "bold",
-                        }}>{info.infoTitle}: </text> {info.infoDetails}
+                        }}>{info.infoTitle}: </span> {info.infoDetails}
                     </span>
                     )
                 ))}

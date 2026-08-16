@@ -1,9 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {SectionHeader} from "./SectionHeader";
 import {Button, Spinner} from "react-bootstrap";
-import {useResumeProvider} from "../../../context/ResumeContext";
-import * as Yup from "yup";
-import {fetchOpenAIResponse} from "../../../services/OpenAIService";
 import {RulesInput} from "./RulesInput";
 import {openAIInstruction} from "../../../data/openAIInstruction";
 
@@ -14,7 +11,7 @@ interface InstructionFormProps {
 
 const InstructionForm: React.FC<InstructionFormProps> = ({instructionFormFormik, isLoading}) => {
     const inputFieldClassName =
-        "mt-1 block w-full px-3 py-2 focus:outline-none " +
+        "mt-1 block w-full px-3 py-2 focus:outline-hidden " +
         "focus:ring-0 focus:border-black focus:border-2 sm:text-sm";
 
     const rules = instructionFormFormik.values.rules || [];

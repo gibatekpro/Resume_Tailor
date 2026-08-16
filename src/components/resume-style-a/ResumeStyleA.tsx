@@ -3,12 +3,10 @@ import '../../styles/resumeStyleA.css';
 import {HeaderSection} from "./HeaderSection";
 import {SummarySection} from "./SummarySection";
 import {ContactInfoSection} from "./ContactInfoSection";
-import {Container} from "react-bootstrap";
 import {SkillsSection} from "./SkillsSection";
 import {WorkExperienceSection} from "./WorkExperienceSection";
 import {EducationSection} from "./EducationSection";
 import {ProjectsSection} from "./ProjectsSection";
-import {useResumeProvider} from "../../context/ResumeContext";
 import {ResumeInfo} from "../../models/ResumeInfo";
 
 

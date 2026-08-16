@@ -1,5 +1,4 @@
 import React, {createContext, ReactNode, useContext, useEffect, useState} from "react";
-import {resumeData as initialResumeData} from "../data/resumeData";
 import {openAIInstruction as initialOpenAIInstructionData} from "../data/openAIInstruction";
 import {ResumeData} from "../models/ResumeData";
 import {ResumeInfo} from "../models/ResumeInfo";
@@ -24,7 +23,7 @@ type ResumeProviderProps = {
 }
 
 export const ResumeProvider: React.FC<ResumeProviderProps> = ({children}) => {
-    const [resumeData, setResumeData] = useState(initialResumeData);
+    const [resumeData, setResumeData] = useState(DefaultResumeData);
     const [resumeDataOpenAI, setResumeDataOpenAI] = useState(DefaultResumeData);
     const [openAIInstructionData, setOpenAIInstructionData] = useState(initialOpenAIInstructionData);
     const [hideButton, setHideButton] = useState(false);
@@ -32,9 +31,6 @@ export const ResumeProvider: React.FC<ResumeProviderProps> = ({children}) => {
 
     useEffect(() => {
     }, [resumeData]);
-    //
-    // useEffect(() => {
-    // }, [resumeDataOpenAI]);
 
 
     return(

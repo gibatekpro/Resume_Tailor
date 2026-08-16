@@ -1,24 +1,19 @@
 import React, {useEffect, useRef, useState} from "react";
-import {HeaderSection} from '../components/resume-style-a/HeaderSection';
 import '../styles/resumePrint.css';
 import {useNavigate} from "react-router-dom";
-import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
-import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
 import JobApplicationService from "../services/JobApplicationService";
 import {
     APP_TITLE, RESUME_STYLES,
-} from "../data/applicationData";
+} from "../utils/applicationData";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
-import ROUTES from "../data/routes";
+import ROUTES from "../utils/routes";
 import {DefaultResumeData} from "../data/defaultResumeData";
 import {Button, Col, Form, Row} from "react-bootstrap";
 import {useFormik} from "formik";
-import {resumeData} from "../data/resumeData";
 import * as Yup from "yup";
-import STORAGE from "../data/storage";
-import {ResumeInfo} from "../models/ResumeInfo";
+import STORAGE from "../utils/storage";
 import {renderResumeStyle} from "../utils/HelperFunctions";
-import moment, {now} from "moment";
+import moment from "moment";
 
 export const JobApplicationPreviewPage: React.FC<{
     setHideNavbar: (hide: boolean) => void,
@@ -26,8 +21,6 @@ export const JobApplicationPreviewPage: React.FC<{
 }> = ({setHideNavbar, setAppTitle}) => {
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
     const [isLoading, setIsLoading] = useState(false);
-    const [applicationData, setApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}"));
-    const [theAppTitle, setTheAppTitle] = useState<string>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}").openAIDocumentTitle);
     const navigate = useNavigate();
     const [saved, setSaved] = useState(localStorage.getItem(STORAGE.LOCAL_STORAGE_RESUME_DATA));
     const [savedApplicationData, setSavedApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || JSON.parse("{}")));

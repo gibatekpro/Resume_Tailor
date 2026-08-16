@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Col, Row } from "react-bootstrap";
-import {MONTHS, YEARS} from "../../../../../data/applicationData";
+import {MONTHS, YEARS} from "../../../../../utils/applicationData";
 import {DutyInput} from "./DutyInput";
 
 interface WorkExperienceSectionProps {

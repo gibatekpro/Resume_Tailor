@@ -1,12 +1,10 @@
-import {doc, getFirestore, setDoc, deleteDoc, updateDoc} from "firebase/firestore";
+import {doc, getFirestore, setDoc, deleteDoc} from "firebase/firestore";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
-import {initializeApp} from "firebase/app";
-import {firebaseConfig} from "../data/applicationData";
 import {addDoc, collection, getDocs, getDoc} from "firebase/firestore";
-import {getAuth} from "firebase/auth";
 import {ResumeInfo} from "../models/ResumeInfo";
 import {JobApplicationsResponse} from "../models/JobApplicationsResponse";
 import {SavedResumesResponse} from "../models/SavedResumesResponse";
+import {auth} from "../Firebase";
 
 class JobApplicationService {
     /**
@@ -34,7 +32,7 @@ class JobApplicationService {
             const userJobApplicationsRef = collection(db, `jobApplications/${uid}/applications`);
 
             // Add a new document with auto-generated ID in the user's sub-collection
-            const docRef = await addDoc(userJobApplicationsRef, jobApplication);
+            // const docRef = await addDoc(userJobApplicationsRef, jobApplication);
 
             // console.log(
             //     `Job application for user ${uid} has been saved successfully with ID: ${docRef.id}`
@@ -73,7 +71,6 @@ class JobApplicationService {
 
     async getAllJobApplications(): Promise<JobApplicationsResponse[]> {
         const db = getFirestore();
-        const auth = getAuth();
         const user = auth.currentUser;
 
         if (!user) {
@@ -114,7 +111,7 @@ class JobApplicationService {
             const userResumeDataRef = collection(db, `resumes/${uid}/data`);
 
             // Add a new document with auto-generated ID in the user's sub-collection
-            const docRef = await addDoc(userResumeDataRef, resumeData);
+            // const docRef = await addDoc(userResumeDataRef, resumeData);
             //
             // console.log(
             //     `Resume data for user ${uid} has been saved successfully with ID: ${docRef.id}`
@@ -127,7 +124,7 @@ class JobApplicationService {
 
     async getAllSavedResumes(): Promise<SavedResumesResponse[]> {
         const db = getFirestore();
-        const auth = getAuth();
+        // const auth = getAuth();
         const user = auth.currentUser;
 
         if (!user) {

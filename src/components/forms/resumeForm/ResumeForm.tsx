@@ -1,6 +1,5 @@
-import {useFormik} from "formik";
 import {ResumeInfo} from "../../../models/ResumeInfo";
-import React, {useEffect} from "react";
+import React from "react";
 import {ProfileSection} from "./sections/ProfileSection";
 import {SectionHeader} from "./sections/SectionHeader";
 import {SkillsSection} from "./sections/skillSection/SkillsSection";
@@ -8,7 +7,6 @@ import {EducationSection} from "./sections/EducationSection";
 import {LanguageSection} from "./sections/LanguageSection";
 import {ProjectsSection} from "./sections/projectsSection/ProjectsSection";
 import {ContactInfoSection} from "./sections/ContactInfoSection";
-import {useResumeProvider} from "../../../context/ResumeContext";
 import {WorkExperienceSection} from "./sections/workExperienceSection/WorkExperienceSection";
 import {Button, Spinner} from "react-bootstrap";
 
@@ -21,7 +19,7 @@ interface ResumeFormProps {
 const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButton = false, buttonTitle}) => {
     const isLoading = false;
     const inputFieldClassName =
-        "mt-1 block w-full px-3 py-2 focus:outline-none " +
+        "mt-1 block w-full px-3 py-2 focus:outline-hidden " +
         "focus:ring-0 focus:border-black focus:border-2 sm:text-sm";
 
 

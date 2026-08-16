@@ -9,6 +9,7 @@ const ROUTES = {
     PASSWORD_RESET: "/reset-password",
     APPLICATION_PREVIEW: "/application-preview",
     MY_JOB_APPLICATIONS: "/my-job-applications",
+    TEST: "/test",
 } as const;
 
 export default ROUTES;

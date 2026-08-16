@@ -1,8 +1,5 @@
 import React, {useEffect} from 'react';
 import {Col, Row} from 'react-bootstrap';
-import {useResumeProvider} from "../../context/ResumeContext";
-import {CustomCol} from "../../custom_tags/CustomCol";
-import {DESIGN_BORDER} from "../../constants/DesignConstants";
 import {ResumeInfo} from "../../models/ResumeInfo";
 
 

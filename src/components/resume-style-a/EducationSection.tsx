@@ -1,6 +1,5 @@
 import React from 'react';
 import {Row} from 'react-bootstrap';
-import {useResumeProvider} from "../../context/ResumeContext";
 import {CustomCol} from "../../custom_tags/CustomCol";
 import '../../styles/resumeStyleA.css';
 import {ResumeInfo} from "../../models/ResumeInfo";
@@ -34,7 +33,7 @@ export const EducationSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData
                                 education.institutionName
                             )}
                         </h3>
-                        <text>{education.startMonth + education.startYear} - {education.endMonth + education.endYear}</text>
+                        <span>{education.startMonth + education.startYear} - {education.endMonth + education.endYear}</span>
                     </CustomCol>
                     <CustomCol isLeft={false}>
                         <h4>{education.degree} - {education.course}</h4>

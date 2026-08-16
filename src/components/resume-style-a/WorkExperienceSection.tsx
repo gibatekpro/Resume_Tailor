@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react';
 import { Row } from 'react-bootstrap';
-import {useResumeProvider} from "../../context/ResumeContext";
 import {CustomCol} from "../../custom_tags/CustomCol";
 import '../../styles/resumeStyleA.css';
 import {ResumeInfo} from "../../models/ResumeInfo";
@@ -34,12 +33,12 @@ export const WorkExperienceSection: React.FC<{resumeData: ResumeInfo}> = ({resum
                 }}>
                     <CustomCol isLeft={true}>
                         <h3>{experience.companyName}</h3>
-                        <text>{experience.startMonth + experience.startYear} - {experience.endMonth + experience.endYear}</text>
+                        <span>{experience.startMonth + experience.startYear} - {experience.endMonth + experience.endYear}</span>
                     </CustomCol>
                     <CustomCol isLeft={false}>
-                        <text  style={{
+                        <span  style={{
                             fontWeight: 'bold'
-                        }}>{experience.jobTitle}</text>
+                        }}>{experience.jobTitle}</span>
                         <ul className="list-disc pl-5 mb-0">
                             {experience.duties.map((role, roleIndex) => (
                                 <li key={roleIndex}>{role}</li>

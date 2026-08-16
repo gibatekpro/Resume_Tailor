@@ -1,8 +1,6 @@
 import React, {useEffect} from 'react';
-import {useResumeProvider} from "../../context/ResumeContext";
 import '../../styles/resumeStyleA.css';
 import {ResumeInfo} from "../../models/ResumeInfo";
-import {fontWeight} from "html2canvas/dist/types/css/property-descriptors/font-weight";
 
 export const HeaderSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
 

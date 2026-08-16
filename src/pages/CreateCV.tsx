@@ -1,26 +1,19 @@
 import React, {useEffect, useState} from "react";
-import moment from "moment";
-import {CustomAccordionStyleB} from "../custom_tags/CustomAccordionStyleB";
 import {Button, Card, Col, Fade, Nav, Row, Spinner} from "react-bootstrap";
 import "../styles/myJobApplications.css";
 import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
 import JobApplicationService from "../services/JobApplicationService";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import {useNavigate} from "react-router-dom";
-import ROUTES from "../data/routes";
 import {CustomAccordion} from "../custom_tags/CustomAccordion";
 import ResumeForm from "../components/forms/resumeForm/ResumeForm";
 import {useFormik} from "formik";
-import {CustomResumeData} from "../data/customResumeData";
-import {resumeData} from "../data/resumeData";
 import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
 import {DefaultResumeData} from "../data/defaultResumeData";
 import {Dialog, DialogPanel, DialogTitle} from "@headlessui/react";
 import * as Yup from "yup";
 import {ResumeInfo} from "../models/ResumeInfo";
 import {SavedResumesResponse} from "../models/SavedResumesResponse";
-import {fontSize} from "html2canvas/dist/types/css/property-descriptors/font-size";
-import STORAGE from "../data/storage";
 
 
 export const CreateCV: React.FC = () => {
@@ -41,10 +34,8 @@ export const CreateCV: React.FC = () => {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [resumeList, setResumeList] = useState<SavedResumesResponse[]>([])
     const [activeTab, setActiveTab] = useState("link-1");
-    const [selectedApplication, setSelectedApplication] = useState<JobApplicationInfo>();
-    const navigate = useNavigate();
     const inputFieldClassName =
-        "mt-1 block w-full px-3 py-2 focus:outline-none " +
+        "mt-1 block w-full px-3 py-2 focus:outline-hidden " +
         "focus:ring-0 focus:border-black focus:border-2 sm:text-sm";
 
     useEffect(() => {
@@ -304,14 +295,14 @@ export const CreateCV: React.FC = () => {
             )}
             {!isLoading && (
                 <div className="row g-1 p-2 p-md-0">
-                    <Dialog open={isDialogOpen} as="div" className="relative z-10 focus:outline-none"
+                    <Dialog open={isDialogOpen} as="div" className="relative z-10 focus:outline-hidden"
                             onClose={closeDialog}>
                         <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
                             <div className="flex min-h-full items-center justify-center p-4">
                                 {!isSaveComplete && !isSaveFailed && (
                                     <DialogPanel
                                         transition
-                                        className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                                        className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
                                     >
                                         <DialogTitle as="h3" className="text-black font-medium mb-4">
                                             <div className={"flex justify-between items-center"}>
@@ -345,7 +336,7 @@ export const CreateCV: React.FC = () => {
                                             </div>
                                             <Button
                                                 type="submit"
-                                                className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                                className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
                                                 disabled={isSaveLoading}
                                             >
                                                 {isSaveLoading ? (
@@ -367,7 +358,7 @@ export const CreateCV: React.FC = () => {
                                         </form>
                                         {/*<div className="mt-4">*/}
                                         {/*    <Button*/}
-                                        {/*        className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"*/}
+                                        {/*        className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"*/}
                                         {/*        onClick={closeDialog}*/}
                                         {/*    >*/}
                                         {/*        Got it, thanks!*/}
@@ -378,15 +369,15 @@ export const CreateCV: React.FC = () => {
                                 {isSaveComplete && (
                                     <DialogPanel
                                         transition
-                                        className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                                        className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
                                     >
                                         <DialogTitle as="h3" className="text-black font-medium mb-4">
                                             Successful
                                         </DialogTitle>
-                                        <text>The resume has been saved successfully</text>
+                                        <span>The resume has been saved successfully</span>
                                         <div className="mt-4">
                                             <Button
-                                                className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                                className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
                                                 onClick={closeDialog}
                                             >
                                                 Close
@@ -397,13 +388,13 @@ export const CreateCV: React.FC = () => {
                             </div>
                         </div>
                     </Dialog>
-                    <Dialog open={isDeleteDialogOpen} as="div" className="relative z-10 focus:outline-none"
+                    <Dialog open={isDeleteDialogOpen} as="div" className="relative z-10 focus:outline-hidden"
                             onClose={closeDeleteDialog}>
                         <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
                             <div className="flex min-h-full items-center justify-center p-4">
                                 <DialogPanel
                                     transition
-                                    className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                                    className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
                                 >
                                     <div className={"flex justify-between items-center mb-4"}>
                                         {`Delete CV: ${resumeToDelete?.data.resumeName}`}
@@ -414,10 +405,10 @@ export const CreateCV: React.FC = () => {
                                                 d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
                                         </svg>
                                     </div>
-                                    <text>Are you sure you want to delete this cv</text>
+                                    <span>Are you sure you want to delete this cv</span>
                                     <div className="mt-4">
                                         <Button
-                                            className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                            className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
                                             onClick={deleteResume}
                                         >
                                             Delete

@@ -1,36 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, Navigate } from 'react-router-dom';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useAuth } from './AuthProvider';
-import {auth} from "../../Firebase";
+import { useLocation, Navigate, Outlet } from 'react-router-dom';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from "../../Firebase";
 
-//The props for the RequireAuth component were defined
-interface RequireAuthProps {
-    children: React.ReactNode;
-}
-
-export const RequireAuth: React.FC<RequireAuthProps> = ({ children }) => {
+export const AuthGuard: React.FC = () => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     const location = useLocation();
 
     useEffect(() => {
-        //useEffect is used to handle side effects
-        // const authInstance = getAuth();
+        // Listen for authentication state changes
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            //onAuthStateChanged listens for changes in the user's sign-in state
             setIsAuthenticated(!!user);
         });
 
-        //cleanup function to unsubscribe from onAuthStateChanged
         return () => unsubscribe();
     }, []);
 
-
-    if (!isAuthenticated) {
-
-        return <Navigate to="/login" state={{ from: location }} replace />;
+    if (isAuthenticated === null) {
+        //Avoid redirecting until authentication state is determined
+        return <div>Loading...</div>;
     }
 
-    return <>{children}</>;
+    return isAuthenticated ? (
+        <Outlet />
+    ) : (
+        <Navigate to="/login" state={{ from: location }} replace />
+    );
 };
-

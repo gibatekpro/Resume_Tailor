@@ -1,17 +1,16 @@
 import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
 import {
     createUserWithEmailAndPassword,
-    getAuth,
     onAuthStateChanged,
     signInWithEmailAndPassword,
     signOut,
     sendPasswordResetEmail,
 } from 'firebase/auth';
 import {useNavigate} from 'react-router-dom';
+import {auth} from "../../Firebase";
 
 //The shape of the auth context value was defined
 interface AuthContextType {
-    //Any properties or methods needed to be defined
     user: string | null;
     token: string | null;
     login: (email: string, password: string, callback: (user: string) => void) => Promise<void>;
@@ -36,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     useEffect(() => {
         //useEffect is used to handle side effects
-        const auth = getAuth();
+        // const auth = getAuth();
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             //onAuthStateChanged listens for changes in the user's sign-in state
             if (user) {
@@ -60,7 +59,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const login = async (email: string, password: string, callback: (user: string) => void) => {
         //login function is used to sign in a user
         try {
-            const auth = getAuth();
+            // const auth = getAuth();
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             const token = await user.getIdToken();
@@ -79,7 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const resetPassword = async (email: string, callback: (message: string) => void) => {
         //reset password function is used to reset user's password
         try {
-            const auth = getAuth();
+            // const auth = getAuth();
             sendPasswordResetEmail(auth, email)
                 .then(() => {
                     // Password reset email sent!
@@ -100,7 +99,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const register = async (firstName: string, lastName: string, email: string, password: string, callback: (user: string, failed: boolean) => void) => {
         //register function is used to create a new user
         try {
-            const auth = getAuth();
+            // const auth = getAuth();
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             const token = await user.getIdToken();
@@ -117,7 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const logout = async () => {
         //logout function is used to log a user out
         try {
-            const auth = getAuth();
+            // const auth = getAuth();
             await signOut(auth);
             setUser(null);
             setToken(null);

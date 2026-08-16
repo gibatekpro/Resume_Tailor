@@ -1,5 +1,4 @@
 import React from "react";
-import {useResumeProvider} from "../../context/ResumeContext";
 import '../../styles/resumeStyleA.css';
 import {ResumeInfo} from "../../models/ResumeInfo";
 

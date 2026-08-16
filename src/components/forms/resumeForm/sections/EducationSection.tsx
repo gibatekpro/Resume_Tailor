@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {MONTHS, YEARS} from "../../../../data/applicationData";
+import {MONTHS, YEARS} from "../../../../utils/applicationData";
 import {Col, Row} from "react-bootstrap";
 
 interface EducationSectionProps {

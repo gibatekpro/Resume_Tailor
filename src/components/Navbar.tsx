@@ -26,7 +26,7 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({hide}) => {
     }, []);
 
     const navigation = [
-        {name: "Tailor My CV", path: ROUTES.RESUME_INPUT_PAGE},
+        {name: "Tailor CV", path: ROUTES.RESUME_INPUT_PAGE},
         {name: "My Job Applications", path: ROUTES.MY_JOB_APPLICATIONS},
         {name: "My CVs", path: ROUTES.NEW_CV_PAGE},
     ];

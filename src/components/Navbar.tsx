@@ -48,7 +48,7 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({hide}) => {
             <nav className="flex items-center justify-between p-3 lg:px-8" aria-label="Global">
                 {/* Logo */}
                 <div className="flex lg:flex-1">
-                    <a href="#" className="-m-1.5 p-1.5" onClick={() => navigate(ROUTES.HOME)}>
+                    <a href={ROUTES.HOME} className="-m-1.5 p-1.5" onClick={(e) => { e.preventDefault(); navigate(ROUTES.HOME); }}>
                         <img
                             className="h-8 w-auto"
                             src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
@@ -74,7 +74,8 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({hide}) => {
                     {navigation.map((item) => (
                         <a
                             key={item.name}
-                            onClick={() => handleNavigate(item.path)}
+                            href={item.path}
+                            onClick={(e) => { e.preventDefault(); handleNavigate(item.path); }}
                             className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer"
                         >
                             {item.name}
@@ -86,7 +87,8 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({hide}) => {
                 {!loggedIn && (
                     <div className="hidden lg:flex lg:flex-1 lg:justify-end">
                         <a
-                            onClick={() => handleNavigate(ROUTES.LOGIN)}
+                            href={ROUTES.LOGIN}
+                            onClick={(e) => { e.preventDefault(); handleNavigate(ROUTES.LOGIN); }}
                             className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer"
                         >
                             Log in <span aria-hidden="true">&rarr;</span>
@@ -110,12 +112,13 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({hide}) => {
                         >
                             {email}
                         </button>
-                        <a
+                        <button
+                            type="button"
                             onClick={performLogout}
-                            className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer"
+                            className="text-sm font-semibold leading-6 text-gray-900"
                         >
                             <span aria-hidden="true">&larr;</span> Log out
-                        </a>
+                        </button>
                     </div>
                 )}
             </nav>
@@ -127,7 +130,7 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({hide}) => {
                     className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                     {/* Mobile Header */}
                     <div className="flex items-center justify-between">
-                        <a href="#" className="-m-1.5 p-1.5" onClick={() => navigate(ROUTES.HOME)}>
+                        <a href={ROUTES.HOME} className="-m-1.5 p-1.5" onClick={(e) => { e.preventDefault(); navigate(ROUTES.HOME); }}>
                             <img
                                 className="h-8 w-auto"
                                 src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
@@ -151,7 +154,8 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({hide}) => {
                                 {navigation.map((item) => (
                                     <a
                                         key={item.name}
-                                        onClick={() => handleNavigate(item.path)}
+                                        href={item.path}
+                                        onClick={(e) => { e.preventDefault(); handleNavigate(item.path); }}
                                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 cursor-pointer"
                                     >
                                         {item.name}
@@ -161,7 +165,8 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({hide}) => {
                             <div className="py-6">
                                 {!loggedIn ? (
                                     <a
-                                        onClick={() => handleNavigate(ROUTES.LOGIN)}
+                                        href={ROUTES.LOGIN}
+                                        onClick={(e) => { e.preventDefault(); handleNavigate(ROUTES.LOGIN); }}
                                         className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
                                         Log in
@@ -184,12 +189,13 @@ export const Navbar: React.FC<{ hide?: boolean }> = ({hide}) => {
                                         >
                                             {email}
                                         </button>
-                                        <a
+                                        <button
+                                            type="button"
                                             onClick={performLogout}
                                             className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                         >
                                             Log out
-                                        </a>
+                                        </button>
                                     </>
 
                                 )}

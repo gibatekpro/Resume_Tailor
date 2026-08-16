@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useAuth } from './AuthProvider';
+import {auth} from "../../Firebase";
 
 //The props for the RequireAuth component were defined
 interface RequireAuthProps {
@@ -14,8 +15,8 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({ children }) => {
 
     useEffect(() => {
         //useEffect is used to handle side effects
-        const authInstance = getAuth();
-        const unsubscribe = onAuthStateChanged(authInstance, (user) => {
+        // const authInstance = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
             //onAuthStateChanged listens for changes in the user's sign-in state
             setIsAuthenticated(!!user);
         });
@@ -24,12 +25,9 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({ children }) => {
         return () => unsubscribe();
     }, []);
 
-    if (isAuthenticated === null) {
-        return <div></div>;
-    }
 
     if (!isAuthenticated) {
-        //Redirect to the login page if the user is not authenticated
+
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 

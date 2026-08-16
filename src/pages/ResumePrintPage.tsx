@@ -6,7 +6,7 @@ import STORAGE from "../utils/storage";
 import {renderResumeStyle} from "../utils/HelperFunctions";
 
 export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void, setAppTitle:React.Dispatch<React.SetStateAction<string>> }> = ({ setHideNavbar, setAppTitle }) => {
-    const [applicationData, setApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}"));
+    const [applicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}"));
     const contentRef = useRef<HTMLDivElement>(null);
 
     const handlePrint = useReactToPrint({

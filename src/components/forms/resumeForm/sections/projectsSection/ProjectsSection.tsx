@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Col, Row } from "react-bootstrap";
 import {ProjectDetailInput} from "./ProjectDetailInput";
 import {MONTHS, YEARS} from "../../../../../utils/applicationData";
@@ -16,7 +16,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                                                                 }) => {
     const projectList = resumeFormFormik.values.projects;
     const projects = projectList[index];
-    const [isIconVisible, setIsIconVisible] = useState(false);
+    
 
     const addProjectDetail = () => {
         const updatedProjectDetails = [...(projects.projectDetails || []), ""];

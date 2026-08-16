@@ -85,9 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     callback("An email has been sent to you. Please follow the instructions in the email.")
                 })
                 .catch((error) => {
-                    const errorCode = error.code;
                     const errorMessage = error.message;
-                    // ..
                     callback(errorMessage);
                 });
         } catch (error) {

@@ -1,8 +1,6 @@
 import React, {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {openAIInstruction as initialOpenAIInstructionData} from "../data/openAIInstruction";
-import {ResumeData} from "../models/ResumeData";
 import {ResumeInfo} from "../models/ResumeInfo";
-import {openAIInstruction} from "../data/openAIInstruction";
 import {OpenAIInstruction} from "../models/OpenAIInstruction";
 import {DefaultResumeData} from "../data/defaultResumeData";
 

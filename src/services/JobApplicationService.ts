@@ -1,6 +1,5 @@
-import {doc, getFirestore, setDoc, deleteDoc} from "firebase/firestore";
+import {doc, getFirestore, setDoc, deleteDoc, collection, getDocs, getDoc} from "firebase/firestore";
 import {JobApplicationInfo} from "../models/JobApplicationInfo";
-import {addDoc, collection, getDocs, getDoc} from "firebase/firestore";
 import {ResumeInfo} from "../models/ResumeInfo";
 import {JobApplicationsResponse} from "../models/JobApplicationsResponse";
 import {SavedResumesResponse} from "../models/SavedResumesResponse";
@@ -31,8 +30,9 @@ class JobApplicationService {
             // Reference to the sub-collection for job applications under the user's document
             const userJobApplicationsRef = collection(db, `jobApplications/${uid}/applications`);
 
+            void userJobApplicationsRef;
+
             // Add a new document with auto-generated ID in the user's sub-collection
-            // const docRef = await addDoc(userJobApplicationsRef, jobApplication);
 
             // console.log(
             //     `Job application for user ${uid} has been saved successfully with ID: ${docRef.id}`
@@ -109,9 +109,9 @@ class JobApplicationService {
         try {
             // Reference to the sub-collection for job applications under the user's document
             const userResumeDataRef = collection(db, `resumes/${uid}/data`);
+            void userResumeDataRef;
 
             // Add a new document with auto-generated ID in the user's sub-collection
-            // const docRef = await addDoc(userResumeDataRef, resumeData);
             //
             // console.log(
             //     `Resume data for user ${uid} has been saved successfully with ID: ${docRef.id}`
@@ -254,4 +254,6 @@ class JobApplicationService {
 
 }
 
-export default new JobApplicationService();
+const jobApplicationService = new JobApplicationService();
+
+export default jobApplicationService;

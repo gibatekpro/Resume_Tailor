@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import '../styles/resumePrint.css';
 import {useNavigate} from "react-router-dom";
 import JobApplicationService from "../services/JobApplicationService";
@@ -19,11 +19,11 @@ export const JobApplicationPreviewPage: React.FC<{
     setHideNavbar: (hide: boolean) => void,
     setAppTitle: React.Dispatch<React.SetStateAction<string>>
 }> = ({setHideNavbar, setAppTitle}) => {
-    const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
+    const [user] = useState<string | null>(localStorage.getItem('user'));
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    const [saved, setSaved] = useState(localStorage.getItem(STORAGE.LOCAL_STORAGE_RESUME_DATA));
-    const [savedApplicationData, setSavedApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || JSON.parse("{}")));
+    const [saved] = useState(localStorage.getItem(STORAGE.LOCAL_STORAGE_RESUME_DATA));
+    const [savedApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || JSON.parse("{}")));
     const resumeDataOpenAI = saved ? JSON.parse(saved) : DefaultResumeData;
     const [selectedResumeStyle, setSelectedResumeStyle] = useState(RESUME_STYLES[0])
 

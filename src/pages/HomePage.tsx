@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import {useNavigate} from "react-router-dom";
 import ROUTES from "../utils/routes";
 
@@ -34,11 +34,13 @@ export const HomePage: React.FC = () => {
                         <div
                             className="relative rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20">
                             Announcing our next round of funding.{' '}
-                            <a href="#"
+                            <button
+                               type="button"
+                               onClick={() => { /* no-op or navigate to details */ }}
                                className="font-semibold text-indigo-600 transition-all duration-300 ease-in-out transform hover:scale-110 hover:text-indigo-800">
                                 <span aria-hidden="true" className="absolute inset-0"></span>
                                 Read more <span aria-hidden="true">&rarr;</span>
-                            </a>
+                            </button>
                         </div>
                     </div>
                     <div className="text-center">
@@ -50,13 +52,14 @@ export const HomePage: React.FC = () => {
                             while keeping your skills and experience unchanged.
                         </p>
                         <div className="mt-10 flex items-center justify-center gap-x-6">
-                            <a
+                            <button
+                                type="button"
                                 onClick={handleNavigateToInput}
-                                className="cursor-pointer rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-2xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-2xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                             >
                                 Get started
-                            </a>
-                            <a onClick={handleNavigateToInput} className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
+                            </button>
+                            <a href={ROUTES.TEST} onClick={(e) => { e.preventDefault(); handleNavigateToInput(); }} className="text-sm font-semibold leading-6 text-gray-900">
                                 Tailor CV <span aria-hidden="true">→</span>
                             </a>
                         </div>

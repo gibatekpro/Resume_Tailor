@@ -11,7 +11,7 @@ import {appName} from "../../utils/applicationData";
 
 export const ResetPasswordPage: React.FC = () => {
     window.scroll(0, 0);
-    const [resetFailed, setResetFailed] = useState(false);
+    const [resetFailed] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     let auth = useAuth();
     const navigate = useNavigate();

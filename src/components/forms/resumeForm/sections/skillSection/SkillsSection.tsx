@@ -1,6 +1,4 @@
-import React, {useEffect, useState} from "react";
-import {MONTHS} from "../../../../../utils/applicationData";
-import { v4 as uuidv4 } from "uuid";
+import React from "react";
 import {SkillInput} from "./SkillInput";
 
 interface SkillsSectionProps {

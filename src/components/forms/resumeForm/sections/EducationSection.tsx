@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {MONTHS, YEARS} from "../../../../utils/applicationData";
 import {Col, Row} from "react-bootstrap";
 
@@ -15,7 +15,7 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
                                                                   }) => {
     const educationList = resumeFormFormik.values.education;
     const education = educationList[index];
-    const [isIconVisible, setIsIconVisible] = useState(false);
+    
 
     const removeEducation = () => {
         const updatedEducation = educationList.filter(
@@ -29,9 +29,7 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
     return (
         <>
 
-            <div className="grid grid-cols-2 gap-1 mb-1"
-                 onMouseEnter={() => setIsIconVisible(true)}
-                 onMouseLeave={() => setIsIconVisible(false)}>
+              <div className="grid grid-cols-2 gap-1 mb-1">
 
                 <div className="bg-white">
                     <input

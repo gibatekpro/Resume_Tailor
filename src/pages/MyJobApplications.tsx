@@ -1,18 +1,14 @@
 import React, {useEffect, useState} from "react";
 import moment from "moment";
 import {CustomAccordionStyleB} from "../custom_tags/CustomAccordionStyleB";
-import {Button, Card, Col, Row} from "react-bootstrap";
+import {Button, Col, Row} from "react-bootstrap";
 import "../styles/myJobApplications.css";
-import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
 import JobApplicationService from "../services/JobApplicationService";
-import {JobApplicationInfo} from "../models/JobApplicationInfo";
 import {useNavigate} from "react-router-dom";
 import ROUTES from "../utils/routes";
 import {JobApplicationsResponse} from "../models/JobApplicationsResponse";
 import STORAGE from "../utils/storage";
 import {Dialog, DialogPanel} from "@headlessui/react";
-import {SavedResumesResponse} from "../models/SavedResumesResponse";
-import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
 import {renderResumeStyle} from "../utils/HelperFunctions";
 
 export const MyJobApplications: React.FC = () => {
@@ -27,7 +23,7 @@ export const MyJobApplications: React.FC = () => {
     const [selectedApplication, setSelectedApplication] = useState<JobApplicationsResponse>();
     const [jobApplicationToDelete, setJobApplicationToDelete] = useState<JobApplicationsResponse>();
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
+    const [user] = useState<string | null>(localStorage.getItem('user'));
     const navigate = useNavigate();
 
     useEffect(() => {

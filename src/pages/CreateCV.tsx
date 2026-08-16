@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from "react";
-import {Button, Card, Col, Fade, Nav, Row, Spinner} from "react-bootstrap";
+import {Button, Col, Nav, Row, Spinner} from "react-bootstrap";
 import "../styles/myJobApplications.css";
 import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
 import JobApplicationService from "../services/JobApplicationService";
-import {JobApplicationInfo} from "../models/JobApplicationInfo";
-import {useNavigate} from "react-router-dom";
+
 import {CustomAccordion} from "../custom_tags/CustomAccordion";
 import ResumeForm from "../components/forms/resumeForm/ResumeForm";
 import {useFormik} from "formik";
@@ -21,7 +20,7 @@ export const CreateCV: React.FC = () => {
     const [isBeingEdited, setIsBeingEdited] = useState<SavedResumesResponse>();
     const [resumeToDelete, setResumeToDelete] = useState<SavedResumesResponse>();
     const [isBeingEditedIndex, setIsBeingEditedIndex] = useState<number>(-1);
-    const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
+    const [user] = useState<string | null>(localStorage.getItem('user'));
     const [isLoading, setIsLoading] = useState(false);
     const [isSaveComplete, setIsSaveComplete] = useState(false);
     const [isSaveFailed, setIsSaveFailed] = useState(false);
@@ -261,10 +260,10 @@ export const CreateCV: React.FC = () => {
 
     useEffect(() => {
 
-        setIsBeingEdited({
-            ...isBeingEdited,
+        setIsBeingEdited(prev => ({
+            ...prev,
             data: customResumeFormFormik.values,
-        });
+        }));
 
     }, [customResumeFormFormik.values]);
 

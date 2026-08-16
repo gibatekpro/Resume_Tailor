@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {ResumeInfo} from "../../models/ResumeInfo";
 import {Col, Row} from "react-bootstrap";
 import {HeaderSection} from "./HeaderSection";
@@ -13,24 +13,6 @@ import {LanguageSection} from "./LanguageSection";
 
 
 export const ResumeStyleC: React.FunctionComponent<{resumeData: ResumeInfo}> = ({resumeData}) => {
-    const [hasProjects, setHasProjects] = useState(!!resumeData.projects && resumeData.projects.length > 0);
-    const [hasLanguage, setHasLanguage] = useState(!!resumeData.languages && resumeData.languages.length > 0);
-    const [hasSummary, setHasSummary] = useState(!!resumeData.profile?.summary);
-    const [hasSkills, setHasSkills] = useState(!!resumeData.skills && resumeData.skills.length > 0);
-    const [hasWorkExperience, setHasWorkExperience] = useState(!!resumeData.workExperience && resumeData.workExperience.length > 0);
-    const [hasEducation, setHasEducation] = useState(!!resumeData.education && resumeData.education.length > 0);
-    const [hasContactInfo, setHasContactInfo] = useState(!!resumeData.contactInfo && resumeData.contactInfo.length > 0);
-
-    useEffect(() => {
-        // Update state for sections visibility
-
-        setHasProjects(!!resumeData.projects && resumeData.projects.length > 0);
-        setHasLanguage(!!resumeData.languages && resumeData.languages.length > 0);
-        setHasSkills(!!resumeData.skills && resumeData.skills.length > 0);
-        setHasWorkExperience(!!resumeData.workExperience && resumeData.workExperience.length > 0);
-        setHasEducation(!!resumeData.education && resumeData.education.length > 0);
-        setHasContactInfo(!!resumeData.contactInfo && resumeData.contactInfo.length > 0);
-    }, [resumeData]);
 
     return(
         <div style={

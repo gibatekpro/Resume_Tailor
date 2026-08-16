@@ -1,5 +1,4 @@
 import React from "react";
-import {ResumeInfo} from "../../../../models/ResumeInfo";
 
 interface ProfileSectionProps {
     resumeFormFormik: any;

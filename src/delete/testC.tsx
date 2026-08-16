@@ -1,11 +1,4 @@
-import React, {CSSProperties, useEffect, useState} from "react";
-
-interface PersonType {
-    id: number,
-    name: string,
-    email: string,
-    image: string,
-}
+import React, {CSSProperties, useState} from "react";
 
 type PracticeProperties = {
     textColor?: string;

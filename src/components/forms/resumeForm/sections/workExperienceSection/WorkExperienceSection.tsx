@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Col, Row } from "react-bootstrap";
 import {MONTHS, YEARS} from "../../../../../utils/applicationData";
 import {DutyInput} from "./DutyInput";
@@ -16,7 +16,7 @@ export const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
                                                                             }) => {
     const workExperienceList = resumeFormFormik.values.workExperience;
     const workExperience = workExperienceList[index];
-    const [isIconVisible, setIsIconVisible] = useState(false);
+    
 
     const addDuty = () => {
         const updatedDuties = [...(workExperience.duties || []), ""];
@@ -53,9 +53,7 @@ export const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
                         value={workExperience.companyName || ""}
                     />
                 </div>
-                <div className="bg-white flex items-center"
-                     onMouseEnter={() => setIsIconVisible(true)}
-                     onMouseLeave={() => setIsIconVisible(false)}>
+                 <div className="bg-white flex items-center">
                     <input
                         id={`workExperience-${workExperience.id}-jobTitle`}
                         name={`workExperience[${index}].jobTitle`}

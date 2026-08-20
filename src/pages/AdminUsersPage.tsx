@@ -88,14 +88,14 @@ export const AdminUsersPage: React.FC = () => {
     return (
         <AppLayout>
             <TopNav title="Admin Users" />
-            <main className="relative flex flex-1 flex-col p-6">
+            <main className="relative flex flex-1 flex-col px-4 py-5 md:px-6 md:py-6 lg:px-8">
                 <PageLoadingOverlay
                     visible={isLoading}
                     withinParent={true}
                     message={loadingMessage}
                 />
 
-                <div className="w-full rounded-2xl border border-[#c6c6cd] bg-white p-6 shadow-[0_1px_3px_rgba(15,23,42,0.05)]">
+                <div className="w-full rounded-2xl border border-[#c6c6cd] bg-white p-4 shadow-[0_1px_3px_rgba(15,23,42,0.05)] md:p-6">
                     <div className="mb-4">
                         <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2170e4]">Administration</p>
                         <h2 className="mt-1 text-xl font-semibold text-[#161c22]">User Permissions</h2>

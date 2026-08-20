@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/auth/AuthProvider';
 import userProfileService from '../../service/UserProfileService';
 import ROUTES from '../../utils/Routes';
@@ -10,6 +10,27 @@ interface TopNavProps {
   title?: string;
   actions?: React.ReactNode;
 }
+
+interface NavItem {
+  path: string;
+  icon: string;
+  label: string;
+}
+
+const baseNavItems: NavItem[] = [
+  { path: ROUTES.HOME, icon: 'home', label: 'Home' },
+  { path: ROUTES.RESUME_INPUT_PAGE, icon: 'edit_document', label: 'Tailor Resume' },
+  { path: ROUTES.NEW_CV_PAGE, icon: 'description', label: 'New CV' },
+  { path: ROUTES.MY_JOB_APPLICATIONS, icon: 'work_history', label: 'My Job Applications' },
+  { path: ROUTES.PROFILE, icon: 'manage_accounts', label: 'Profile' },
+  { path: ROUTES.ADMIN_USERS, icon: 'admin_panel_settings', label: 'Admin Users' },
+];
+
+const authNavItems: NavItem[] = [
+  { path: ROUTES.LOGIN, icon: 'login', label: 'Login' },
+  { path: ROUTES.REGISTER, icon: 'person_add', label: 'Register' },
+  { path: ROUTES.PASSWORD_RESET, icon: 'lock_reset', label: 'Reset Password' },
+];
 
 const formatUserLabel = (firstName: string, lastName: string, fallbackUserId: string | null) => {
   const fullName = `${firstName} ${lastName}`.trim();
@@ -26,14 +47,18 @@ const formatUserLabel = (firstName: string, lastName: string, fallbackUserId: st
 
 export default function TopNav({ searchPlaceholder = 'Search...', onSearch, title, actions }: TopNavProps) {
   const [q, setQ] = useState('');
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [profileName, setProfileName] = useState('Profile');
   const [profilePermission, setProfilePermission] = useState('User');
   const auth = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const mobileNavRef = useRef<HTMLDivElement | null>(null);
+  const mobileNavToggleRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -43,6 +68,13 @@ export default function TopNav({ searchPlaceholder = 'Search...', onSearch, titl
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
+      }
+
+      const isInsideMobileNav = mobileNavRef.current?.contains(event.target as Node) ?? false;
+      const isInsideMobileNavToggle = mobileNavToggleRef.current?.contains(event.target as Node) ?? false;
+
+      if (!isInsideMobileNav && !isInsideMobileNavToggle) {
+        setIsMobileNavOpen(false);
       }
     };
 
@@ -73,6 +105,7 @@ export default function TopNav({ searchPlaceholder = 'Search...', onSearch, titl
   }, [auth?.isAuthenticated, auth?.user]);
 
   const userLabel = profileName;
+  const mobileNavItems = auth?.isAuthenticated ? baseNavItems : [...baseNavItems, ...authNavItems];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQ(e.target.value);
@@ -91,23 +124,43 @@ export default function TopNav({ searchPlaceholder = 'Search...', onSearch, titl
     navigate(ROUTES.PASSWORD_RESET, { replace: false });
   };
 
+  const isMobileItemActive = (path: string) => {
+    if (path === ROUTES.HOME) {
+      return location.pathname === path;
+    }
+
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+
   return (
     <>
       <header
-        className="sticky top-0 z-40 flex justify-between items-center"
+        className="sticky top-0 z-40 flex items-center justify-between gap-2"
         style={{
-          height: '64px',
-          padding: '0 24px',
+          minHeight: '64px',
+          padding: '10px 16px',
           backgroundColor: '#f6f9ff',
           borderBottom: '1px solid #c6c6cd',
           boxShadow: '0px 1px 3px rgba(15,23,42,0.05)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
+          <button
+            ref={mobileNavToggleRef}
+            type="button"
+            onClick={() => setIsMobileNavOpen((value) => !value)}
+            className="cursor-pointer inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#c6c6cd] bg-white text-[#161c22] lg:hidden"
+            aria-label="Toggle navigation"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+              {isMobileNavOpen ? 'close' : 'menu'}
+            </span>
+          </button>
+
           {title ? (
             <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#161c22', margin: 0 }}>{title}</h2>
           ) : (
-            <div style={{ position: 'relative', maxWidth: '400px', width: '100%' }}>
+            <div className="hidden md:block" style={{ position: 'relative', maxWidth: '400px', width: '100%' }}>
               <span
                 className="material-symbols-outlined"
                 style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '18px', color: '#76777d' }}
@@ -133,7 +186,7 @@ export default function TopNav({ searchPlaceholder = 'Search...', onSearch, titl
           )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {actions}
           <button
             style={{
@@ -142,6 +195,7 @@ export default function TopNav({ searchPlaceholder = 'Search...', onSearch, titl
               background: 'transparent', border: 'none', cursor: 'pointer',
               position: 'relative',
             }}
+            className="hidden md:flex"
           >
             <span className="material-symbols-outlined" style={{ color: '#45464d' }}>notifications</span>
             <span style={{
@@ -150,7 +204,7 @@ export default function TopNav({ searchPlaceholder = 'Search...', onSearch, titl
               backgroundColor: '#ba1a1a', border: '2px solid #f6f9ff',
             }} />
           </button>
-          <div style={{ width: '1px', height: '32px', backgroundColor: '#c6c6cd' }} />
+          <div className="hidden md:block" style={{ width: '1px', height: '32px', backgroundColor: '#c6c6cd' }} />
           <div ref={menuRef} style={{ position: 'relative' }}>
             <button
               type="button"
@@ -167,7 +221,7 @@ export default function TopNav({ searchPlaceholder = 'Search...', onSearch, titl
                 transform: isMenuOpen ? 'translateY(-1px)' : 'translateY(0)',
               }}
             >
-              <div style={{ textAlign: 'right' }}>
+              <div className="hidden sm:block" style={{ textAlign: 'right' }}>
                 <p style={{ fontSize: '12px', fontWeight: 700, color: '#161c22', margin: 0 }}>
                   {auth?.isAuthenticated ? userLabel : 'Profile'}
                 </p>
@@ -307,6 +361,43 @@ export default function TopNav({ searchPlaceholder = 'Search...', onSearch, titl
           </div>
         </div>
       </header>
+
+      {isMobileNavOpen && (
+        <div
+          ref={mobileNavRef}
+          className="sticky top-16 z-30 border-b border-[#2a344b] bg-[#131b2e] px-3 py-2 lg:hidden"
+        >
+          <div className="grid grid-cols-1 gap-1 rounded-xl border border-[#3f465c] bg-[#131b2e] p-2 shadow-[0_10px_24px_rgba(6,10,20,0.45)]">
+            {mobileNavItems.map((item) => (
+              <button
+                key={item.path}
+                type="button"
+                onClick={() => {
+                  setIsMobileNavOpen(false);
+                  navigate(item.path);
+                }}
+                className="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2 text-left text-sm font-medium transition-colors"
+                style={{
+                  borderLeftColor: isMobileItemActive(item.path) ? '#2170e4' : 'transparent',
+                  backgroundColor: isMobileItemActive(item.path) ? 'rgba(33,112,228,0.2)' : 'transparent',
+                  color: isMobileItemActive(item.path) ? '#ffffff' : 'rgba(124,131,155,0.9)',
+                }}
+              >
+                <span
+                  className="material-symbols-outlined"
+                  style={{
+                    fontSize: '18px',
+                    color: isMobileItemActive(item.path) ? '#ffffff' : 'rgba(124,131,155,0.9)',
+                  }}
+                >
+                  {item.icon}
+                </span>
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {isConfirmOpen && (
         <div

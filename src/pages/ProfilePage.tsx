@@ -67,7 +67,7 @@ export const ProfilePage: React.FC = () => {
     return (
         <AppLayout>
             <TopNav title="Profile" />
-            <main className="relative flex flex-1 items-center justify-center p-6">
+            <main className="relative flex flex-1 items-center justify-center px-4 py-6 md:px-6 lg:px-8">
                 <PageLoadingOverlay
                     visible={isLoading}
                     withinParent={true}
@@ -92,7 +92,7 @@ export const ProfilePage: React.FC = () => {
                                 <form
                                     noValidate
                                     onSubmit={submitForm}
-                                    className="flex w-full flex-col gap-5 rounded-2xl border border-[#c6c6cd] bg-white p-7 shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-all duration-200 hover:shadow-[0_6px_24px_rgba(33,112,228,0.08)]"
+                                    className="flex w-full flex-col gap-5 rounded-2xl border border-[#c6c6cd] bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-all duration-200 hover:shadow-[0_6px_24px_rgba(33,112,228,0.08)] md:p-7"
                                 >
                                     <div className="text-center">
                                         <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2170e4]">Account settings</p>

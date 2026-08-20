@@ -6,9 +6,9 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f6f9ff' }}>
+    <div className="flex min-h-screen bg-[#f6f9ff]">
       <Sidebar />
-      <div style={{ marginLeft: '260px', flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <div className="flex min-w-0 flex-1 flex-col lg:ml-[260px]">
         {children}
       </div>
     </div>

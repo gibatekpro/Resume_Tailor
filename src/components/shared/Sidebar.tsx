@@ -29,7 +29,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="fixed left-0 top-0 h-full flex flex-col py-2 z-50"
+      className="fixed left-0 top-0 z-50 hidden h-full flex-col py-2 lg:flex"
       style={{ width: '260px', backgroundColor: '#131b2e' }}
     >
       <div className="px-6 py-6 mb-2">

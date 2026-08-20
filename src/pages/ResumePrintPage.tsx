@@ -52,8 +52,8 @@ export const ResumePrintPage: React.FC<ResumePrintPageProps> = ({ setHideNavbar,
     }, [setHideNavbar, applicationData]);
 
     return (
-        <div className={"print-page-container"}>
-            <div ref={contentRef} className="pdf-container">
+        <div className={"print-page-container w-full overflow-x-auto"}>
+            <div ref={contentRef} className="pdf-container mx-auto">
                 {/*<ResumeStyleA/>*/}
                 {renderResumeStyle(applicationData?.resumeInfo || {}, applicationData.resumeStyle)}
             </div>

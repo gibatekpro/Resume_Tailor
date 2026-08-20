@@ -123,20 +123,14 @@ export const JobApplicationPreviewPage: React.FC<{
                 }
             />
 
-            <main style={{ position: "relative", flex: 1, overflowY: 'auto', padding: '24px' }}>
+            <main className="relative flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6 lg:px-8">
                 <PageLoadingOverlay
                     visible={isLoading}
                     withinParent={true}
                     message="Saving your application and preparing print view..."
                 />
                 <div className="grid grid-cols-1 gap-4 p-2 md:p-0 lg:grid-cols-12">
-                    <div
-                        className="lg:col-span-5 xl:col-span-4"
-                        style={{
-                            position: "sticky",
-                            alignSelf: "flex-start",
-                        }}
-                    >
+                    <div className="lg:col-span-5 lg:sticky lg:top-[88px] lg:self-start xl:col-span-4">
                         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                             <div className="mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
@@ -320,13 +314,13 @@ export const JobApplicationPreviewPage: React.FC<{
                         </div>
                     </div>
 
-                    <div className="lg:col-span-7 xl:col-span-8">
+                    <div className="min-w-0 lg:col-span-7 xl:col-span-8">
                         <div style={{
                             border: "1px solid #0f5a73",
                             borderRadius: "8px",
-                            display: "inline-block",
-                            width: "fit-content",
-                            maxWidth: "100%",
+                            display: "block",
+                            width: "100%",
+                            overflowX: "auto",
                             height: "fit-content",
                             padding: "10px",
                             background: "#fff",

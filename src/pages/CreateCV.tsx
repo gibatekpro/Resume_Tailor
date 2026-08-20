@@ -382,7 +382,7 @@ export const CreateCV: React.FC = () => {
                 </div>
             )}
             {!isLoading && (
-                <div className="row g-1 p-2 p-md-0">
+                <div className="row g-2 p-1 p-md-0">
                     <Dialog open={isDialogOpen} as="div" className="relative z-10 focus:outline-hidden"
                             onClose={closeDialog}>
                         <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -637,7 +637,7 @@ export const CreateCV: React.FC = () => {
                     </div>
 
                     {activeStep === 1 && (
-                    <div className={resumePreviewClassName}>
+                    <div className={`${resumePreviewClassName} min-w-0`}>
                         <Nav fill variant="tabs" activeKey={activeTab} onSelect={handleSelect}>
                             <Nav.Item>
                                 <Nav.Link eventKey="link-1">Style A</Nav.Link>

@@ -364,7 +364,7 @@ export const TailorResumePage: React.FC = () => {
         <AppLayout>
             <TopNav title="Tailor Resume" />
 
-            <main className="relative flex-1 bg-[#f6f9ff] px-4 py-6 md:px-6 lg:px-8">
+            <main className="relative flex-1 bg-[#f6f9ff] px-3 py-5 md:px-6 md:py-6 lg:px-8">
                 <div className="mx-auto max-w-[1600px]">
                     <div className="mb-6 overflow-hidden rounded-lg border border-[#c6c6cd] bg-white shadow-[0_12px_28px_rgba(15,23,42,0.05)]">
                         <div className="border-b border-[#eaeaf0] bg-gradient-to-r from-[#eef4ff] via-[#f8fbff] to-white px-5 py-4 md:px-6">

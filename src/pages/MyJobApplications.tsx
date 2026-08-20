@@ -208,7 +208,7 @@ export const MyJobApplications: React.FC = () => {
     return (
         <AppLayout>
             <TopNav title="My Job Applications" />
-            <main className="relative flex-1 bg-[#f6f9ff] px-4 py-6 md:px-6 lg:px-8">
+            <main className="relative flex-1 bg-[#f6f9ff] px-3 py-5 md:px-6 md:py-6 lg:px-8">
                 <div className="mx-auto max-w-[1600px]">
                     <PageLoadingOverlay
                         visible={isLoading}

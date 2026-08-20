@@ -130,13 +130,11 @@ export default function HomePage() {
     <AppLayout>
       <TopNav searchPlaceholder="Search opportunities..." />
 
-      <main style={{ padding: '24px', flex: 1, overflowY: 'auto', width: '100%' }}>
+      <main className="w-full flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6 lg:px-8">
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gap: '24px' }}>
           <section
+            className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between"
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
               gap: '20px',
               padding: '28px 28px',
               borderRadius: '20px',
@@ -160,6 +158,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => navigate(AppRoutes.resumeInputPage)}
+              className="w-full justify-center md:w-auto"
               style={{
                 display: 'flex',
                 alignItems: 'center',

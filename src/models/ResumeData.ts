@@ -1,8 +1,8 @@
-import {WorkExperience} from "./WorkExperience";
-import {Education} from "./Education";
-import {Project} from "./Project";
-import {ContactInfo} from "./ContactInfo";
-import {Language} from "./Language";
+import type {WorkExperience} from "./WorkExperience";
+import type {Education} from "./Education";
+import type {Project} from "./Project";
+import type {ContactInfo} from "./ContactInfo";
+import type {Language} from "./Language";
 
 export interface ResumeData {
     openAINote?: string,

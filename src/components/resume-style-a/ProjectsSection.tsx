@@ -2,7 +2,7 @@ import React from 'react';
 import { Row } from 'react-bootstrap';
 import {CustomCol} from "../../custom_tags/CustomCol";
 import '../../styles/resumeStyleA.css';
-import {ResumeInfo} from "../../models/ResumeInfo";
+import type { ResumeInfo } from "../../models/ResumeInfo";
 
 export const ProjectsSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
 

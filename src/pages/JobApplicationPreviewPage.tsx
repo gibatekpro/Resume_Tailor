@@ -1,36 +1,41 @@
 import React, {useEffect, useState} from "react";
 import '../styles/resumePrint.css';
 import {useNavigate} from "react-router-dom";
-import JobApplicationService from "../services/JobApplicationService";
+import JobApplicationService from "../service/JobApplicationService";
 import {
     APP_TITLE, RESUME_STYLES,
 } from "../utils/applicationData";
-import {JobApplicationInfo} from "../models/JobApplicationInfo";
-import ROUTES from "../utils/routes";
+import type { JobApplicationInfo } from "../models/JobApplicationInfo";
+import ROUTES from "../utils/Routes";
 import {DefaultResumeData} from "../data/defaultResumeData";
-import {Button, Col, Form, Row} from "react-bootstrap";
 import {useFormik} from "formik";
 import * as Yup from "yup";
 import STORAGE from "../utils/storage";
 import {renderResumeStyle} from "../utils/HelperFunctions";
 import moment from "moment";
+import styleAImage from "../assets/resume_styles/StyleA.png";
+import styleBImage from "../assets/resume_styles/StyleB.png";
+import styleCImage from "../assets/resume_styles/StyleC.png";
+import AppLayout from "../components/shared/AppLayout";
+import TopNav from "../components/shared/TopNav";
+import PageLoadingOverlay from "../components/shared/PageLoadingOverlay";
 
 export const JobApplicationPreviewPage: React.FC<{
-    setHideNavbar: (hide: boolean) => void,
-    setAppTitle: React.Dispatch<React.SetStateAction<string>>
+    setHideNavbar?: (hide: boolean) => void,
+    setAppTitle?: React.Dispatch<React.SetStateAction<string>>
 }> = ({setHideNavbar, setAppTitle}) => {
     const [user] = useState<string | null>(localStorage.getItem('user'));
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const [saved] = useState(localStorage.getItem(STORAGE.LOCAL_STORAGE_RESUME_DATA));
-    const [savedApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || JSON.parse("{}")));
+    const [savedApplicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}"));
     const resumeDataOpenAI = saved ? JSON.parse(saved) : DefaultResumeData;
     const [selectedResumeStyle, setSelectedResumeStyle] = useState(RESUME_STYLES[0])
 
     const imageStyles: { [key: string]: any } = {
-        StyleA: require('../assets/images/resume_styles/StyleA.png'),
-        StyleB: require('../assets/images/resume_styles/StyleB.png'),
-        StyleC: require('../assets/images/resume_styles/StyleC.png'),
+        StyleA: styleAImage,
+        StyleB: styleBImage,
+        StyleC: styleCImage,
     };
 
     const saveAndPrint = async () => {
@@ -46,8 +51,6 @@ export const JobApplicationPreviewPage: React.FC<{
                 date: moment().toISOString(),
             };
 
-            setIsLoading(false);
-
             localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(updatedData));
 
             console.log("Updated Data >>>>>: " + updatedData.jobPostingUrl);
@@ -56,14 +59,14 @@ export const JobApplicationPreviewPage: React.FC<{
             await JobApplicationService.saveJobApplication(user ?? "", updatedData);
 
             //Update the app title if available
-            setAppTitle(updatedData.openAIDocumentTitle || APP_TITLE);
+            setAppTitle?.(updatedData.openAIDocumentTitle || APP_TITLE);
 
             //Navigate to the resume print page
-            setIsLoading(false);
-            setHideNavbar(true);
+            setHideNavbar?.(true);
             navigate(ROUTES.RESUME_PRINT_PAGE);
         } catch (error) {
             console.error("Error saving and printing:", error);
+        } finally {
             setIsLoading(false);
         }
     };
@@ -93,285 +96,246 @@ export const JobApplicationPreviewPage: React.FC<{
         },
     });
 
-    const styles = {
-        leftColumn: {
-            padding: {
-                paddingLeft: 10,
-                paddingRight: 20,
-            },
-            titleRow: {
-                padding: 10,
-                marginBottom: 10,
-                fontWeight: "bold",
-                color: "gray",
-            },
-        },
-        rightBorderStyle: {
-            borderRight: "1px solid lightgray",
-        },
-        leftBorderStyle: {
-            borderLeft: "1px solid lightgray",
-        },
-        borderBottomStyle: {
-            borderBottom: "1px solid lightgray",
-        },
-        borderTopStyle: {
-            borderTop: "1px solid lightgray",
-        },
-        listItem: {
-            padding: 5,
-            borderBottom: "1px solid lightgray",
-            color: "black",
-        },
-        jobInfo: {
-            header: {
-                fontSize: "1.5rem",
-                fontWeight: "bold",
-                color: "#333",
-                marginBottom: 5,
-            },
-            subheader: {
-                fontSize: "1.2rem",
-                color: "#555",
-                marginBottom: 10,
-            },
-            normalText: {
-                fontSize: "1rem",
-                color: "#666",
-                marginBottom: 8,
-            },
-        },
-    };
-
-    const overlayStyle = {
-        position: "fixed" as const,
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 1000,
-    };
-
-    const loadingMessageStyle = {
-        fontSize: "1.5rem",
-        color: "#333",
-        fontWeight: "bold" as const,
-    };
-
-
     useEffect(() => {
         setSelectedResumeStyle(jobApplicationFormFormik.values.resumeStyle);
     }, [jobApplicationFormFormik.values.resumeStyle]);
 
     return (
-        <div className="row g-1 p-2 p-md-0">
-            {isLoading && (
-                <div style={overlayStyle}>
-                    <div style={loadingMessageStyle}>Loading, please wait...</div>
-                </div>
-            )}
-            <h1 className={"flex justify-center font-bold "} style={{
-                fontSize: "1.5rem",
-                margin: 10,
-            }}>Preview Job Application</h1>
-            <div className="col-md-8 mb-4 px-4">
-                <div style={{
-                    border: "1px solid #0f5a73",
-                    borderRadius: "5px",
-                    display: "inline-block",
-                    width: "fit-content",
-                    height: "fit-content",
-                    padding: "10px"
-                }}>
-                    {renderResumeStyle(resumeDataOpenAI, selectedResumeStyle)}
-                </div>
-            </div>
-            <div
-                className="col-md-4"
-                style={{
-                    ...styles.leftBorderStyle,
-                    ...styles.leftColumn.padding,
-                }}
-            >
-                <div>
-                    <Row className={"row row-cols-2"}
-                         style={{
-                             ...styles.leftColumn.titleRow,
-                             ...styles.borderTopStyle,
-                             ...styles.borderBottomStyle,
-                         }}
+        <AppLayout>
+            <TopNav
+                title="Preview Job Application"
+                actions={
+                    <button
+                        type="button"
+                        onClick={() => navigate(ROUTES.RESUME_INPUT_PAGE)}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            color: '#45464d',
+                        }}
                     >
-                        <Col xs={4} className={"flex justify-end"}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
-                                 stroke="currentColor" className="size-6">
-                                <path strokeLinecap="round" strokeLinejoin="round"
-                                      d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
-                            </svg>
+                        <span className="material-symbols-outlined">arrow_back</span>
+                    </button>
+                }
+            />
 
-                        </Col>
-                        <Col xs={8}>
-                            <h5>Application Details</h5>
-                        </Col>
-                    </Row>
+            <main style={{ position: "relative", flex: 1, overflowY: 'auto', padding: '24px' }}>
+                <PageLoadingOverlay
+                    visible={isLoading}
+                    withinParent={true}
+                    message="Saving your application and preparing print view..."
+                />
+                <div className="grid grid-cols-1 gap-4 p-2 md:p-0 lg:grid-cols-12">
+                    <div
+                        className="lg:col-span-5 xl:col-span-4"
+                        style={{
+                            position: "sticky",
+                            alignSelf: "flex-start",
+                        }}
+                    >
+                        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                            <div className="mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5"
+                                     stroke="currentColor" className="size-6 text-slate-600">
+                                    <path strokeLinecap="round" strokeLinejoin="round"
+                                          d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
+                                </svg>
+                                <h5 className="m-0 text-base font-semibold text-slate-800">Application Details</h5>
+                            </div>
 
-                    <div style={{marginTop: "10px"}} className={"px-2"}>
-                        <Form onSubmit={jobApplicationFormFormik.handleSubmit}>
-                            <Row className="mb-3">
-                                <Form.Group as={Col} controlId="openAIJobTitle">
-                                    <Form.Label>Job Title</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="e.g Electrician"
-                                        onChange={jobApplicationFormFormik.handleChange}
-                                        defaultValue={jobApplicationFormFormik.values.openAIJobTitle || ""}
-                                    />
-                                    {jobApplicationFormFormik.touched.openAIJobTitle && jobApplicationFormFormik.errors.openAIJobTitle && (
-                                        <span
-                                            className="sm:text-sm text-red-600">Required</span>
-                                    )}
-                                </Form.Group>
+                            <form onSubmit={jobApplicationFormFormik.handleSubmit} className="w-full space-y-4">
+                                    <div
+                                        style={{
+                                            border: "1px solid #dbe2e8",
+                                            borderRadius: "10px",
+                                            padding: "14px",
+                                            marginBottom: "16px",
+                                            background: "#f9fbfc",
+                                        }}
+                                    >
+                                        <div style={{ marginBottom: "10px" }}>
+                                            <h6 style={{ margin: 0, fontWeight: 700, color: "#1f2933" }}>Job Details</h6>
+                                            <p style={{ margin: "4px 0 0", fontSize: "0.85rem", color: "#6b7280" }}>
+                                                Confirm the role details before saving and printing.
+                                            </p>
+                                        </div>
 
-                                <Form.Group as={Col} controlId="openAIJobCompanyName">
-                                    <Form.Label>Company Name</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="e.g Amazon Ltd"
-                                        onChange={jobApplicationFormFormik.handleChange}
-                                        defaultValue={jobApplicationFormFormik.values.openAIJobCompanyName || ""}
-                                    />
-
-                                    {jobApplicationFormFormik.touched.openAIJobCompanyName && jobApplicationFormFormik.errors.openAIJobCompanyName && (
-                                        <span
-                                            className="sm:text-sm text-red-600">Required</span>
-                                    )}
-                                </Form.Group>
-                            </Row>
-                            <Row className="mb-3">
-                                <Form.Group as={Col} controlId="openAIJobLocation">
-                                    <Form.Label>Job Location</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="e.g London, UK - Hybrid"
-                                        onChange={jobApplicationFormFormik.handleChange}
-                                        defaultValue={jobApplicationFormFormik.values.openAIJobLocation || ""}
-                                    />
-                                    {jobApplicationFormFormik.touched.openAIJobLocation && jobApplicationFormFormik.errors.openAIJobLocation && (
-                                        <span
-                                            className="sm:text-sm text-red-600">Required</span>
-                                    )}
-                                </Form.Group>
-
-                                <Form.Group as={Col} controlId="openAIDocumentTitle">
-                                    <Form.Label>Document Name</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="e.g john-doe-companyName"
-                                        onChange={jobApplicationFormFormik.handleChange}
-                                        defaultValue={jobApplicationFormFormik.values.openAIDocumentTitle || ""}
-                                    />
-                                    {jobApplicationFormFormik.touched.openAIDocumentTitle && jobApplicationFormFormik.errors.openAIDocumentTitle && (
-                                        <span
-                                            className="sm:text-sm text-red-600">Required</span>
-                                    )}
-                                </Form.Group>
-                            </Row>
-                            <Form.Group className="mb-3" controlId="jobPostingUrl">
-                                <Form.Label>Job Posting Link <span style={{color: 'grey'}}>(Optional)</span></Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="e.g https://indeed.com"
-                                    onChange={jobApplicationFormFormik.handleChange}
-                                    defaultValue={jobApplicationFormFormik.values.jobPostingUrl || ""}
-                                />
-                                {jobApplicationFormFormik.touched.jobPostingUrl && jobApplicationFormFormik.errors.jobPostingUrl && (
-                                    <span
-                                        className="sm:text-sm text-red-600">Required</span>
-                                )}
-                            </Form.Group>
-                            <Form.Group className="mb-3" controlId="openAISimpleJobDescription">
-                                <Form.Label>Simple Job Description</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={3}
-                                    placeholder="e.g. Software developer to generate web pages"
-                                    onChange={jobApplicationFormFormik.handleChange}
-                                    defaultValue={jobApplicationFormFormik.values.openAISimpleJobDescription || ""}
-                                />
-                                {jobApplicationFormFormik.touched.openAISimpleJobDescription && jobApplicationFormFormik.errors.openAISimpleJobDescription && (
-                                    <span
-                                        className="sm:text-sm text-red-600">Required</span>
-                                )}
-                            </Form.Group>
-                            <Form.Group className="mb-3" controlId="resumeStyle">
-                                <Form.Label>Select a style</Form.Label>
-                                <Row>
-                                    {RESUME_STYLES.map((style, index) => (
-                                        <Col key={index}>
-                                            {/* Hidden Radio Input */}
-                                            <Form.Check
-                                                type="radio"
-                                                name="resumeInfo.resumeStyle"
-                                                id={`resumeStyle-${index}`}
-                                                value={style}
-                                                checked={jobApplicationFormFormik.values.resumeStyle === style}
-                                                onChange={(e) =>
-                                                    jobApplicationFormFormik.setFieldValue(
-                                                        "resumeStyle",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="d-none"
+                                        <div className="mb-3">
+                                            <label htmlFor="openAIJobTitle" className="mb-1 block text-sm font-medium text-slate-700">Job Title</label>
+                                            <input
+                                                id="openAIJobTitle"
+                                                name="openAIJobTitle"
+                                                type="text"
+                                                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+                                                placeholder="e.g Electrician"
+                                                onChange={jobApplicationFormFormik.handleChange}
+                                                onBlur={jobApplicationFormFormik.handleBlur}
+                                                value={jobApplicationFormFormik.values.openAIJobTitle || ""}
                                             />
-                                            {/* Custom Label */}
-                                            <label
-                                                htmlFor={`resumeStyle-${index}`}
-                                                style={{
-                                                    display: "flex",
-                                                    cursor: "pointer",
-                                                    border:
-                                                        jobApplicationFormFormik.values.resumeStyle === style
-                                                            ? "2px solid #000"
-                                                            : "1px solid #ccc",
-                                                    borderRadius: "5px",
-                                                    padding: "10px",
-                                                    textAlign: "center",
-                                                    justifyContent: "center",
-                                                    transition: "border-color 0.2s ease-in-out",
-                                                }}
-                                            >
-                                                <img
-                                                    src={imageStyles[style]}
-                                                    alt={`Placeholder for ${style}`}
-                                                    style={{
-                                                        width: "100px",
-                                                        height: "100px",
-                                                        objectFit: "fill",
-                                                        marginBottom: "10px",
-                                                    }}
-                                                />
-                                            </label>
-                                        </Col>
-                                    ))}
-                                </Row>
-                                {/* Error Message */}
-                                {!jobApplicationFormFormik.values.resumeStyle && (
-                                    <span className="sm:text-sm text-red-600">Required</span>
-                                )}
-                            </Form.Group>
+                                            {jobApplicationFormFormik.touched.openAIJobTitle && jobApplicationFormFormik.errors.openAIJobTitle && (
+                                                <span className="text-sm text-red-600">Required</span>
+                                            )}
+                                        </div>
 
+                                        <div className="mb-3">
+                                            <label htmlFor="openAIJobCompanyName" className="mb-1 block text-sm font-medium text-slate-700">Company Name</label>
+                                            <input
+                                                id="openAIJobCompanyName"
+                                                name="openAIJobCompanyName"
+                                                type="text"
+                                                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+                                                placeholder="e.g Amazon Ltd"
+                                                onChange={jobApplicationFormFormik.handleChange}
+                                                onBlur={jobApplicationFormFormik.handleBlur}
+                                                value={jobApplicationFormFormik.values.openAIJobCompanyName || ""}
+                                            />
 
-                            <Button variant="primary" type="submit" className="fancy-btn w-full">
-                                Save and Print
-                            </Button>
-                        </Form>
+                                            {jobApplicationFormFormik.touched.openAIJobCompanyName && jobApplicationFormFormik.errors.openAIJobCompanyName && (
+                                                <span className="text-sm text-red-600">Required</span>
+                                            )}
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label htmlFor="openAIJobLocation" className="mb-1 block text-sm font-medium text-slate-700">Job Location</label>
+                                            <input
+                                                id="openAIJobLocation"
+                                                name="openAIJobLocation"
+                                                type="text"
+                                                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+                                                placeholder="e.g London, UK - Hybrid"
+                                                onChange={jobApplicationFormFormik.handleChange}
+                                                onBlur={jobApplicationFormFormik.handleBlur}
+                                                value={jobApplicationFormFormik.values.openAIJobLocation || ""}
+                                            />
+                                            {jobApplicationFormFormik.touched.openAIJobLocation && jobApplicationFormFormik.errors.openAIJobLocation && (
+                                                <span className="text-sm text-red-600">Required</span>
+                                            )}
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label htmlFor="openAIDocumentTitle" className="mb-1 block text-sm font-medium text-slate-700">Document Name</label>
+                                            <input
+                                                id="openAIDocumentTitle"
+                                                name="openAIDocumentTitle"
+                                                type="text"
+                                                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+                                                placeholder="e.g john-doe-companyName"
+                                                onChange={jobApplicationFormFormik.handleChange}
+                                                onBlur={jobApplicationFormFormik.handleBlur}
+                                                value={jobApplicationFormFormik.values.openAIDocumentTitle || ""}
+                                            />
+                                            {jobApplicationFormFormik.touched.openAIDocumentTitle && jobApplicationFormFormik.errors.openAIDocumentTitle && (
+                                                <span className="text-sm text-red-600">Required</span>
+                                            )}
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label htmlFor="jobPostingUrl" className="mb-1 block text-sm font-medium text-slate-700">Job Posting Link <span style={{color: 'grey'}}>(Optional)</span></label>
+                                            <input
+                                                id="jobPostingUrl"
+                                                name="jobPostingUrl"
+                                                type="text"
+                                                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+                                                placeholder="e.g https://indeed.com"
+                                                onChange={jobApplicationFormFormik.handleChange}
+                                                onBlur={jobApplicationFormFormik.handleBlur}
+                                                value={jobApplicationFormFormik.values.jobPostingUrl || ""}
+                                            />
+                                            {jobApplicationFormFormik.touched.jobPostingUrl && jobApplicationFormFormik.errors.jobPostingUrl && (
+                                                <span className="text-sm text-red-600">Required</span>
+                                            )}
+                                        </div>
+
+                                        <div className="mb-0">
+                                            <label htmlFor="openAISimpleJobDescription" className="mb-1 block text-sm font-medium text-slate-700">Simple Job Description</label>
+                                            <textarea
+                                                id="openAISimpleJobDescription"
+                                                name="openAISimpleJobDescription"
+                                                rows={3}
+                                                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+                                                placeholder="e.g. Software developer to generate web pages"
+                                                onChange={jobApplicationFormFormik.handleChange}
+                                                onBlur={jobApplicationFormFormik.handleBlur}
+                                                value={jobApplicationFormFormik.values.openAISimpleJobDescription || ""}
+                                            />
+                                            {jobApplicationFormFormik.touched.openAISimpleJobDescription && jobApplicationFormFormik.errors.openAISimpleJobDescription && (
+                                                <span className="text-sm text-red-600">Required</span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <label className="mb-2 block text-sm font-semibold text-slate-800">Select a style</label>
+                                        <div className="flex gap-2 overflow-x-auto pb-1">
+                                            {RESUME_STYLES.map((style, index) => (
+                                                <div key={index} style={{ flex: "0 0 auto" }}>
+                                                    <input
+                                                        type="radio"
+                                                        name="resumeInfo.resumeStyle"
+                                                        id={`resumeStyle-${index}`}
+                                                        value={style}
+                                                        checked={jobApplicationFormFormik.values.resumeStyle === style}
+                                                        onChange={(e) =>
+                                                            jobApplicationFormFormik.setFieldValue(
+                                                                "resumeStyle",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className="hidden"
+                                                    />
+                                                    <label
+                                                        htmlFor={`resumeStyle-${index}`}
+                                                        className={`flex w-[88px] cursor-pointer flex-col items-center rounded-lg bg-white p-1.5 transition-all ${
+                                                            jobApplicationFormFormik.values.resumeStyle === style
+                                                                ? "border-2 border-sky-700"
+                                                                : "border border-slate-300"
+                                                        }`}
+                                                    >
+                                                        <img
+                                                            src={imageStyles[style]}
+                                                            alt={`Style preview ${style}`}
+                                                            className="mb-1 h-16 w-16 rounded object-cover"
+                                                        />
+                                                        <span className="text-xs text-slate-700">{style}</span>
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        {!jobApplicationFormFormik.values.resumeStyle && (
+                                            <span className="text-sm text-red-600">Required</span>
+                                        )}
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        className="cursor-pointer w-full rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-800"
+                                    >
+                                        Save and Print
+                                    </button>
+                            </form>
+                        </div>
                     </div>
 
+                    <div className="lg:col-span-7 xl:col-span-8">
+                        <div style={{
+                            border: "1px solid #0f5a73",
+                            borderRadius: "8px",
+                            display: "inline-block",
+                            width: "fit-content",
+                            maxWidth: "100%",
+                            height: "fit-content",
+                            padding: "10px",
+                            background: "#fff",
+                        }}>
+                            {renderResumeStyle(resumeDataOpenAI, selectedResumeStyle)}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </main>
+        </AppLayout>
     );
 };

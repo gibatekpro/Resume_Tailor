@@ -7,7 +7,7 @@ import {SkillsSection} from "./SkillsSection";
 import {WorkExperienceSection} from "./WorkExperienceSection";
 import {EducationSection} from "./EducationSection";
 import {ProjectsSection} from "./ProjectsSection";
-import {ResumeInfo} from "../../models/ResumeInfo";
+import type { ResumeInfo } from "../../models/ResumeInfo";
 
 
 export const ResumeStyleA: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =>{

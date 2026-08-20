@@ -1,23 +1,29 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import ResumeForm from "../components/forms/resumeForm/ResumeForm";
 import {useFormik} from "formik";
 import {DefaultResumeData} from "../data/defaultResumeData";
-import {OpenAIInstruction} from "../models/OpenAIInstruction";
+import type { OpenAIInstruction } from "../models/OpenAIInstruction";
 import {InstructionResumeData} from "../data/instructionResumeData";
 import * as Yup from "yup";
-import {fetchOpenAIResponse} from "../services/OpenAIService";
+import {fetchOpenAIResponse} from "../service/OpenAIService";
 import InstructionForm from "../components/forms/instructionForm/InstructionForm";
 import {useNavigate} from "react-router-dom";
-import ROUTES from "../utils/routes";
-import JobApplicationService from "../services/JobApplicationService";
-import {JobApplicationInfo} from "../models/JobApplicationInfo";
+import AppLayout from "../components/shared/AppLayout";
+import TopNav from "../components/shared/TopNav";
+import ROUTES from "../utils/Routes";
+import JobApplicationService from "../service/JobApplicationService";
+import type { JobApplicationInfo } from "../models/JobApplicationInfo";
 import {CustomAccordion} from "../custom_tags/CustomAccordion";
 import {openAIInstruction} from "../data/openAIInstruction";
 import moment from "moment";
-import {SavedResumesResponse} from "../models/SavedResumesResponse";
+import type { SavedResumesResponse } from "../models/SavedResumesResponse";
 import {Button, Col, Row} from "react-bootstrap";
 import STORAGE from "../utils/storage";
 import {Dialog, DialogPanel} from "@headlessui/react";
+import PageLoadingOverlay from "../components/shared/PageLoadingOverlay";
+import PaginationControls from "../components/shared/PaginationControls";
+
+const RESUMES_PER_PAGE = 8;
 
 export const TailorResumePage: React.FC = () => {
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
@@ -39,6 +45,7 @@ export const TailorResumePage: React.FC = () => {
     const [generateHasError, setGenerateHasError] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [resumeList, setResumeList] = useState<SavedResumesResponse[]>([])
+    const [currentResumePage, setCurrentResumePage] = useState(1);
 
     const closeDeleteDialog = () => {
         setIsDeleteDialogOpen(false);
@@ -217,7 +224,7 @@ export const TailorResumePage: React.FC = () => {
         }
     };
 
-    const overlayStyle = {
+    const dialogOverlayStyle = {
         position: "fixed" as const,
         top: 0,
         left: 0,
@@ -271,41 +278,48 @@ export const TailorResumePage: React.FC = () => {
 
     useEffect(() => {
         setIsLoading(true);
-        const fetchResumes = async () => {
+        const loadPageData = async () => {
             try {
-                const savedResumes: SavedResumesResponse[] = await JobApplicationService.getAllSavedResumes();
+                const [savedResumes, rules] = await Promise.all([
+                    JobApplicationService.getAllSavedResumes(),
+                    JobApplicationService.getRules(user || ""),
+                ]);
 
                 setResumeList(savedResumes);
+                setSavedRules(rules);
 
                 if (savedResumes.length > 0) {
-
-                    setIsBeingEdited(savedResumes[0])
+                    setIsBeingEdited(savedResumes[0]);
                     setIsBeingEditedIndex(0);
-
                 }
-
             } catch (error) {
-                console.error("Error fetching job applications:", error);
+                console.error("Error loading page data:", error);
+            } finally {
                 setIsLoading(false);
             }
         };
 
-        const fetchSavedInstructionRules = async () => {
-            try {
-                const rules = await JobApplicationService.getRules(user || "");
-                setSavedRules(rules);
-            } catch (error) {
-                console.error("Error saving rules", error);
-                return null;
-            }
-        };
-
-
-        fetchResumes();
-        fetchSavedInstructionRules();
-        setIsLoading(false);
+        void loadPageData();
 
     }, []);
+
+    const totalResumePages = Math.max(1, Math.ceil(resumeList.length / RESUMES_PER_PAGE));
+
+    useEffect(() => {
+        if (currentResumePage > totalResumePages) {
+            setCurrentResumePage(totalResumePages);
+        }
+    }, [currentResumePage, totalResumePages]);
+
+    const pagedResumes = useMemo(() => {
+        const start = (currentResumePage - 1) * RESUMES_PER_PAGE;
+        return resumeList.slice(start, start + RESUMES_PER_PAGE).map((resume, index) => ({
+            resume,
+            globalIndex: start + index,
+        }));
+    }, [currentResumePage, resumeList]);
+
+    const [activeStep, setActiveStep] = useState(0);
 
     useEffect(() => {
         if (savedRules.length > 0) {
@@ -314,317 +328,330 @@ export const TailorResumePage: React.FC = () => {
     }, [savedRules]);
 
     useEffect(() => {
+        if (activeStep !== 0) {
+            setIsResumesPanelOpen(false);
+        }
+    }, [activeStep]);
+
+    useEffect(() => {
         isBeingEdited != null ? customResumeFormFormik.setValues(isBeingEdited?.data) : customResumeFormFormik.setValues(DefaultResumeData)
     }, [isBeingEdited]);
 
+    const steps = [
+        {
+            title: '1. Resume details',
+            description: 'Build your profile, skills, and work history.',
+            tone: 'bg-[#2170e4] text-white',
+            active: true,
+        },
+        {
+            title: '2. Job brief',
+            description: 'Paste the role description and tailor the brief.',
+            tone: 'bg-[#eef4fc] text-[#161c22]',
+            active: false,
+        },
+        {
+            title: '3. Review output',
+            description: 'Check the AI-generated resume and preview the application.',
+            tone: 'bg-[#edf7ee] text-[#161c22]',
+            active: false,
+        },
+    ];
+
+    const stepProgress = `${((activeStep + 1) / steps.length) * 100}%`;
+
     return (
+        <AppLayout>
+            <TopNav title="Tailor Resume" />
 
-        <div className="bg-gray-100 py-4">
-
-            {isLoading && (
-                <div style={overlayStyle}>
-                    <div style={loadingMessageStyle}>Loading, please wait...</div>
-                </div>
-            )}
-            {isDialogOpen && (
-                <Dialog open={isDialogOpen} as="div" className="relative z-0 focus:outline-hidden" style={overlayStyle}
-                        onClose={closeDialog}>
-                    <div className="fixed inset-0 z-0 w-screen overflow-y-auto">
-                        <div className="flex min-h-full items-center justify-center p-4">
-                            <DialogPanel
-                                transition
-                                className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
-                            >
-                                <div className={"flex justify-between items-center mb-4"}>
-                                    {generateHasError ? (
-                                        "Failed"
-                                    ) : (
-                                        "Successful"
-                                    )}
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                         fill="currentColor" className="bi bi-x-lg" viewBox="0 0 16 16"
-                                         onClick={closeDeleteDialog} cursor={"pointer"}>
-                                        <path
-                                            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-                                    </svg>
+            <main className="relative flex-1 bg-[#f6f9ff] px-4 py-6 md:px-6 lg:px-8">
+                <div className="mx-auto max-w-[1600px]">
+                    <div className="mb-6 overflow-hidden rounded-lg border border-[#c6c6cd] bg-white shadow-[0_12px_28px_rgba(15,23,42,0.05)]">
+                        <div className="border-b border-[#eaeaf0] bg-gradient-to-r from-[#eef4ff] via-[#f8fbff] to-white px-5 py-4 md:px-6">
+                            <div className="flex items-center justify-between gap-4">
+                                <div>
+                                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2170e4]">Resume Workflow</p>
+                                    <h2 className="mt-2 text-xl font-semibold text-[#161c22] md:text-2xl">Tailor your application step by step</h2>
                                 </div>
-                                {generateHasError ? (
-                                    <text>Failed to generate an output. Check logs for details.</text>
-                                ) : (
-                                    <text>Successfully generated an resume</text>
-                                )}
-                                <div className="mt-4">
-                                    <Button
-                                        className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
-                                        onClick={closeDialog}
+                            </div>
+                        </div>
+
+                        <div className="p-4 md:p-6">
+                            <div className="rounded-xl border border-[#c6c6cd] bg-[#f9fbff] p-4 transition-all duration-300 md:p-5">
+                                <div className="mb-4 flex items-start justify-between gap-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold shadow-sm ${steps[activeStep].tone}`}>
+                                            {activeStep + 1}
+                                        </div>
+                                        <div>
+                                            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#76777d]">Current step</p>
+                                            <h3 className="text-lg font-semibold text-[#161c22]">{steps[activeStep].title}</h3>
+                                        </div>
+                                    </div>
+                                    <span className="rounded-full border border-[#d8e3f7] bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4a5f87]">
+                                        Step {activeStep + 1} of {steps.length}
+                                    </span>
+                                </div>
+
+                                <p className="text-sm leading-6 text-[#45464d]">{steps[activeStep].description}</p>
+
+                                <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-[#e5ebf7]">
+                                    <div
+                                        className="h-full rounded-full bg-[#2170e4] transition-all duration-300"
+                                        style={{width: stepProgress}}
+                                    />
+                                </div>
+
+                                <div className="mt-4 grid gap-2 md:grid-cols-3">
+                                    {steps.map((step, index) => (
+                                        <button
+                                            key={step.title}
+                                            type="button"
+                                            onClick={() => setActiveStep(index)}
+                                            className={`cursor-pointer flex items-start gap-3 rounded-lg border px-3 py-3 text-left transition-all duration-200 ${
+                                                index === activeStep
+                                                    ? 'border-[#2170e4] bg-[#eef4fc] shadow-[0_2px_8px_rgba(33,112,228,0.12)]'
+                                                    : 'border-[#dfe4ee] bg-white hover:border-[#bfd5ff]'
+                                            }`}
+                                        >
+                                            <span
+                                                className={`mt-0.5 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                                                    index === activeStep ? 'bg-[#2170e4] text-white' : 'bg-[#edf2fb] text-[#5a6f94]'
+                                                }`}
+                                            >
+                                                {index + 1}
+                                            </span>
+                                            <span>
+                                                <span className={`block text-sm font-semibold ${index === activeStep ? 'text-[#1f4f9c]' : 'text-[#161c22]'}`}>
+                                                    {step.title}
+                                                </span>
+                                                <span className="mt-0.5 block text-xs leading-5 text-[#5f6370]">
+                                                    {step.description}
+                                                </span>
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="mt-4 flex flex-wrap justify-end gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setActiveStep((prev) => Math.max(prev - 1, 0))}
+                                        disabled={activeStep === 0}
+                                        className="cursor-pointer rounded-lg border border-[#d6dcec] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#4a4e57] transition-all duration-200 hover:border-[#bacaf0] disabled:cursor-not-allowed disabled:opacity-50"
                                     >
-                                        ok
-                                    </Button>
+                                        Previous
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setActiveStep((prev) => Math.min(prev + 1, steps.length - 1))}
+                                        disabled={activeStep === steps.length - 1}
+                                        className="cursor-pointer rounded-lg border border-[#2170e4] bg-[#2170e4] px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-all duration-200 hover:bg-[#195fc0] disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        Next
+                                    </button>
                                 </div>
-                            </DialogPanel>
+                            </div>
                         </div>
                     </div>
-                </Dialog>
-            )}
 
-            <div style={isLoading ? blurredStyle : {}}>
-
-                <div className="row g-1 p-2 p-md-0">
-
-                    {isResumesPanelOpen && (
-                        <div
-                            className="col-md-4 pb-4"
-                            style={{
-                                ...styles.rightBorderStyle,
-                                ...styles.leftColumn.padding,
-                            }}
-                        >
-                            <div>
-                                <Row
-                                    style={{
-                                        ...styles.leftColumn.titleRow,
-                                        ...styles.borderTopStyle,
-                                        ...styles.borderBottomStyle,
-                                    }}
-                                >
-                                    <Col xs={9}>
-                                        <h5>Saved CVs</h5>
-                                    </Col>
-                                    <Col xs={3}>
-                                        <button
-                                            type="button"
-                                            className="btn"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="top"
-                                            title="Close"
-                                            onClick={closeResumesPanel}
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="16"
-                                                height="16"
-                                                fill="currentColor"
-                                                className="bi bi-x-lg"
-                                                viewBox="0 0 16 16"
-                                                cursor="pointer"
-                                            >
+                    <PageLoadingOverlay
+                        visible={isLoading}
+                        withinParent={true}
+                        message="Loading your saved CVs and personalization rules..."
+                    />
+                    {isDialogOpen && (
+                        <Dialog open={isDialogOpen} as="div" className="relative z-0 focus:outline-hidden" style={dialogOverlayStyle}
+                                onClose={closeDialog}>
+                            <div className="fixed inset-0 z-0 w-screen overflow-y-auto">
+                                <div className="flex min-h-full items-center justify-center p-4">
+                                    <DialogPanel
+                                        transition
+                                        className="w-full max-w-md rounded-xl bg-gray-100 p-6 backdrop-blur-2xl duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
+                                    >
+                                        <div className={"flex justify-between items-center mb-4"}>
+                                            {generateHasError ? (
+                                                "Failed"
+                                            ) : (
+                                                "Successful"
+                                            )}
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                  fill="currentColor" className="bi bi-x-lg cursor-pointer" viewBox="0 0 16 16"
+                                                  onClick={closeDeleteDialog}>
                                                 <path
                                                     d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
                                             </svg>
-                                        </button>
-                                    </Col>
-                                </Row>
-
-                                <div style={{marginTop: "10px"}}>
-                                    {isLoading ? (
-                                        <p>Loading resumes...</p>
-                                    ) : (
-                                        <>
-                                            <div
-                                                style={{
-                                                    padding: "10px",
-                                                    cursor: "pointer",
-                                                    fontWeight: "bold",
-                                                    backgroundColor: createNewHover ? "#6CB4EE" : "#89CFF0",
-                                                    borderBottom: "1px solid #ddd",
-                                                    textAlign: "center",
-                                                    transition: "background-color 0.3s ease", // Smooth transition
-                                                }}
-                                                onMouseEnter={() => setCreateNewHover(true)}
-                                                onMouseLeave={() => setCreateNewHover(false)}
-                                                onClick={() => {
-                                                    handleCreateNewCV();
-                                                    setIsBeingEditedIndex(-1)
-                                                }}
+                                        </div>
+                                        {generateHasError ? (
+                                            <text>Failed to generate an output. Check logs for details.</text>
+                                        ) : (
+                                            <text>Successfully generated an resume</text>
+                                        )}
+                                        <div className="mt-4">
+                                            <Button
+                                                className="cursor-pointer inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
+                                                onClick={closeDialog}
                                             >
-                                                + <span className={"ml-4"}>Create New CV</span>
-                                            </div>
-
-                                            {resumeList.map((resume, index) => (
-                                                <Row
-                                                    key={resume.id}
-                                                    style={{
-                                                        display: "flex", // Flexbox for layout
-                                                        justifyContent: "space-between", // Space between text and SVG
-                                                        alignItems: "center", // Center items vertically
-                                                        padding: "10px",
-                                                        cursor: "pointer",
-                                                        borderBottom: "1px solid #ddd",
-                                                        backgroundColor: index === isBeingEditedIndex ? "darkgray" : "transparent",
-                                                    }}
-                                                    className="hover:bg-gray-100 mx-0 row row-cols-2"
-                                                >
-                                                    {/* Resume Name Column */}
-                                                    <Col
-                                                        lg={12}
-                                                        onClick={() => {
-                                                            handleResumeClick(resume);
-                                                            setIsBeingEditedIndex(index);
-                                                        }}
-                                                    >
-                                                        {resume.data.resumeName || "Untitled Resume"}
-                                                    </Col>
-
-                                                    {/* Trash Icon Column */}
-                                                    {/*<Col lg={3} className={"flex align-items-end justify-end"}>*/}
-                                                    {/*    <svg*/}
-                                                    {/*        xmlns="http://www.w3.org/2000/svg"*/}
-                                                    {/*        width="16"*/}
-                                                    {/*        height="16"*/}
-                                                    {/*        fill="currentColor"*/}
-                                                    {/*        className="bi bi-trash3"*/}
-                                                    {/*        viewBox="0 0 16 16"*/}
-                                                    {/*        // onClick={() => handleDeleteResume(resume)}*/}
-                                                    {/*        style={{cursor: "pointer"}} // Ensures pointer cursor for the icon*/}
-                                                    {/*    >*/}
-                                                    {/*        <path*/}
-                                                    {/*            d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>*/}
-                                                    {/*    </svg>*/}
-                                                    {/*</Col>*/}
-                                                </Row>
-                                            ))}
-
-                                        </>
-                                    )}
+                                                ok
+                                            </Button>
+                                        </div>
+                                    </DialogPanel>
                                 </div>
-
                             </div>
-                        </div>
+                        </Dialog>
                     )}
 
-                    <div
-                        className={resumeFormClassName}
-                        style={{
-                            ...styles.rightBorderStyle,
-                            ...styles.leftColumn.padding,
-                        }}
-                    >
-                        <div
-                            style={{}}
-                        >
-                            <Row style={{
-                                ...styles.leftColumn.titleRow,
-                                ...styles.borderTopStyle,
-                                ...styles.borderBottomStyle
-                            }}>
-                                <Col xs={3} sm={3} md={3} lg={3} xl={3} className={"flex"}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black"
-                                         className="bi bi-list align-items-center justify-center cursor-pointer"
-                                         viewBox="0 0 16 16" onClick={openResumesPanel}>
-                                        <path fillRule="evenodd"
-                                              d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
-                                    </svg>
-                                </Col>
-                                <Col xs={6} sm={6} md={6} lg={6} xl={6} style={styles.rightBorderStyle}>
-                                    Template
-                                </Col>
-                                <Col xs={3} sm={3} md={3} lg={3} xl={3}
-                                     style={{alignItems: "center", textAlign: "center"}}>
-                                    <button type="button" className="btn" data-bs-toggle="tooltip"
-                                            data-bs-placement="top" title="Add Section">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                             fill="currentColor" className="bi bi-plus-lg" viewBox="0 0 16 16">
-                                            <path fillRule="evenodd"
-                                                  d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+                    <div style={isLoading ? blurredStyle : {}} className="grid grid-cols-1 gap-5">
+                        {activeStep === 0 && (
+                            <>
+                                {isResumesPanelOpen && (
+                                    <div
+                                        className="rounded-lg border border-[#c6c6cd] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)]"
+                                        style={{
+                                            ...styles.rightBorderStyle,
+                                            ...styles.leftColumn.padding,
+                                        }}
+                                    >
+                                        <div className="flex items-center justify-between border-b border-[#eaeaf0] bg-[#f8fbff] px-3 py-2.5">
+                                            <button
+                                                type="button"
+                                                className="cursor-pointer flex h-8 w-8 items-center justify-center rounded-md border border-[#efc2c2] bg-white text-[#ba1a1a] transition-all duration-200 hover:border-[#dc2626] hover:bg-[#fff1f1] hover:text-[#a31212]"
+                                                title="Close"
+                                                onClick={closeResumesPanel}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                                </svg>
+                                            </button>
+                                            <h5 className="mb-0 text-sm font-semibold uppercase tracking-[0.08em] text-[#45464d]">Saved CVs</h5>
+                                            <div className="h-8 w-8" aria-hidden="true" />
+                                        </div>
+
+                                        <div className="p-2">
+                                                {isLoading ? (
+                                                    <p>Loading resumes...</p>
+                                                ) : (
+                                                    <>
+                                                        <div
+                                                            className="mb-2 rounded-md border border-[#c6d9ff] px-2 py-2 text-center text-sm font-semibold text-[#1f4f9c] transition-colors duration-200"
+                                                            style={{backgroundColor: createNewHover ? "#dbeafe" : "#edf4ff"}}
+                                                            onMouseEnter={() => setCreateNewHover(true)}
+                                                            onMouseLeave={() => setCreateNewHover(false)}
+                                                            onClick={() => {
+                                                                handleCreateNewCV();
+                                                                setIsBeingEditedIndex(-1)
+                                                            }}
+                                                        >
+                                                            + <span className={"ml-2"}>Create New CV</span>
+                                                        </div>
+
+                                                        {pagedResumes.map(({resume, globalIndex}) => (
+                                                            <button
+                                                                key={resume.id}
+                                                                type="button"
+                                                                className="mb-1 flex w-full items-center justify-between rounded-md border border-[#e5e7eb] px-2 py-2 text-left transition-all duration-200 hover:border-[#bfd5ff] hover:bg-[#f8fbff]"
+                                                                style={{backgroundColor: globalIndex === isBeingEditedIndex ? "#e8eef6" : "transparent"}}
+                                                                onClick={() => {
+                                                                    handleResumeClick(resume);
+                                                                    setIsBeingEditedIndex(globalIndex);
+                                                                }}
+                                                            >
+                                                                <span className="truncate text-sm text-[#161c22]">
+                                                                    {resume.data.resumeName || "Untitled Resume"}
+                                                                </span>
+                                                            </button>
+                                                        ))}
+
+                                                        <PaginationControls
+                                                            currentPage={currentResumePage}
+                                                            totalPages={totalResumePages}
+                                                            onPageChange={setCurrentResumePage}
+                                                            label="Saved CV"
+                                                        />
+                                                    </>
+                                                )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="rounded-lg border border-[#c6c6cd] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)] min-w-0">
+                                    <div className="flex items-center justify-between border-b border-[#eaeaf0] bg-[#f8fbff] px-4 py-3">
+                                        {!isResumesPanelOpen ? (
+                                            <button
+                                                type="button"
+                                                onClick={openResumesPanel}
+                                                className="cursor-pointer flex h-9 w-9 items-center justify-center rounded-lg border border-[#c6c6cd] bg-white text-[#161c22] transition-all duration-200 hover:border-[#2170e4] hover:text-[#2170e4]"
+                                                aria-label="Open saved CVs"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                                    <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                                                </svg>
+                                            </button>
+                                        ) : (
+                                            <div className="h-9 w-9" aria-hidden="true" />
+                                        )}
+                                        <span className="text-sm font-semibold uppercase tracking-[0.08em] text-[#45464d]">Template</span>
+                                        <div className="h-9 w-9" aria-hidden="true" />
+                                    </div>
+                                    <div className="p-4">
+                                        <CustomAccordion
+                                            isOpen={isFormOpen}
+                                            setIsOpen={setIsFormOpen}
+                                            children={<ResumeForm resumeFormFormik={customResumeFormFormik} />}
+                                        />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeStep === 1 && (
+                            <div className="rounded-lg border border-[#c6c6cd] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)] min-w-0">
+                                <div className="p-4">
+                                    <InstructionForm
+                                        isLoading={isLoading}
+                                        instructionFormFormik={instructionFormFormik}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {activeStep === 2 && (
+                            <div className="rounded-lg border border-[#c6c6cd] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)] min-w-0">
+                                <div className="flex items-center justify-between border-b border-[#eaeaf0] bg-[#f8fbff] px-4 py-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsBeingEditedIndex(-1);
+                                            customResumeFormFormik.setValues(generatedResumeFormFormik.values);
+                                        }}
+                                        className="cursor-pointer rounded-lg border border-[#c6c6cd] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#161c22] transition-all duration-200 hover:border-[#2170e4] hover:text-[#2170e4]"
+                                    >
+                                        Use As Template
+                                    </button>
+                                    <span className="text-sm font-semibold uppercase tracking-[0.08em] text-[#45464d]">AI Output</span>
+                                    <button type="button" className="cursor-pointer flex h-9 w-9 items-center justify-center rounded-lg border border-[#c6c6cd] bg-white text-[#161c22] transition-all duration-200 hover:border-[#2170e4] hover:text-[#2170e4]" aria-label="Add section">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                            <path fillRule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
                                         </svg>
                                     </button>
-                                </Col>
-                            </Row>
-                        </div>
-
-                        <CustomAccordion
-                            isOpen={isFormOpen}
-                            setIsOpen={setIsFormOpen}
-                            children={<ResumeForm
-                                resumeFormFormik={customResumeFormFormik}
-                            />}
-                        />
-
-                    </div>
-
-
-                    <div className="col-md-4 px-2 mb-4 pb-4">
-                        <InstructionForm
-                            isLoading={isLoading}
-                            instructionFormFormik={instructionFormFormik}/>
-                    </div>
-
-                    {!isResumesPanelOpen && (
-                        <div
-                            className={resumeFormClassName}
-                            style={{
-                                ...styles.leftBorderStyle,
-                                ...styles.leftColumn.padding,
-                            }}
-                        >
-                            <div
-                                style={{}}
-                            >
-                                <Row style={{
-                                    ...styles.leftColumn.titleRow,
-                                    ...styles.borderTopStyle,
-                                    ...styles.borderBottomStyle
-                                }}>
-                                    <Col xs={4} sm={4} md={4} lg={4} xl={4} className="flex">
-                                        <button
-                                            onClick={() => {
-                                                setIsBeingEditedIndex(-1);
-                                                customResumeFormFormik.setValues(generatedResumeFormFormik.values);
-                                            }}
-                                            style={{
-                                                backgroundColor: "white",
-                                                border: "1px solid darkgray",
-                                                color: "black",
-                                                padding: "4px",
-                                                borderRadius: "4px",
-                                                cursor: "pointer",
-                                                fontSize: 12,
-                                                transition: "background-color 0.3s, color 0.3s",
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                e.currentTarget.style.backgroundColor = "darkgray";
-                                                e.currentTarget.style.color = "white";
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.backgroundColor = "white";
-                                                e.currentTarget.style.color = "black";
-                                            }}
-                                        >
-                                            Use As Template
-                                        </button>
-                                    </Col>
-
-                                    <Col xs={5} sm={5} md={5} lg={5} xl={5} style={styles.rightBorderStyle}
-                                         className={"pl-2"}>
-                                        AI Generated Output
-                                    </Col>
-                                    <Col xs={2} sm={2} md={2} lg={2} xl={2}
-                                         style={{alignItems: "center", textAlign: "center"}}>
-                                        <button type="button" className="btn" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" title="Add Section">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                 fill="currentColor" className="bi bi-plus-lg" viewBox="0 0 16 16">
-                                                <path fillRule="evenodd"
-                                                      d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
-                                            </svg>
-                                        </button>
-                                    </Col>
-                                </Row>
+                                </div>
+                                <div className="p-4 cursor-pointer">
+                                    <CustomAccordion
+                                        isOpen={isGeneratedFormOpen}
+                                        setIsOpen={setIsGeneratedFormOpen}
+                                        children={<ResumeForm
+                                            hasSubmitButton={true}
+                                            buttonTitle={"Preview Application"}
+                                            resumeFormFormik={generatedResumeFormFormik}
+                                        />}
+                                    />
+                                </div>
                             </div>
-
-                            <CustomAccordion isOpen={isGeneratedFormOpen} setIsOpen={setIsGeneratedFormOpen}
-                                             children={<ResumeForm
-                                                 hasSubmitButton={true}
-                                                 buttonTitle={"Preview Application"}
-                                                 resumeFormFormik={generatedResumeFormFormik}
-                                             />}
-                            />
-
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
-            </div>
-
-        </div>
+            </main>
+        </AppLayout>
     );
 };
+

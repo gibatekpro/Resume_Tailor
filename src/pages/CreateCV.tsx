@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {Button, Col, Nav, Row, Spinner} from "react-bootstrap";
 import "../styles/myJobApplications.css";
 import {ResumeStyleB} from "../components/resume-style-b/ResumeStyleB";
-import JobApplicationService from "../services/JobApplicationService";
+import JobApplicationService from "../service/JobApplicationService";
 
 import {CustomAccordion} from "../custom_tags/CustomAccordion";
 import ResumeForm from "../components/forms/resumeForm/ResumeForm";
@@ -11,8 +11,14 @@ import {ResumeStyleA} from "../components/resume-style-a/ResumeStyleA";
 import {DefaultResumeData} from "../data/defaultResumeData";
 import {Dialog, DialogPanel, DialogTitle} from "@headlessui/react";
 import * as Yup from "yup";
-import {ResumeInfo} from "../models/ResumeInfo";
-import {SavedResumesResponse} from "../models/SavedResumesResponse";
+import type { ResumeInfo } from "../models/ResumeInfo";
+import type { SavedResumesResponse } from "../models/SavedResumesResponse";
+import AppLayout from "../components/shared/AppLayout";
+import TopNav from "../components/shared/TopNav";
+import PageLoadingOverlay from "../components/shared/PageLoadingOverlay";
+import PaginationControls from "../components/shared/PaginationControls";
+
+const RESUMES_PER_PAGE = 8;
 
 
 export const CreateCV: React.FC = () => {
@@ -32,28 +38,59 @@ export const CreateCV: React.FC = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [resumeList, setResumeList] = useState<SavedResumesResponse[]>([])
+    const [currentResumePage, setCurrentResumePage] = useState(1);
     const [activeTab, setActiveTab] = useState("link-1");
+    const [activeStep, setActiveStep] = useState(0);
     const inputFieldClassName =
         "mt-1 block w-full px-3 py-2 focus:outline-hidden " +
         "focus:ring-0 focus:border-black focus:border-2 sm:text-sm";
 
-    useEffect(() => {
-        const fetchResumes = async () => {
-            setIsLoading(true);
-            try {
-                const savedResumes: SavedResumesResponse[] = await JobApplicationService.getAllSavedResumes();
+    const steps = [
+        {
+            title: '1. CV details',
+            description: 'Build the resume content and maintain saved CV entries.',
+            tone: 'bg-[#2170e4] text-white',
+        },
+        {
+            title: '2. Review & save',
+            description: 'Preview the generated CV in your selected layout and save it.',
+            tone: 'bg-[#edf7ee] text-[#161c22]',
+        },
+    ];
 
-                setResumeList(savedResumes);
+    const stepProgress = `${((activeStep + 1) / steps.length) * 100}%`;
 
-                setIsLoading(false);
-            } catch (error) {
-                console.error("Error fetching job applications:", error);
-                setIsLoading(false);
-            }
-        };
-
-        fetchResumes();
+    const fetchResumes = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const savedResumes: SavedResumesResponse[] = await JobApplicationService.getAllSavedResumes();
+            setResumeList(savedResumes);
+        } catch (error) {
+            console.error("Error fetching job applications:", error);
+        } finally {
+            setIsLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        void fetchResumes();
+    }, [fetchResumes]);
+
+    const totalResumePages = Math.max(1, Math.ceil(resumeList.length / RESUMES_PER_PAGE));
+
+    useEffect(() => {
+        if (currentResumePage > totalResumePages) {
+            setCurrentResumePage(totalResumePages);
+        }
+    }, [currentResumePage, totalResumePages]);
+
+    const pagedResumes = useMemo(() => {
+        const start = (currentResumePage - 1) * RESUMES_PER_PAGE;
+        return resumeList.slice(start, start + RESUMES_PER_PAGE).map((resume, index) => ({
+            resume,
+            globalIndex: start + index,
+        }));
+    }, [currentResumePage, resumeList]);
 
     const styles = {
         leftColumn: {
@@ -105,28 +142,9 @@ export const CreateCV: React.FC = () => {
         },
     };
 
-    const overlayStyle = {
-        position: "fixed" as const,
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 1000,
-    };
-
-    const loadingMessageStyle = {
-        fontSize: "1.5rem",
-        color: "#333",
-        fontWeight: "bold" as const,
-    };
-
     const customResumeFormFormik = useFormik({
         initialValues: isBeingEdited?.data || DefaultResumeData,
-        onSubmit: (values) => {
+        onSubmit: (_values) => {
         },
     });
 
@@ -158,21 +176,7 @@ export const CreateCV: React.FC = () => {
                 setIsSaveComplete(true);
                 setIsSaveFailed(false);
 
-                const fetchResumes = async () => {
-                    setIsLoading(true);
-                    try {
-                        const savedResumes: SavedResumesResponse[] = await JobApplicationService.getAllSavedResumes();
-
-                        setResumeList(savedResumes);
-
-                        setIsLoading(false);
-                    } catch (error) {
-                        console.error("Error fetching job applications:", error);
-                        setIsLoading(false);
-                    }
-                };
-
-                fetchResumes();
+                await fetchResumes();
 
             } catch (error) {
                 setIsSaveLoading(false);
@@ -198,21 +202,7 @@ export const CreateCV: React.FC = () => {
     const deleteResume = async () => {
         try {
             await JobApplicationService.deleteResume(user ?? "", resumeToDelete?.id || "")
-            const fetchResumes = async () => {
-                setIsLoading(true);
-                try {
-                    const savedResumes: SavedResumesResponse[] = await JobApplicationService.getAllSavedResumes();
-
-                    setResumeList(savedResumes);
-
-                    setIsLoading(false);
-                } catch (error) {
-                    console.error("Error fetching job applications:", error);
-                    setIsLoading(false);
-                }
-            };
-
-            fetchResumes();
+            await fetchResumes();
 
         } catch (error) {
             console.log(error)
@@ -267,6 +257,12 @@ export const CreateCV: React.FC = () => {
 
     }, [customResumeFormFormik.values]);
 
+    useEffect(() => {
+        if (activeStep !== 0) {
+            setIsResumesPanelOpen(false);
+        }
+    }, [activeStep]);
+
     const handleCreateNewCV = () => {
 
         setIsBeingEdited({
@@ -282,12 +278,105 @@ export const CreateCV: React.FC = () => {
     }
 
     return (
-        <div className="py-0 my-2">
-            {isLoading && (
-                <div style={overlayStyle}>
-                    <div style={loadingMessageStyle}>Loading, please wait...</div>
-                </div>
-            )}
+        <AppLayout>
+            <TopNav title="Create CV" />
+            <main className="relative flex-1 bg-[#f6f9ff] px-4 py-6 md:px-6 lg:px-8">
+                <div className="mx-auto max-w-[1600px]">
+                    <div className="mb-6 overflow-hidden rounded-lg border border-[#c6c6cd] bg-white shadow-[0_12px_28px_rgba(15,23,42,0.05)]">
+                        <div className="border-b border-[#eaeaf0] bg-gradient-to-r from-[#eef4ff] via-[#f8fbff] to-white px-5 py-4 md:px-6">
+                            <div className="flex items-center justify-between gap-4">
+                                <div>
+                                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2170e4]">CV Workflow</p>
+                                    <h2 className="mt-2 text-xl font-semibold text-[#161c22] md:text-2xl">Create and manage your CV</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-4 md:p-6">
+                            <div className="rounded-xl border border-[#c6c6cd] bg-[#f9fbff] p-4 transition-all duration-300 md:p-5">
+                                <div className="mb-4 flex items-start justify-between gap-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold shadow-sm ${steps[activeStep].tone}`}>
+                                            {activeStep + 1}
+                                        </div>
+                                        <div>
+                                            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#76777d]">Current step</p>
+                                            <h3 className="text-lg font-semibold text-[#161c22]">{steps[activeStep].title}</h3>
+                                        </div>
+                                    </div>
+                                    <span className="rounded-full border border-[#d8e3f7] bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4a5f87]">
+                                        Step {activeStep + 1} of {steps.length}
+                                    </span>
+                                </div>
+
+                                <p className="text-sm leading-6 text-[#45464d]">{steps[activeStep].description}</p>
+
+                                <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-[#e5ebf7]">
+                                    <div
+                                        className="h-full rounded-full bg-[#2170e4] transition-all duration-300"
+                                        style={{width: stepProgress}}
+                                    />
+                                </div>
+
+                                <div className="mt-4 grid gap-2 md:grid-cols-2">
+                                    {steps.map((step, index) => (
+                                        <button
+                                            key={step.title}
+                                            type="button"
+                                            onClick={() => setActiveStep(index)}
+                                            className={`cursor-pointer flex items-start gap-3 rounded-lg border px-3 py-3 text-left transition-all duration-200 ${
+                                                index === activeStep
+                                                    ? 'border-[#2170e4] bg-[#eef4fc] shadow-[0_2px_8px_rgba(33,112,228,0.12)]'
+                                                    : 'border-[#dfe4ee] bg-white hover:border-[#bfd5ff]'
+                                            }`}
+                                        >
+                                            <span
+                                                className={`mt-0.5 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                                                    index === activeStep ? 'bg-[#2170e4] text-white' : 'bg-[#edf2fb] text-[#5a6f94]'
+                                                }`}
+                                            >
+                                                {index + 1}
+                                            </span>
+                                            <span>
+                                                <span className={`block text-sm font-semibold ${index === activeStep ? 'text-[#1f4f9c]' : 'text-[#161c22]'}`}>
+                                                    {step.title}
+                                                </span>
+                                                <span className="mt-0.5 block text-xs leading-5 text-[#5f6370]">
+                                                    {step.description}
+                                                </span>
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="mt-4 flex flex-wrap justify-end gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setActiveStep((prev) => Math.max(prev - 1, 0))}
+                                        disabled={activeStep === 0}
+                                        className="cursor-pointer rounded-lg border border-[#d6dcec] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#4a4e57] transition-all duration-200 hover:border-[#bacaf0] disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        Previous
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setActiveStep((prev) => Math.min(prev + 1, steps.length - 1))}
+                                        disabled={activeStep === steps.length - 1}
+                                        className="cursor-pointer rounded-lg border border-[#2170e4] bg-[#2170e4] px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white transition-all duration-200 hover:bg-[#195fc0] disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="py-0 my-2">
+            <PageLoadingOverlay
+                visible={isLoading}
+                withinParent={true}
+                message="Loading saved CVs and preparing your workspace..."
+            />
             {isDialogOpen && (
                 <div className={"relative z-20 bg-white"}>
                 </div>
@@ -307,8 +396,8 @@ export const CreateCV: React.FC = () => {
                                             <div className={"flex justify-between items-center"}>
                                                 Save resume
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                     fill="currentColor" className="bi bi-x-lg" viewBox="0 0 16 16"
-                                                     onClick={closeDialog} cursor={"pointer"}>
+                                                       fill="currentColor" className="bi bi-x-lg cursor-pointer" viewBox="0 0 16 16"
+                                                       onClick={closeDialog}>
                                                     <path
                                                         d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
                                                 </svg>
@@ -335,7 +424,7 @@ export const CreateCV: React.FC = () => {
                                             </div>
                                             <Button
                                                 type="submit"
-                                                className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
+                                                className="cursor-pointer inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
                                                 disabled={isSaveLoading}
                                             >
                                                 {isSaveLoading ? (
@@ -376,7 +465,7 @@ export const CreateCV: React.FC = () => {
                                         <span>The resume has been saved successfully</span>
                                         <div className="mt-4">
                                             <Button
-                                                className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
+                                                className="cursor-pointer inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
                                                 onClick={closeDialog}
                                             >
                                                 Close
@@ -398,8 +487,8 @@ export const CreateCV: React.FC = () => {
                                     <div className={"flex justify-between items-center mb-4"}>
                                         {`Delete CV: ${resumeToDelete?.data.resumeName}`}
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                             fill="currentColor" className="bi bi-x-lg" viewBox="0 0 16 16"
-                                             onClick={closeDeleteDialog} cursor={"pointer"}>
+                                            fill="currentColor" className="bi bi-x-lg cursor-pointer" viewBox="0 0 16 16"
+                                            onClick={closeDeleteDialog}>
                                             <path
                                                 d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
                                         </svg>
@@ -407,7 +496,7 @@ export const CreateCV: React.FC = () => {
                                     <span>Are you sure you want to delete this cv</span>
                                     <div className="mt-4">
                                         <Button
-                                            className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
+                                            className="cursor-pointer inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-hidden data-hover:bg-gray-600 data-focus:outline-1 data-focus:outline-white data-open:bg-gray-700"
                                             onClick={deleteResume}
                                         >
                                             Delete
@@ -417,7 +506,7 @@ export const CreateCV: React.FC = () => {
                             </div>
                         </div>
                     </Dialog>
-                    {isResumesPanelOpen && (
+                    {activeStep === 0 && isResumesPanelOpen && (
                         <div
                             className="col-md-2 pb-4"
                             style={{
@@ -425,57 +514,30 @@ export const CreateCV: React.FC = () => {
                                 ...styles.leftColumn.padding,
                             }}
                         >
-                            <div>
-                                <Row
-                                    style={{
-                                        ...styles.leftColumn.titleRow,
-                                        ...styles.borderTopStyle,
-                                        ...styles.borderBottomStyle,
-                                    }}
-                                >
-                                    <Col xs={9}>
-                                        <h5>Saved CVs</h5>
-                                    </Col>
-                                    <Col xs={3}>
-                                        <button
-                                            type="button"
-                                            className="btn"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="top"
-                                            title="Close"
-                                            onClick={closeResumesPanel}
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="16"
-                                                height="16"
-                                                fill="currentColor"
-                                                className="bi bi-x-lg"
-                                                viewBox="0 0 16 16"
-                                                cursor="pointer"
-                                            >
-                                                <path
-                                                    d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-                                            </svg>
-                                        </button>
-                                    </Col>
-                                </Row>
+                            <div className="rounded-lg border border-[#c6c6cd] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)]">
+                                <div className="flex items-center justify-between border-b border-[#eaeaf0] bg-[#f8fbff] px-3 py-2.5">
+                                    <button
+                                        type="button"
+                                        className="cursor-pointer flex h-8 w-8 items-center justify-center rounded-md border border-[#efc2c2] bg-white text-[#ba1a1a] transition-all duration-200 hover:border-[#dc2626] hover:bg-[#fff1f1] hover:text-[#a31212]"
+                                        title="Close"
+                                        onClick={closeResumesPanel}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                        </svg>
+                                    </button>
+                                    <h5 className="mb-0 text-sm font-semibold uppercase tracking-[0.08em] text-[#45464d]">Saved CVs</h5>
+                                    <div className="h-8 w-8" aria-hidden="true" />
+                                </div>
 
-                                <div style={{marginTop: "10px"}}>
+                                <div className="p-2">
                                     {isLoading ? (
                                         <p>Loading resumes...</p>
                                     ) : (
                                         <>
                                             <div
-                                                style={{
-                                                    padding: "10px",
-                                                    cursor: "pointer",
-                                                    fontWeight: "bold",
-                                                    backgroundColor: createNewHover ? "#6CB4EE" : "#89CFF0",
-                                                    borderBottom: "1px solid #ddd",
-                                                    textAlign: "center",
-                                                    transition: "background-color 0.3s ease", // Smooth transition
-                                                }}
+                                                className="mb-2 rounded-md border border-[#c6d9ff] px-2 py-2 text-center text-sm font-semibold text-[#1f4f9c] transition-colors duration-200"
+                                                style={{backgroundColor: createNewHover ? "#dbeafe" : "#edf4ff"}}
                                                 onMouseEnter={() => setCreateNewHover(true)}
                                                 onMouseLeave={() => setCreateNewHover(false)}
                                                 onClick={() => {
@@ -483,36 +545,32 @@ export const CreateCV: React.FC = () => {
                                                     setIsBeingEditedIndex(-1)
                                                 }}
                                             >
-                                                + <span className={"ml-4"}>Create New CV</span>
+                                                + <span className={"ml-2"}>Create New CV</span>
                                             </div>
 
-                                            {resumeList.map((resume, index) => (
-                                                <Row
+                                            {pagedResumes.map(({resume, globalIndex}) => (
+                                                <div
                                                     key={resume.id}
-                                                    style={{
-                                                        display: "flex", // Flexbox for layout
-                                                        justifyContent: "space-between", // Space between text and SVG
-                                                        alignItems: "center", // Center items vertically
-                                                        padding: "10px",
-                                                        cursor: "pointer",
-                                                        borderBottom: "1px solid #ddd",
-                                                        backgroundColor: index === isBeingEditedIndex ? "#F3F4F6" : "transparent",
-                                                    }}
-                                                    className="hover:bg-gray-100 mx-0 row row-cols-2"
+                                                    className="mb-1 flex items-center justify-between rounded-md border border-[#e5e7eb] px-2 py-2 transition-all duration-200 hover:border-[#bfd5ff] hover:bg-[#f8fbff]"
+                                                    style={{backgroundColor: globalIndex === isBeingEditedIndex ? "#e8eef6" : "transparent"}}
                                                 >
-                                                    {/* Resume Name Column */}
-                                                    <Col
-                                                        lg={9}
+                                                    <button
+                                                        type="button"
+                                                        className="cursor-pointer mr-2 flex-1 truncate text-left text-sm text-[#161c22]"
                                                         onClick={() => {
                                                             handleResumeClick(resume);
-                                                            setIsBeingEditedIndex(index);
+                                                            setIsBeingEditedIndex(globalIndex);
                                                         }}
                                                     >
                                                         {resume.data.resumeName || "Untitled Resume"}
-                                                    </Col>
+                                                    </button>
 
-                                                    {/* Trash Icon Column */}
-                                                    <Col lg={3} className={"flex align-items-end justify-end"}>
+                                                    <button
+                                                        type="button"
+                                                        className="cursor-pointer flex h-7 w-7 items-center justify-center rounded-md text-[#ba1a1a] transition-colors duration-200 hover:bg-[#ffebe9]"
+                                                        onClick={() => handleDeleteResume(resume)}
+                                                        aria-label="Delete saved CV"
+                                                    >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
                                                             width="16"
@@ -520,15 +578,20 @@ export const CreateCV: React.FC = () => {
                                                             fill="currentColor"
                                                             className="bi bi-trash3"
                                                             viewBox="0 0 16 16"
-                                                            onClick={() => handleDeleteResume(resume)}
-                                                            style={{cursor: "pointer"}} // Ensures pointer cursor for the icon
                                                         >
                                                             <path
                                                                 d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
                                                         </svg>
-                                                    </Col>
-                                                </Row>
+                                                    </button>
+                                                </div>
                                             ))}
+
+                                            <PaginationControls
+                                                currentPage={currentResumePage}
+                                                totalPages={totalResumePages}
+                                                onPageChange={setCurrentResumePage}
+                                                label="Saved CV"
+                                            />
 
                                         </>
                                     )}
@@ -544,37 +607,23 @@ export const CreateCV: React.FC = () => {
                             ...styles.leftColumn.padding,
                         }}
                     >
-                        <div
-                            style={{}}
-                        >
-                            <Row style={{
-                                ...styles.leftColumn.titleRow,
-                                ...styles.borderTopStyle,
-                                ...styles.borderBottomStyle
-                            }}>
-                                <Col xs={3} sm={3} md={3} lg={3} xl={3} className={"flex"}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black"
-                                         className="bi bi-list align-items-center justify-center cursor-pointer"
-                                         viewBox="0 0 16 16" onClick={openResumesPanel}>
-                                        <path fillRule="evenodd"
-                                              d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                        <div className="flex items-center justify-between border-y border-[#eaeaf0] bg-[#f8fbff] px-4 py-3">
+                            {!isResumesPanelOpen ? (
+                                <button
+                                    type="button"
+                                    onClick={openResumesPanel}
+                                    className="cursor-pointer flex h-9 w-9 items-center justify-center rounded-lg border border-[#c6c6cd] bg-white text-[#161c22] transition-all duration-200 hover:border-[#2170e4] hover:text-[#2170e4]"
+                                    aria-label="Open saved CVs"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                        <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
                                     </svg>
-                                </Col>
-                                <Col xs={6} sm={6} md={6} lg={6} xl={6} style={styles.rightBorderStyle}>
-                                    CV Details
-                                </Col>
-                                <Col xs={3} sm={3} md={3} lg={3} xl={3}
-                                     style={{alignItems: "center", textAlign: "center"}}>
-                                    <button type="button" className="btn" data-bs-toggle="tooltip"
-                                            data-bs-placement="top" title="Add Section">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                             fill="currentColor" className="bi bi-plus-lg" viewBox="0 0 16 16">
-                                            <path fillRule="evenodd"
-                                                  d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
-                                        </svg>
-                                    </button>
-                                </Col>
-                            </Row>
+                                </button>
+                            ) : (
+                                <div className="h-9 w-9" aria-hidden="true" />
+                            )}
+                            <span className="text-sm font-semibold uppercase tracking-[0.08em] text-[#45464d]">CV Details</span>
+                            <div className="h-9 w-9" aria-hidden="true" />
                         </div>
 
                         <CustomAccordion
@@ -587,6 +636,7 @@ export const CreateCV: React.FC = () => {
 
                     </div>
 
+                    {activeStep === 1 && (
                     <div className={resumePreviewClassName}>
                         <Nav fill variant="tabs" activeKey={activeTab} onSelect={handleSelect}>
                             <Nav.Item>
@@ -609,7 +659,7 @@ export const CreateCV: React.FC = () => {
                                         </h1>
                                     )}
                                     <Button onClick={() => handleSave()}
-                                            className="mb-1 mt-5"
+                                            className="mb-1 mt-5 cursor-pointer"
                                             style={{
                                                 backgroundColor: '#ccc',
                                                 borderColor: '#ccc',
@@ -651,7 +701,7 @@ export const CreateCV: React.FC = () => {
                                         </h1>
                                     )}
                                     <Button onClick={() => handleSave()}
-                                            className="mb-1 mt-5"
+                                            className="mb-1 mt-5 cursor-pointer"
                                             style={{
                                                 backgroundColor: '#ccc',
                                                 borderColor: '#ccc',
@@ -685,8 +735,12 @@ export const CreateCV: React.FC = () => {
                         </div>
 
                     </div>
+                    )}
                 </div>
             )}
-        </div>
+                    </div>
+                </div>
+            </main>
+        </AppLayout>
     );
 };

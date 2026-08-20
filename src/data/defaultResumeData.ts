@@ -1,4 +1,4 @@
-import {ResumeInfo} from "../models/ResumeInfo";
+import type {ResumeInfo} from "../models/ResumeInfo";
 
 export const DefaultResumeData: ResumeInfo = {
     workExperience: [

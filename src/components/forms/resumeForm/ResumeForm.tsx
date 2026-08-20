@@ -1,4 +1,4 @@
-import {ResumeInfo} from "../../../models/ResumeInfo";
+import type { ResumeInfo } from "../../../models/ResumeInfo";
 import React from "react";
 import {ProfileSection} from "./sections/ProfileSection";
 import {SectionHeader} from "./sections/SectionHeader";
@@ -19,8 +19,7 @@ interface ResumeFormProps {
 const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButton = false, buttonTitle}) => {
     const isLoading = false;
     const inputFieldClassName =
-        "mt-1 block w-full px-3 py-2 focus:outline-hidden " +
-        "focus:ring-0 focus:border-black focus:border-2 sm:text-sm";
+        "mt-1 block w-full border border-[#c6c6cd] bg-[#f6f9ff] px-4 py-2 text-[14px] text-[#161c22] transition-all duration-200 ease-out placeholder:text-[#76777d] focus:border-[#2170e4] focus:outline-none focus:ring-2 focus:ring-[#d8e2ff] focus:ring-offset-0";
 
 
     const addToSection = (section: keyof ResumeInfo) => {
@@ -94,8 +93,8 @@ const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButto
 
 
     return (
-        <div className="flex justify-center items-center sm:px-2">
-            <form onSubmit={resumeFormFormik.handleSubmit}>
+        <div className="w-full sm:px-1">
+            <form onSubmit={resumeFormFormik.handleSubmit} className="w-full">
                 {resumeFormFormik.values.profile &&
                     <SectionHeader
                         title={"About"}
@@ -225,7 +224,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({resumeFormFormik, hasSubmitButto
                 {hasSubmitButton && (
                     <Button
                         type="submit"
-                        className="w-full mt-4 bg-blue-500 text-white hover:bg-blue-600"
+                        className="cursor-pointer mt-4 w-full border border-[#c6c6cd] bg-[#2170e4] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_1px_3px_rgba(15,23,42,0.05)] transition-all duration-200 ease-out hover:bg-[#185fd1] disabled:cursor-not-allowed disabled:opacity-70"
                         disabled={isLoading}
                     >
                         {isLoading ? (

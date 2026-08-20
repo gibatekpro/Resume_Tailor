@@ -1,11 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
-import { JobApplicationInfo } from "../models/JobApplicationInfo";
+import type { JobApplicationInfo } from "../models/JobApplicationInfo";
 import {APP_TITLE, LOCAL_STORAGE_APP_TITLE} from "../utils/applicationData";
 import { useReactToPrint } from "react-to-print";
 import STORAGE from "../utils/storage";
 import {renderResumeStyle} from "../utils/HelperFunctions";
 
-export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void, setAppTitle:React.Dispatch<React.SetStateAction<string>> }> = ({ setHideNavbar, setAppTitle }) => {
+type ResumePrintPageProps = {
+    setHideNavbar?: (hide: boolean) => void;
+    setAppTitle?: React.Dispatch<React.SetStateAction<string>>;
+};
+
+export const ResumePrintPage: React.FC<ResumePrintPageProps> = ({ setHideNavbar, setAppTitle }) => {
     const [applicationData] = useState<JobApplicationInfo>(JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "{}"));
     const contentRef = useRef<HTMLDivElement>(null);
 
@@ -27,21 +32,22 @@ export const ResumePrintPage: React.FC<{ setHideNavbar: (hide: boolean) => void,
 
         console.log("Print === Updated Data >>>>>: " + applicationData.jobPostingUrl);
 
-        setHideNavbar(true); // Hide Navbar when this page is loaded
+        setHideNavbar?.(true); // Hide Navbar when this page is loaded
 
         // Dynamically set the document title
         if (applicationData && applicationData.openAIDocumentTitle) {
             localStorage.setItem(LOCAL_STORAGE_APP_TITLE, applicationData.openAIDocumentTitle);
         }
 
-        setTimeout(() => {
+        const timer = window.setTimeout(() => {
             handlePrint();
-        }, 3000);
+        }, 1200);
 
         return () => {
-            setHideNavbar(false);
+            window.clearTimeout(timer);
+            setHideNavbar?.(false);
             localStorage.setItem(LOCAL_STORAGE_APP_TITLE, APP_TITLE);
-            setAppTitle(APP_TITLE);
+            setAppTitle?.(APP_TITLE);
         };
     }, [setHideNavbar, applicationData]);
 

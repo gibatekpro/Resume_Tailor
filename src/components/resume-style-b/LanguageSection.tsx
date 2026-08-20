@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import '../../styles/resumeStyleB.css';
-import {ResumeInfo} from "../../models/ResumeInfo";
+import type { ResumeInfo } from "../../models/ResumeInfo";
 
 export const LanguageSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
     useEffect(()=>{

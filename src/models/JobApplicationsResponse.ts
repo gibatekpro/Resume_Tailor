@@ -1,4 +1,4 @@
-import {JobApplicationInfo} from "./JobApplicationInfo";
+import type {JobApplicationInfo} from './JobApplicationInfo';
 
 export interface JobApplicationsResponse {
     id: string,

@@ -1,5 +1,4 @@
-import {JobApplicationInfo} from "./JobApplicationInfo";
-import {ResumeInfo} from "./ResumeInfo";
+import type {ResumeInfo} from "./ResumeInfo";
 
 export interface SavedResumesResponse {
     id?: string,

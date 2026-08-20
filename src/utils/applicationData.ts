@@ -1,4 +1,4 @@
-import {ResumeData} from "../models/ResumeData";
+import type {ResumeData} from "../models/ResumeData";
 
 export interface ApplicationData{
 

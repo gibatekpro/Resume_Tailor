@@ -1,4 +1,4 @@
-import {OpenAIInstruction} from "../models/OpenAIInstruction";
+import type {OpenAIInstruction} from "../models/OpenAIInstruction";
 
 export const openAIInstruction: OpenAIInstruction = {
     prompt: [

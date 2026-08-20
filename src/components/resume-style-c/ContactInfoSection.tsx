@@ -1,5 +1,5 @@
 import React from "react";
-import {ResumeInfo} from "../../models/ResumeInfo";
+import type { ResumeInfo } from "../../models/ResumeInfo";
 import {ResumeStyleCStyle} from "./styles/ResumeStyleCStyle";
 
 export const ContactInfoSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {

@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import {v4 as uuidv4} from "uuid";
+import {colors} from "../../../../../styles/theme";
 
 
 export const ProjectDetailInput: React.FC<{
@@ -48,8 +49,9 @@ export const ProjectDetailInput: React.FC<{
                             viewBox="0 0 24 24"
                             strokeWidth="1.5"
                             stroke="currentColor"
-                            className="w-6 h-6 ml-2 text-gray-500 cursor-pointer mr-1"
+                            className="w-6 h-6 ml-2 cursor-pointer mr-1"
                             onClick={addProjectDetail}
+                            style={{color: colors.secondaryContainer}}
                         >
                             <path
                                 strokeLinecap="round"
@@ -65,8 +67,9 @@ export const ProjectDetailInput: React.FC<{
                             viewBox="0 0 24 24"
                             strokeWidth="1.5"
                             stroke="currentColor"
-                            className="w-6 h-6 ml-2 text-gray-500 cursor-pointer mr-1"
+                            className="w-6 h-6 ml-2 cursor-pointer mr-1"
                             onClick={() => removeProjectDetail(projectDetailIndex)}
+                            style={{color: colors.error}}
                         >
                             <path
                                 strokeLinecap="round"

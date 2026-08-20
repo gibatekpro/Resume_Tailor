@@ -1,6 +1,6 @@
 import React from "react";
 import '../../styles/resumeStyleA.css';
-import {ResumeInfo} from "../../models/ResumeInfo";
+import type { ResumeInfo } from "../../models/ResumeInfo";
 
 export const SummarySection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
     return(

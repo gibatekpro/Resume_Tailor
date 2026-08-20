@@ -5,7 +5,7 @@ import {LEFT_COL_BREAKPOINTS, RIGHT_COL_BREAKPOINTS} from "../constants/BreakPoi
 
 interface CustomColProps {
     isLeft?: boolean;
-    children: React.ReactNode;
+    children?: React.ReactNode;
     style?: React.CSSProperties;
     className?: string; // Optional additional class names
 }

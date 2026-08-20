@@ -1,8 +1,7 @@
-import { ResumeInfo } from "../models/ResumeInfo";
+import type { ResumeInfo } from "../models/ResumeInfo";
 import { ResumeStyleA } from "../components/resume-style-a/ResumeStyleA";
 import { ResumeStyleB } from "../components/resume-style-b/ResumeStyleB";
-import React from "react";
-import {ResumeStyleC} from "../components/resume-style-c/ResumeStyleC";
+import { ResumeStyleC } from "../components/resume-style-c/ResumeStyleC";
 
 export const renderResumeStyle = (resumeData: ResumeInfo, resumeStyle?: string) => {
     switch (resumeStyle) {

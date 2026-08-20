@@ -11,7 +11,7 @@ import {EducationSection} from "./EducationSection";
 import {ProjectsSection} from "./ProjectsSection";
 import {AvatarSection} from "./AvatarSection";
 import {LanguageSection} from "./LanguageSection";
-import {ResumeInfo} from "../../models/ResumeInfo";
+import type { ResumeInfo } from "../../models/ResumeInfo";
 
 
 export const ResumeStyleB: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =>{
@@ -43,11 +43,15 @@ export const ResumeStyleB: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =
                 border: '1px solid #015a84',
                 paddingLeft: "0",
                 margin:"0",
+                display: 'flex',
+                flexWrap: 'nowrap',
             }}>
                 <CustomCol className={"left-col"} isLeft={true}
                     style={{
                         // ...DESIGN_BORDER,
                         // backgroundColor: "#015a84"
+                        flex: '0 0 33.3333%',
+                        maxWidth: '33.3333%',
                     }}>
                     <AvatarSection/>
                     {hasContactInfo && (
@@ -67,6 +71,9 @@ export const ResumeStyleB: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =
                 <CustomCol className={"right-col"} isLeft={false}
                     style={{
                         // ...DESIGN_BORDER
+                        flex: '0 0 66.6667%',
+                        maxWidth: '66.6667%',
+                        minWidth: 0,
                     }}>
                     <HeaderSection
                         resumeData={resumeData}/>

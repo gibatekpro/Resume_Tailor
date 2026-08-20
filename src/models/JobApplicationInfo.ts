@@ -1,6 +1,4 @@
-import {OpenAIInstruction} from "./OpenAIInstruction";
-import {ResumeInfo} from "./ResumeInfo";
-import moment from "moment";
+import type {ResumeInfo} from './ResumeInfo';
 
 export interface JobApplicationInfo {
     date?: string,

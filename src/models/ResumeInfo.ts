@@ -1,8 +1,8 @@
-import {Education} from "./Education";
-import {WorkExperience} from "./WorkExperience";
-import {Language} from "./Language";
-import {Project} from "./Project";
-import {ContactInfo} from "./ContactInfo";
+import type {Education} from "./Education";
+import type {WorkExperience} from "./WorkExperience";
+import type {Language} from "./Language";
+import type {Project} from "./Project";
+import type {ContactInfo} from "./ContactInfo";
 
 export interface ResumeInfo {
     resumeName?: string,

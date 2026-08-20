@@ -1,4 +1,4 @@
-import {ResumeInfo} from "./ResumeInfo";
+import type {ResumeInfo} from './ResumeInfo';
 
 export interface OpenAIInstruction {
     prompt?: string[],

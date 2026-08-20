@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {Col, Row} from "react-bootstrap";
+import {colors} from "../../../../styles/theme";
 
 interface LanguageSectionProps {
     resumeFormFormik: any; // Replace 'any' with the type from your Formik configuration.
@@ -25,22 +26,23 @@ export const LanguageSection: React.FC<LanguageSectionProps> = ({
 
     if (!language) return null;
 
+    const proficiencyOptions = ["Basic", "Intermediate", "Fluent"];
+
     return (
-        <>
+        <div className="border border-[#eef2f7] bg-transparent p-0">
             <div
-                className="mb-0 flex items-center justify-between bg-white"
+                className="mb-2 flex items-center justify-between gap-3"
                 onMouseEnter={() => setIsIconVisible(true)}
                 onMouseLeave={() => setIsIconVisible(false)}
             >
-                <div className="flex items-center flex-1">
-                    <span className=" font-normal sm:text-sm pl-3.5 text-gray-500">Language:</span>
-
+                <div className="flex flex-1 items-center gap-2">
+                    <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#676a72]">Language</span>
                     <input
                         id={`language-${language.id}-name`}
-                        name={`languages.${index}.name`} // Corrected name for Formik binding
+                        name={`languages.${index}.name`}
                         type="text"
                         placeholder="Language"
-                        className={`${inputFieldClassName} font-bold`}
+                        className={`${inputFieldClassName} font-medium`}
                         onChange={resumeFormFormik.handleChange}
                         value={language.name || ""}
                     />
@@ -53,8 +55,9 @@ export const LanguageSection: React.FC<LanguageSectionProps> = ({
                         viewBox="0 0 24 24"
                         strokeWidth="1.5"
                         stroke="currentColor"
-                        className="w-6 h-6 text-gray-500 cursor-pointer mr-3 ml-2"
+                        className="w-6 h-6 cursor-pointer"
                         onClick={removeLanguage}
+                        style={{color: colors.error}}
                     >
                         <path
                             strokeLinecap="round"
@@ -65,58 +68,35 @@ export const LanguageSection: React.FC<LanguageSectionProps> = ({
                 )}
             </div>
 
-            <Row
-                className="mb-1 pb-2 bg-white mx-0 row row-cols-4 row-cols-sm-4
-                row-cols-md-4 row-cols-lg-12 row-gap-3 row-gap-sm-3
-                row-gap-md-3 row-gap-lg-0"
-            >
-                <Col lg={1} sm={1} xs={1} className={"mr-4 mr-md-2 "}>
-                    <span className="font-normal text-gray-500">Level:</span>
-                </Col>
-                <Col lg={3} sm={2} xs={2}  className={"mr-4 mr-md-2 "}>
-                    <label className="d-flex align-items-center">
-                        <input
-                            id={`language-${language.id}-proficiency-basic`}
-                            name={`languages.${index}.proficiency`}
-                            type="radio"
-                            className="me-2"
-                            onChange={resumeFormFormik.handleChange}
-                            value="Basic"
-                            checked={language.proficiency === "Basic"}
-                        />
-                        Basic
-                    </label>
-                </Col>
-                <Col lg={3} sm={3} xs={2} className={"mr-4 mr-md-2 "}>
-                    <label className="d-flex align-items-center">
-                        <input
-                            id={`language-${language.id}-proficiency-fluent`}
-                            name={`languages.${index}.proficiency`}
-                            type="radio"
-                            className="me-2"
-                            onChange={resumeFormFormik.handleChange}
-                            value="Fluent"
-                            checked={language.proficiency === "Fluent"}
-                        />
-                        Fluent
-                    </label>
-                </Col>
-                <Col lg={3} sm={3}>
-                    <label className="d-flex align-items-center">
-                        <input
-                            id={`language-${language.id}-proficiency-intermediate`}
-                            name={`languages.${index}.proficiency`}
-                            type="radio"
-                            className="me-2"
-                            onChange={resumeFormFormik.handleChange}
-                            value="Intermediate"
-                            checked={language.proficiency === "Intermediate"}
-                        />
-                        Intermediate
-                    </label>
-                </Col>
-            </Row>
-
-        </>
+            <div className="mt-2">
+            <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#676a72]">Proficiency</p>
+            <div className="flex flex-wrap gap-1.5">
+                    {proficiencyOptions.map((option) => {
+                        const checked = language.proficiency === option;
+                        return (
+                            <label
+                                key={option}
+                            className={`inline-flex cursor-pointer items-center border px-2 py-1 text-xs font-medium transition-all duration-200 ${
+                                    checked
+                                    ? "border-[#2170e4] bg-[#eef4fc] text-[#2170e4]"
+                                        : "border-[#dfe4ee] bg-white text-[#45464d] hover:border-[#bfd5ff] hover:text-[#161c22]"
+                                }`}
+                            >
+                                <input
+                                    id={`language-${language.id}-proficiency-${option.toLowerCase()}`}
+                                    name={`languages.${index}.proficiency`}
+                                    type="radio"
+                                    className="sr-only"
+                                    onChange={resumeFormFormik.handleChange}
+                                    value={option}
+                                    checked={checked}
+                                />
+                                <span>{option}</span>
+                            </label>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
     );
 };

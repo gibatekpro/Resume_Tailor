@@ -1,83 +1,199 @@
-import React from "react";
-import {useNavigate} from "react-router-dom";
-import ROUTES from "../utils/routes";
+import { useNavigate } from 'react-router-dom';
+import AppLayout from '../components/shared/AppLayout';
+import TopNav from '../components/shared/TopNav';
+import AppRoutes from '../utils/Routes';
+import indeedIcon from '../assets/brand/indeed.com.png';
+import linkedinIcon from '../assets/brand/linkedin.com.png';
+import gradcrackerIcon from '../assets/brand/gradcracker.com.png';
+import upworkIcon from '../assets/brand/upwork.svg';
+import fiverrIcon from '../assets/brand/fiverr.svg';
 
+type SiteCardItem = {
+  name: string;
+  url: string;
+  description: string;
+  icon: string;
+  accent: string;
+};
 
-export const HomePage: React.FC = () => {
-    const navigate = useNavigate();
+const jobSites: SiteCardItem[] = [
+  {
+    name: 'Indeed',
+    url: 'https://www.indeed.com/',
+    description: 'Search roles with salary and location filters.',
+    icon: indeedIcon,
+    accent: '#2557a7',
+  },
+  {
+    name: 'LinkedIn',
+    url: 'https://www.linkedin.com/jobs/',
+    description: 'Discover professional opportunities and hiring teams.',
+    icon: linkedinIcon,
+    accent: '#0a66c2',
+  },
+  {
+    name: 'Gradcracker',
+    url: 'https://www.gradcracker.com/',
+    description: 'Graduate roles and early-career opportunities.',
+    icon: gradcrackerIcon,
+    accent: '#1d4ed8',
+  },
+];
 
-    const handleNavigateToInput = () => {
-        // e.preventDefault();  // Prevent default anchor behavior
-        navigate(ROUTES.TEST);  // Navigate to the practice page
-    };
+const freelanceSites: SiteCardItem[] = [
+  {
+    name: 'Upwork',
+    url: 'https://www.upwork.com/',
+    description: 'Find freelance projects and consulting work.',
+    icon: upworkIcon,
+    accent: '#14a800',
+  },
+  {
+    name: 'Fiverr',
+    url: 'https://www.fiverr.com/',
+    description: 'Browse quick-turn services and specialist gigs.',
+    icon: fiverrIcon,
+    accent: '#1dbf73',
+  },
+];
 
-    return (
-        <div className="bg-white">
-            {/*Be absolutely positioned at the top of the page.
-                Span the full width of its container.
-                Appear in front of most other elements due to its high z-index of 50.*/}
-            <div className="relative isolate px-6 pt-14 lg:px-8">
-                <div
-                    aria-hidden="true"
-                    className="absolute inset-x-0 -top-40 -z-50 transform-gpu overflow-hidden blur-3xl sm:-top-80"
-                >
-                    <div
-                        style={{
-                            clipPath:
-                                'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-                        }}
-                        className="relative left-[calc(50%-11rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-                    />
-                </div>
-                <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
-                    <div className="hidden sm:mb-8 sm:flex sm:justify-center">
-                        <div
-                            className="relative rounded-full px-3 py-1 text-sm leading-6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20">
-                            Announcing our next round of funding.{' '}
-                            <button
-                               type="button"
-                               onClick={() => { /* no-op or navigate to details */ }}
-                               className="font-semibold text-indigo-600 transition-all duration-300 ease-in-out transform hover:scale-110 hover:text-indigo-800">
-                                <span aria-hidden="true" className="absolute inset-0"></span>
-                                Read more <span aria-hidden="true">&rarr;</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div className="text-center">
-                        <h1 className="text-balance text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-                            Tailor your CV to the job requirements
-                        </h1>
-                        <p className="mt-6 text-lg leading-8 text-gray-600">
-                            A great tool to help you tailor your cv to a job requirement,
-                            while keeping your skills and experience unchanged.
-                        </p>
-                        <div className="mt-10 flex items-center justify-center gap-x-6">
-                            <button
-                                type="button"
-                                onClick={handleNavigateToInput}
-                                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-2xs hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                            >
-                                Get started
-                            </button>
-                            <a href={ROUTES.TEST} onClick={(e) => { e.preventDefault(); handleNavigateToInput(); }} className="text-sm font-semibold leading-6 text-gray-900">
-                                Tailor CV <span aria-hidden="true">→</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div
-                    aria-hidden="true"
-                    className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
-                >
-                    <div
-                        style={{
-                            clipPath:
-                                'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-                        }}
-                        className="relative left-[calc(50%+3rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
-                    />
-                </div>
+function SiteGroup({ title, sites }: { title: string; sites: SiteCardItem[] }) {
+  return (
+    <section style={{ backgroundColor: '#ffffff', border: '1px solid #c6c6cd', borderRadius: '18px', boxShadow: '0px 1px 3px rgba(15,23,42,0.05)', overflow: 'hidden' }}>
+      <div style={{ padding: '18px 20px', borderBottom: '1px solid #eaeaf0', background: 'linear-gradient(180deg, rgba(238,244,252,0.6), rgba(255,255,255,0.9))' }}>
+        <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, letterSpacing: '-0.02em', color: '#161c22' }}>{title}</h2>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', padding: '20px' }}>
+        {sites.map((site) => (
+          <a
+            key={site.name}
+            href={site.url}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
+              padding: '18px 16px',
+              borderRadius: '14px',
+              border: '1px solid #dfe4ee',
+              background: 'linear-gradient(180deg, #ffffff 0%, #f9fbff 100%)',
+              textDecoration: 'none',
+              color: '#161c22',
+              boxShadow: '0px 8px 18px rgba(15,23,42,0.03)',
+              transition: 'all 200ms ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 14px 24px rgba(33, 112, 228, 0.08)';
+              e.currentTarget.style.borderColor = '#c6d9ff';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0px 8px 18px rgba(15,23,42,0.03)';
+              e.currentTarget.style.borderColor = '#dfe4ee';
+            }}
+          >
+            <div
+              style={{
+                width: '52px',
+                height: '52px',
+                borderRadius: '14px',
+                backgroundColor: `${site.accent}12`,
+                border: `1px solid ${site.accent}33`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <img src={site.icon} alt={site.name} style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
             </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#161c22' }}>{site.name}</h3>
+                <span className="material-symbols-outlined" style={{ fontSize: '18px', color: site.accent }}>open_in_new</span>
+              </div>
+              <p style={{ margin: '8px 0 0', fontSize: '13px', lineHeight: 1.5, color: '#45464d' }}>{site.description}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default function HomePage() {
+  const navigate = useNavigate();
+
+  return (
+    <AppLayout>
+      <TopNav searchPlaceholder="Search opportunities..." />
+
+      <main style={{ padding: '24px', flex: 1, overflowY: 'auto', width: '100%' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gap: '24px' }}>
+          <section
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '20px',
+              padding: '28px 28px',
+              borderRadius: '20px',
+              background: 'linear-gradient(135deg, #eef4ff 0%, #e8f1ff 15%, #f6f9ff 100%)',
+              border: '1px solid #c6d9ff',
+              boxShadow: '0px 12px 28px rgba(33,112,228,0.08)',
+            }}
+          >
+            <div>
+              <p style={{ margin: 0, fontSize: '12px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#2170e4' }}>
+                Career launchpad
+              </p>
+              <h1 style={{ margin: '12px 0 8px', fontSize: '30px', letterSpacing: '-0.04em', color: '#161c22', fontWeight: 700 }}>
+                Explore your next opportunity
+              </h1>
+              <p style={{ margin: 0, fontSize: '15px', color: '#45464d', maxWidth: '580px', lineHeight: 1.6 }}>
+                Stay in motion with your job search and keep your resume ready for the next role, contract, or freelance opportunity.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate(AppRoutes.resumeInputPage)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '12px 18px',
+                border: 'none',
+                borderRadius: '12px',
+                backgroundColor: '#2170e4',
+                color: '#ffffff',
+                fontSize: '14px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 12px 22px rgba(33,112,228,0.2)',
+                transition: 'all 200ms ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 16px 28px rgba(33,112,228,0.24)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 12px 22px rgba(33,112,228,0.2)';
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span>
+              Tailor Resume
+            </button>
+          </section>
+
+          <SiteGroup title="Job sites" sites={jobSites} />
+          <SiteGroup title="Freelance sites" sites={freelanceSites} />
         </div>
-    );
+      </main>
+    </AppLayout>
+  );
 }

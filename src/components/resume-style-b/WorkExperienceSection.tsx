@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {Col, Row} from 'react-bootstrap';
-import {ResumeInfo} from "../../models/ResumeInfo";
+import type { ResumeInfo } from "../../models/ResumeInfo";
 
 
 export const WorkExperienceSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {

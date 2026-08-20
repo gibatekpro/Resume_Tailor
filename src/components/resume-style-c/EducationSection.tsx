@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {ResumeInfo} from "../../models/ResumeInfo";
+import type { ResumeInfo } from "../../models/ResumeInfo";
 import {Col, Row} from "react-bootstrap";
 import {ResumeStyleCStyle} from "./styles/ResumeStyleCStyle";
 

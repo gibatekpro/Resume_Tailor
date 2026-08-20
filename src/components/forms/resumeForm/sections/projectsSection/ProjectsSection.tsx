@@ -1,7 +1,7 @@
 import React from "react";
-import { Col, Row } from "react-bootstrap";
 import {ProjectDetailInput} from "./ProjectDetailInput";
-import {MONTHS, YEARS} from "../../../../../utils/applicationData";
+import {MonthYearPicker} from "../shared/MonthYearPicker";
+import {colors} from "../../../../../styles/theme";
 
 interface ProjectsSectionProps {
     resumeFormFormik: any; // Replace 'any' with the type from your Formik configuration.
@@ -76,8 +76,9 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                             viewBox="0 0 24 24"
                             strokeWidth="1.5"
                             stroke="currentColor"
-                            className="w-6 h-6 ml-2 text-gray-500 cursor-pointer mr-1"
+                            className="w-6 h-6 ml-2 cursor-pointer mr-1"
                             onClick={removeProjects}
+                            style={{color: colors.error}}
                         >
                             <path
                                 strokeLinecap="round"
@@ -101,88 +102,28 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                 />
             </div>
 
-            <div className="grid grid-rows-2 gap-1 bg-white py-2 pl-4 pr-2">
-                <Row className="
-                row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-12
-                row-gap-3 row-gap-sm-3 row-gap-md-3 row-gap-lg-0"
-                >
-                    <Col lg={2} className={"flex justify-start"}>
-                        <span className="text-sm font-normal text-gray-500">Start</span>
-                    </Col>
-                    <Col lg={3}>
-                        <select
-                            id={`projects-${projects.id}-startMonth`}
-                            name={`projects[${index}].startMonth`}
-                            className={inputFieldClassName + " sm:text-sm"}
-                            onChange={resumeFormFormik.handleChange}
-                            value={projectList[index]?.startMonth || ""}
-                            defaultValue={MONTHS[0]}
-                        >
-                            {MONTHS.map((month) => (
-                                <option key={month} value={month}>
-                                    {month}
-                                </option>
-                            ))}
-                        </select>
-                    </Col>
-                    <Col lg={3} className={"mb-4 mb-md-2"}>
-                        <select
-                            id={`projects-${projects.id}-startYear`}
-                            name={`projects[${index}].startYear`}
-                            className={inputFieldClassName + " sm:text-sm"}
-                            onChange={resumeFormFormik.handleChange}
-                            value={projectList[index]?.startYear || ""}
-                            defaultValue={YEARS[0]}
-                        >
-                            {YEARS.map((year) => (
-                                <option key={year} value={year}>
-                                    {year}
-                                </option>
-                            ))}
-                        </select>
-                    </Col>
-                </Row>
+            <div className="grid gap-2 bg-white py-2 pl-4 pr-2">
+                <MonthYearPicker
+                    label="Start"
+                    idPrefix={`projects-${projects.id}`}
+                    monthField={`projects[${index}].startMonth`}
+                    yearField={`projects[${index}].startYear`}
+                    monthValue={projectList[index]?.startMonth}
+                    yearValue={projectList[index]?.startYear}
+                    setFieldValue={resumeFormFormik.setFieldValue}
+                    inputFieldClassName={inputFieldClassName}
+                />
 
-                <Row className="
-                row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-12
-                row-gap-3 row-gap-sm-3 row-gap-md-3 row-gap-lg-0"
-                >
-                    <Col lg={2} className={"flex justify-start"}>
-                        <span className="text-sm font-normal text-gray-500">End</span>
-                    </Col>
-                    <Col lg={3}>
-                        <select
-                            id={`projects-${projects.id}-endMonth`}
-                            name={`projects[${index}].endMonth`}
-                            className={inputFieldClassName + " sm:text-sm"}
-                            onChange={resumeFormFormik.handleChange}
-                            value={projectList[index]?.endMonth || ""}
-                            defaultValue={MONTHS[0]}
-                        >
-                            {MONTHS.map((month) => (
-                                <option key={month} value={month}>
-                                    {month}
-                                </option>
-                            ))}
-                        </select>
-                    </Col>
-                    <Col lg={3}  className={"mb-2 mb-md-0"}>
-                        <select
-                            id={`projects-${projects.id}-endYear`}
-                            name={`projects[${index}].endYear`}
-                            className={inputFieldClassName + " sm:text-sm"}
-                            onChange={resumeFormFormik.handleChange}
-                            value={projectList[index]?.endYear || ""}
-                            defaultValue={YEARS[0]}
-                        >
-                            {YEARS.map((year) => (
-                                <option key={year} value={year}>
-                                    {year}
-                                </option>
-                            ))}
-                        </select>
-                    </Col>
-                </Row>
+                <MonthYearPicker
+                    label="End"
+                    idPrefix={`projects-${projects.id}`}
+                    monthField={`projects[${index}].endMonth`}
+                    yearField={`projects[${index}].endYear`}
+                    monthValue={projectList[index]?.endMonth}
+                    yearValue={projectList[index]?.endYear}
+                    setFieldValue={resumeFormFormik.setFieldValue}
+                    inputFieldClassName={inputFieldClassName}
+                />
             </div>
             <div className="bg-white mb-1">
                 {projects.projectDetails?.map((_: any, projectDetailIndex: number) => (

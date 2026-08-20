@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Col, Row} from "react-bootstrap";
+import {colors} from "../../../../styles/theme";
 
 interface ContactInfoSectionProps {
     resumeFormFormik: any; // Replace 'any' with the type from your Formik configuration.
@@ -26,126 +26,68 @@ export const ContactInfoSection: React.FC<ContactInfoSectionProps> = ({
     const shouldShowLinkInput = contactInfo.infoTitle === "LinkedIn" || contactInfo.infoTitle === "GitHub";
     const shouldShowInfoDetailsInput = ["Email", "Phone", "Location"].includes(contactInfo.infoTitle);
 
+    const contactTypeOptions = ["Email", "Phone", "Location", "GitHub", "LinkedIn"];
+    const fieldLabel = shouldShowLinkInput ? "Profile link" : "Contact details";
+    const fieldPlaceholder = shouldShowLinkInput
+        ? `${contactInfo.infoTitle} URL`
+        : (contactInfo.infoTitle || "Details");
+
     return (
-        <div>
-            <Row className=" bg-white mx-0 p-2
-            row row-cols-4 row-cols-sm-4 row-cols-md-4 row-cols-lg-12
-            row-gap-3 row-gap-sm-3 row-gap-md-3 row-gap-lg-0
-            ">
-                <Col lg={2}>
-                    <label className="flex items-center mr-4 sm:text-sm">
-                        <input
-                            id={`contactInfo-${index}-infoTitle-email`}
-                            name={`contactInfo.${index}.infoTitle`}
-                            type="radio"
-                            className="mr-2"
-                            onChange={resumeFormFormik.handleChange}
-                            value="Email"
-                            checked={contactInfo.infoTitle === "Email"}
-                        />
-                        Email
-                    </label>
-                </Col>
-                <Col lg={2}>
-                    <label className="flex items-center mr-4 sm:text-sm">
-                        <input
-                            id={`contactInfo-${index}-infoTitle-phone`}
-                            name={`contactInfo.${index}.infoTitle`}
-                            type="radio"
-                            className="mr-2"
-                            onChange={resumeFormFormik.handleChange}
-                            value="Phone"
-                            checked={contactInfo.infoTitle === "Phone"}
-                        />
-                        Phone
-                    </label>
-                </Col>
-                <Col lg={3}>
-                    <label className="flex items-center mr-4 sm:text-sm">
-                        <input
-                            id={`contactInfo-${index}-infoTitle-location`}
-                            name={`contactInfo.${index}.infoTitle`}
-                            type="radio"
-                            className="mr-2"
-                            onChange={resumeFormFormik.handleChange}
-                            value="Location"
-                            checked={contactInfo.infoTitle === "Location"}
-                        />
-                        Location
-                    </label>
-                </Col>
-                <Col lg={2}>
-                    <label className="flex items-center mr-4 sm:text-sm">
-                        <input
-                            id={`contactInfo-${index}-infoTitle-github`}
-                            name={`contactInfo.${index}.infoTitle`}
-                            type="radio"
-                            className="mr-2"
-                            onChange={resumeFormFormik.handleChange}
-                            value="GitHub"
-                            checked={contactInfo.infoTitle === "GitHub"}
-                        />
-                        GitHub
-                    </label>
-                </Col>
-                <Col lg={3}>
-                    <label className="flex items-center mr-4 sm:text-sm">
-                        <input
-                            id={`contactInfo-${index}-infoTitle-linkedin`}
-                            name={`contactInfo.${index}.infoTitle`}
-                            type="radio"
-                            className="mr-2"
-                            onChange={resumeFormFormik.handleChange}
-                            value="LinkedIn"
-                            checked={contactInfo.infoTitle === "LinkedIn"}
-                        />
-                        LinkedIn
-                    </label>
-                </Col>
-            </Row>
+        <div
+            className="border border-[#dfe4ee] bg-transparent p-3 transition-all duration-200"
+            onMouseEnter={() => setIsIconVisible(true)}
+            onMouseLeave={() => setIsIconVisible(false)}
+        >
+            <div className="mb-3 flex items-start justify-between gap-2">
+                <div>
+                    <div className="flex flex-wrap gap-1.5">
+                        {contactTypeOptions.map((option) => {
+                            const checked = contactInfo.infoTitle === option;
 
-            <div
-                className="flex items-center mb-1 bg-white"
-                onMouseEnter={() => setIsIconVisible(true)}
-                onMouseLeave={() => setIsIconVisible(false)}
-            >
-                {shouldShowLinkInput && (
-                    <div className="bg-white flex-1 mr-2">
-                        <input
-                            id={`contactInfo-${index}-infoLink`}
-                            name={`contactInfo.${index}.infoLink`}
-                            type="url"
-                            placeholder={contactInfo.infoTitle + " Url" || "Link"}
-                            className={`${inputFieldClassName} font-normal`}
-                            onChange={resumeFormFormik.handleChange}
-                            value={contactInfo.infoLink || ""}
-                        />
+                            return (
+                                <label
+                                    key={option}
+                                    className={`inline-flex cursor-pointer items-center rounded-md border px-2.5 py-1 text-[11px] font-semibold leading-5 transition-all duration-200 ${
+                                        checked
+                                            ? "border-[#2170e4] bg-[#eef4fc] text-[#1f4f9c] shadow-[0_1px_3px_rgba(33,112,228,0.18)]"
+                                            : "border-[#dfe4ee] bg-white text-[#45464d] hover:border-[#bfd5ff] hover:text-[#161c22]"
+                                    }`}
+                                >
+                                    <input
+                                        id={`contactInfo-${index}-infoTitle-${option.toLowerCase()}`}
+                                        name={`contactInfo.${index}.infoTitle`}
+                                        type="radio"
+                                        className="sr-only"
+                                        onChange={resumeFormFormik.handleChange}
+                                        value={option}
+                                        checked={checked}
+                                    />
+                                    <span>{option}</span>
+                                </label>
+                            );
+                        })}
                     </div>
-                )}
+                </div>
 
-                {shouldShowInfoDetailsInput && (
-                    <div className="bg-white flex-1 mr-2">
-                        <input
-                            id={`contactInfo-${index}-infoDetails`}
-                            name={`contactInfo.${index}.infoDetails`}
-                            type="text"
-                            placeholder={contactInfo.infoTitle || "Details"}
-                            className={`${inputFieldClassName} font-normal`}
-                            onChange={resumeFormFormik.handleChange}
-                            value={contactInfo.infoDetails || ""}
-                        />
-                    </div>
-                )}
-
-                {isIconVisible && contactInfoList.length > 1 && (
+                <button
+                    type="button"
+                    onClick={removeContactInfo}
+                    disabled={contactInfoList.length <= 1}
+                    className={`cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-md border transition-all duration-200 ${
+                        contactInfoList.length > 1
+                            ? `${isIconVisible ? "opacity-100" : "opacity-70"}`
+                            : "cursor-not-allowed border-[#eceff5] bg-[#f6f7fb] text-[#a9afbb]"
+                    }`}
+                    aria-label="Remove contact info"
+                    style={contactInfoList.length > 1 ? {color: colors.error, borderColor: colors.error} : undefined}
+                >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
                         strokeWidth="1.5"
                         stroke="currentColor"
-                        className="w-6 h-6 text-gray-500 cursor-pointer mr-3"
-                        onClick={removeContactInfo}
+                        className="h-4 w-4"
                     >
                         <path
                             strokeLinecap="round"
@@ -153,6 +95,34 @@ export const ContactInfoSection: React.FC<ContactInfoSectionProps> = ({
                             d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
                         />
                     </svg>
+                </button>
+            </div>
+
+            <div className="border border-[#e7ebf3] bg-white p-2.5">
+                <p className="mb-1 text-[11px] font-medium text-[#6b7280]">{fieldLabel}</p>
+
+                {shouldShowLinkInput && (
+                    <input
+                        id={`contactInfo-${index}-infoLink`}
+                        name={`contactInfo.${index}.infoLink`}
+                        type="url"
+                        placeholder={fieldPlaceholder}
+                        className={`${inputFieldClassName} mt-0 font-normal`}
+                        onChange={resumeFormFormik.handleChange}
+                        value={contactInfo.infoLink || ""}
+                    />
+                )}
+
+                {shouldShowInfoDetailsInput && (
+                    <input
+                        id={`contactInfo-${index}-infoDetails`}
+                        name={`contactInfo.${index}.infoDetails`}
+                        type="text"
+                        placeholder={fieldPlaceholder}
+                        className={`${inputFieldClassName} mt-0 font-normal`}
+                        onChange={resumeFormFormik.handleChange}
+                        value={contactInfo.infoDetails || ""}
+                    />
                 )}
             </div>
         </div>

@@ -1,29 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, Navigate, Outlet } from 'react-router-dom';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from "../../Firebase";
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import ROUTES from '../../utils/Routes';
+import { useAuth } from './AuthProvider';
 
-export const AuthGuard: React.FC = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-    const location = useLocation();
+export const AuthGuard = () => {
+  const auth = useAuth();
+  const location = useLocation();
 
-    useEffect(() => {
-        // Listen for authentication state changes
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setIsAuthenticated(!!user);
-        });
+  if (!auth?.isAuthReady) {
+    return null;
+  }
 
-        return () => unsubscribe();
-    }, []);
+  if (!auth?.isAuthenticated) {
+    return <Navigate to={ROUTES.LOGIN} replace state={{ from: location }} />;
+  }
 
-    if (isAuthenticated === null) {
-        //Avoid redirecting until authentication state is determined
-        return <div>Loading...</div>;
-    }
-
-    return isAuthenticated ? (
-        <Outlet />
-    ) : (
-        <Navigate to="/login" state={{ from: location }} replace />
-    );
+  return <Outlet />;
 };

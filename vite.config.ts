@@ -7,54 +7,62 @@ import path from 'path';
 import child_process from 'child_process';
 import { env } from 'process';
 
-const baseFolder =
-    env.APPDATA !== undefined && env.APPDATA !== ''
-        ? `${env.APPDATA}/ASP.NET/https`
-        : `${env.HOME}/.aspnet/https`;
+const getHttpsForLocalDev = () => {
+    const baseFolder =
+        env.APPDATA !== undefined && env.APPDATA !== ''
+            ? `${env.APPDATA}/ASP.NET/https`
+            : `${env.HOME}/.aspnet/https`;
 
-const certificateName = 'appdock.client';
-const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
-const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
+    const certificateName = 'appdock.client';
+    const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
+    const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
 
-if (!fs.existsSync(baseFolder)) {
-    fs.mkdirSync(baseFolder, { recursive: true });
-}
-
-if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
-    if (0 !== child_process.spawnSync('dotnet', [
-        'dev-certs', 'https',
-        '--export-path', certFilePath,
-        '--format', 'Pem',
-        '--no-password',
-    ], { stdio: 'inherit' }).status) {
-        throw new Error('Could not create certificate.');
+    if (!fs.existsSync(baseFolder)) {
+        fs.mkdirSync(baseFolder, { recursive: true });
     }
-}
+
+    if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
+        if (0 !== child_process.spawnSync('dotnet', [
+            'dev-certs', 'https',
+            '--export-path', certFilePath,
+            '--format', 'Pem',
+            '--no-password',
+        ], { stdio: 'inherit' }).status) {
+            throw new Error('Could not create certificate.');
+        }
+    }
+
+    return {
+        key: fs.readFileSync(keyFilePath),
+        cert: fs.readFileSync(certFilePath),
+    };
+};
 
 const target = env.ASPNETCORE_URLS
     ? env.ASPNETCORE_URLS.split(';').find(u => u.startsWith('http://')) ?? env.ASPNETCORE_URLS.split(';')[0]
     : 'http://localhost:5024';
 
-export default defineConfig({
-    plugins: [tailwindcss(), react()],
-    resolve: {
-        alias: {
-            '@': fileURLToPath(new URL('./src', import.meta.url)),
-        },
-    },
-    base: '/',
-    server: {
-        proxy: {
-            '^/AppDock/api': {
-                target,
-                changeOrigin: true,
-                rewrite: (p) => p.replace('/AppDock/api', '/api'),
+export default defineConfig(({ command }) => {
+    const isLocalServe = command === 'serve' && !env.VERCEL;
+
+    return {
+        plugins: [tailwindcss(), react()],
+        resolve: {
+            alias: {
+                '@': fileURLToPath(new URL('./src', import.meta.url)),
             },
         },
-        port: parseInt(env.DEV_SERVER_PORT || '62656'),
-        https: {
-            key: fs.readFileSync(keyFilePath),
-            cert: fs.readFileSync(certFilePath),
+        base: '/',
+        server: {
+            proxy: {
+                '^/AppDock/api': {
+                    target,
+                    changeOrigin: true,
+                    rewrite: (p) => p.replace('/AppDock/api', '/api'),
+                },
+            },
+            port: parseInt(env.DEV_SERVER_PORT || '62656'),
+            https: isLocalServe ? getHttpsForLocalDev() : undefined,
         },
-    },
+    };
 });

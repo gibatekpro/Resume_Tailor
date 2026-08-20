@@ -15,9 +15,9 @@ export const ResumePrintPage: React.FC<ResumePrintPageProps> = ({ setHideNavbar,
     const contentRef = useRef<HTMLDivElement>(null);
 
     const handlePrint = useReactToPrint({
-        content: () => contentRef.current,
+        contentRef,
         documentTitle: applicationData.openAIDocumentTitle,
-        onBeforePrint: () => {
+        onBeforePrint: async () => {
             // setHideButton(true);
         },
         onAfterPrint: () => {

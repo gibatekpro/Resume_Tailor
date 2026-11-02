@@ -1,40 +1,22 @@
-import React, {useEffect} from "react";
+import React from "react";
 import type { ResumeInfo } from "../../models/ResumeInfo";
 import {ResumeStyleCStyle} from "./styles/ResumeStyleCStyle";
 
 
 export const LanguageSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
-    useEffect(()=>{
-
-    },[resumeData]);
-
     return (
-        <div>
-            <h2 style={{
-                ...ResumeStyleCStyle.h2,
-                ...ResumeStyleCStyle.boldText,
-                ...ResumeStyleCStyle.initialCaps
-            }}>Languages</h2>
-            <div style={{
-                ...ResumeStyleCStyle.mediumSpacing
-            }}></div>
-            {resumeData.languages && resumeData.languages.length > 0 ? (
-                resumeData.languages.map((language, index) => (
-                    <div key={index}>
-                        <span style={{
-                            ...ResumeStyleCStyle.text,
-                            ...ResumeStyleCStyle.boldText,
-                        }}>{language.name}</span>
-                        <span style={{
-                            ...ResumeStyleCStyle.text,
-                        }}> ({language.proficiency})</span>
-                    </div>
-
-                ))
-            ) : (
-                <p>No languages available</p>
-            )}
-        </div>
+        <section style={{...ResumeStyleCStyle.section, ...ResumeStyleCStyle.entry}}>
+            <h2 className="cv-section-title" style={ResumeStyleCStyle.h2}>Languages</h2>
+            <p style={ResumeStyleCStyle.text}>
+                {resumeData.languages?.map((language, index) => (
+                    <span key={index}>
+                        {index > 0 && "  ·  "}
+                        <span style={ResumeStyleCStyle.boldText}>{language.name}</span>
+                        {language.proficiency && ` (${language.proficiency})`}
+                    </span>
+                ))}
+            </p>
+        </section>
     );
 
 };

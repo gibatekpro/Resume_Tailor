@@ -39,11 +39,17 @@ export const ResumePrintPage: React.FC<ResumePrintPageProps> = ({ setHideNavbar,
             localStorage.setItem(LOCAL_STORAGE_APP_TITLE, applicationData.openAIDocumentTitle);
         }
 
-        const timer = window.setTimeout(() => {
-            handlePrint();
-        }, 1200);
+        // Wait for the CV's web fonts, otherwise the PDF can fall back to system fonts and reflow.
+        let timer: number | undefined;
+        let cancelled = false;
+        void document.fonts.ready.then(() => {
+            if (!cancelled) {
+                timer = window.setTimeout(() => handlePrint(), 400);
+            }
+        });
 
         return () => {
+            cancelled = true;
             window.clearTimeout(timer);
             setHideNavbar?.(false);
             localStorage.setItem(LOCAL_STORAGE_APP_TITLE, APP_TITLE);

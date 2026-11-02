@@ -1,146 +1,104 @@
-@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300');
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Playpen+Sans:wght@100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
-:root {
-    /*//////////////////////*/
-    --large-text-color-rw: #232e53;
-    --sections-text-color-rw: #232e53;
-    --sections-spacing: 5px;
-    --main-row-top-spacing: 20px;
-    --main-row-bottom-spacing: 2px;
-    --sub-row-spacing: 10px;
+/* Style A: classic serif, section and employer on the left, detail on the right. Scoped so it can't leak into the app. */
+.cv-a {
+    --cv-a-ink: #1f2433;
+    --cv-a-accent: #232e53;
+    --cv-a-muted: #5b6070;
+    --cv-a-rule: #b8adfb;
+    --cv-a-left: 40mm;
+
+    padding: 12mm var(--cv-page-gutter) 10mm;
+    font-family: "Crimson Text", Georgia, "Times New Roman", serif;
+    font-size: 11.5pt;
+    line-height: 1.32;
+    color: var(--cv-a-ink);
 }
 
-header {
-    text-align: start;
-}
-
-h1 {
-    font-size: 50px;
-    font-family: "Crimson Text", serif;
+.cv-a .cv-a-header h1 {
+    font-size: 27pt;
     font-weight: 700;
-    font-style: normal;
-    padding: 0;
-    margin: 0;
-    color: #232e53;
+    line-height: 1.05;
+    color: var(--cv-a-accent);
 }
 
-h2 {
-    font-size: 20px;
-    margin-bottom: 10px;
+.cv-a .cv-a-header .cv-a-profession {
+    margin-top: 1mm;
+    font-size: 14pt;
+    font-weight: 600;
+    color: var(--cv-a-accent);
 }
 
-p, li {
-    font-size: 16px;
-    line-height: 1.5;
-}
-.header-container {
-    margin-bottom: var(--sections-spacing);
-}
-
-.summary-container{
-    text-align: start;
-    margin-bottom: var(--sections-spacing);
+.cv-a .cv-a-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5mm 5mm;
+    margin-top: 2mm;
+    font-size: 10.5pt;
+    color: var(--cv-a-muted);
 }
 
-.summary-container p{
-    font-size: 18px;
-    font-family: "Crimson Text", serif;
-    font-weight: 400;
-    font-style: normal;
-    padding: 0;
-    margin: 0;
-    text-align: justify;
+.cv-a .cv-a-contact span {
+    white-space: nowrap;
 }
 
-.contactInfo-container{
-    text-align: start;
+.cv-a .cv-a-summary {
+    margin-top: 3.5mm;
 }
 
-.contactInfo-container p{
-    font-size: 16px;
-    font-family: "Crimson Text", serif;
-    font-weight: 400;
-    font-style: normal;
-    padding: 0;
-    margin-bottom: var(--sections-spacing);
-    text-align: justify;
-    color: dimgray;
+.cv-a .cv-a-section {
+    margin-top: 5mm;
 }
 
-.subSections-container {
-    padding-left: 0;
-    padding-bottom: 0;
-    padding-top: 0;
-}
-
-.main-row {
-    padding-bottom: 0;
-    margin-bottom: var(--main-row-bottom-spacing);
-    margin-top: var(--main-row-top-spacing);
-    /*border: 1px solid black;*/
-}
-
-.main-row .left-col h2{
-    font-size: 25px;
-    font-family: "Crimson Text", serif;
+.cv-a .cv-section-title {
+    padding-bottom: 1mm;
+    margin-bottom: 2.5mm;
+    border-bottom: 1.5px solid var(--cv-a-rule);
+    font-size: 13.5pt;
     font-weight: 700;
-    font-style: normal;
-    text-align: start;
-    color: var(--sections-text-color-rw);
-    margin-bottom: 0;
+    letter-spacing: 0.02em;
+    color: var(--cv-a-accent);
 }
 
-.main-row .right-col{
-    font-size: 18px;
-    font-family: "Crimson Text", serif;
-    font-weight: 400;
-    font-style: normal;
-    text-align: left;
-    padding-left: 20px;
-    /*color: dimgray;*/
+.cv-a .cv-a-row {
+    display: grid;
+    grid-template-columns: var(--cv-a-left) 1fr;
+    column-gap: 5mm;
+    margin-bottom: 3mm;
 }
 
-.sub-row{
-    padding-bottom: 0;
-    margin-bottom: var(--sub-row-spacing);
-    /*border: 1px solid black;*/
-}
-
-.sub-row .left-col h3{
-    font-size: 18px;
-    font-family: "Crimson Text", serif;
+.cv-a .cv-a-row h3 {
+    font-size: 11.5pt;
     font-weight: 700;
-    font-style: normal;
-    text-align: start;
-    color: var(--sections-text-color-rw);
-    margin-bottom: 2px;
+    line-height: 1.2;
+    color: var(--cv-a-accent);
 }
 
-.sub-row .left-col text{
-    font-size: 16px;
-    font-family: "Crimson Text", serif;
-    font-weight: 400;
-    font-style: normal;
-    text-align: start;
-    color: dimgray;
+.cv-a .cv-a-period {
+    margin-top: 0.5mm;
+    font-size: 10pt;
+    color: var(--cv-a-muted);
 }
 
-.sub-row .right-col{
-    font-size: 18px;
-    font-family: "Crimson Text", serif;
-    font-weight: 400;
-    font-style: normal;
-    text-align: left;
-    padding-left: 20px;
-    /*color: dimgray;*/
+.cv-a .cv-a-role {
+    font-weight: 700;
 }
 
-.sub-row .right-col h4{
-    font-size: 18px;
+.cv-a .cv-a-row .cv-bullets {
+    margin-top: 0.5mm;
 }
 
-.sub-row a{
-    text-decoration: none;
-    color: inherit;
+.cv-a .cv-a-row .cv-bullets li + li {
+    margin-top: 0.4mm;
+}
+
+.cv-a .cv-a-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2mm 4.5mm;
+}
+
+.cv-a .cv-a-skills span {
+    border-bottom: 1.5px solid var(--cv-a-rule);
+    white-space: nowrap;
 }

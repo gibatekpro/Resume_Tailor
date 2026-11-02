@@ -14,6 +14,7 @@ import AppLayout from "../components/shared/AppLayout";
 import TopNav from "../components/shared/TopNav";
 import {colors, shadows} from "../styles/theme";
 import PageLoadingOverlay from "../components/shared/PageLoadingOverlay";
+import {GenerationDetails} from "../components/shared/GenerationDetails";
 
 const categorizeApplications = (applications: JobApplicationsResponse[]) => {
     const todayArr: JobApplicationsResponse[] = [];
@@ -348,6 +349,8 @@ export const MyJobApplications: React.FC = () => {
                                             <div style={styles.jobInfo.normalText}>
                                                 <strong>Summary:</strong> {selectedApplication.data.openAISimpleJobDescription}
                                             </div>
+
+                                            <GenerationDetails application={selectedApplication.data}/>
                                         </div>
                                     ) : (
                                         <div className="text-sm" style={{color: colors.onSurfaceVariant}}>

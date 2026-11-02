@@ -5,5 +5,6 @@ export interface OpenAIInstruction {
     responseFormat?: string,
     rules?: string[],
     jobDescriptionData?: string,
+    model?: string,
     resumeInfo?: ResumeInfo,
 }

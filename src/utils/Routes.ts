@@ -21,6 +21,7 @@ const ROUTES = {
   adminUsers: '/admin/users',
   resumePrintPage: '/resume-print',
   applicationPreview: '/application-preview',
+  settings: '/settings',
 
   HOME: '/',
   TEST: '/test',
@@ -34,6 +35,7 @@ const ROUTES = {
   ADMIN_USERS: '/admin/users',
   RESUME_PRINT_PAGE: '/resume-print',
   APPLICATION_PREVIEW: '/application-preview',
+  SETTINGS: '/settings',
 } as const;
 
 export default ROUTES;

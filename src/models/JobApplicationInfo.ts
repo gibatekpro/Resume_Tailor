@@ -1,4 +1,5 @@
 import type {ResumeInfo} from './ResumeInfo';
+import type {GenerationInfo} from './GenerationInfo';
 
 export interface JobApplicationInfo {
     date?: string,
@@ -9,6 +10,8 @@ export interface JobApplicationInfo {
     openAIExpectedSalary?: string,
     openAIJobLocation?: string,
     openAISimpleJobDescription?: string,
+    openAIGaps?: string[],
+    generationInfo?: GenerationInfo,
     resumeStyle?: string,
     resumeInfo?: ResumeInfo,
 }

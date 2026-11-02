@@ -1,32 +1,19 @@
 import React from 'react';
-import '../../styles/resumeStyleA.css';
 import type { ResumeInfo } from "../../models/ResumeInfo";
+import {contactText} from "../../utils/resumeFormat";
 
 export const ContactInfoSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
-
     return (
-        <div className="contactInfo-container">
-            <p>
-                {resumeData.contactInfo?.map((info, index) => (
-                    info.infoLink ? (
-                        <span key={index}>
-                            {/* eslint-disable-next-line eqeqeq */}
-                        {index !== 0 ? " | " : ""} <a href={info.infoLink} target="_blank"
-                                                      rel="noopener noreferrer"><text style={{
-                            fontWeight: "bold",
-                        }}>{info.infoTitle}: </text> 
-                            {info.infoLink}</a>
-                    </span>
+        <p className="cv-a-contact">
+            {resumeData.contactInfo?.map((info, index) => (
+                <span key={index}>
+                    {info.infoLink ? (
+                        <a href={info.infoLink} target="_blank" rel="noopener noreferrer">{contactText(info)}</a>
                     ) : (
-                        <span key={index}>
-                            {index !== 0 ? " | " : ""} <span style={{
-                                fontWeight: "bold",
-                        }}>{info.infoTitle}: </span> {info.infoDetails}
-                    </span>
-                    )
-                ))}
-            </p>
-        </div>
+                        contactText(info)
+                    )}
+                </span>
+            ))}
+        </p>
     );
 };
-

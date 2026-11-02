@@ -10,6 +10,7 @@ import { JobApplicationPreviewPage } from './pages/JobApplicationPreviewPage';
 import { ResumePrintPage } from './pages/ResumePrintPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AdminUsersPage } from './pages/AdminUsersPage';
+import { SettingsPage } from './pages/SettingsPage';
 import AppRoutes from './utils/Routes';
 import { AuthGuard } from './context/auth/AuthGuard';
 
@@ -24,6 +25,7 @@ export default function App() {
         <Route path={AppRoutes.myJobApplications} element={<MyJobApplications />} />
         <Route path={AppRoutes.profile} element={<ProfilePage />} />
         <Route path={AppRoutes.adminUsers} element={<AdminUsersPage />} />
+        <Route path={AppRoutes.settings} element={<SettingsPage />} />
         <Route path={AppRoutes.applicationPreview} element={<JobApplicationPreviewPage />} />
         <Route path={AppRoutes.resumePrintPage} element={<ResumePrintPage />} />
       </Route>

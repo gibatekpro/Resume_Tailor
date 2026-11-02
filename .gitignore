@@ -25,3 +25,6 @@ yarn-debug.log*
 yarn-error.log*
 src/utils/ApplicationProperties.ts
 /.vscode
+
+# build output (Vercel builds on deploy)
+/dist

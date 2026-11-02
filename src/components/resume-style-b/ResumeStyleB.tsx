@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
+import '../../styles/resumeBase.css';
 import '../../styles/resumeStyleB.css';
-import {Row} from "react-bootstrap";
-import {CustomCol} from "../../custom_tags/CustomCol";
 import {SkillsSection} from "./SkillsSection";
 import {ContactInfoSection} from "./ContactInfoSection";
 import {HeaderSection} from "./HeaderSection";
@@ -12,89 +11,29 @@ import {ProjectsSection} from "./ProjectsSection";
 import {AvatarSection} from "./AvatarSection";
 import {LanguageSection} from "./LanguageSection";
 import type { ResumeInfo } from "../../models/ResumeInfo";
+import {cleanResume} from "../../utils/resumeFormat";
 
 
 export const ResumeStyleB: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =>{
-
-    const [hasProjects, setHasProjects] = useState(!!resumeData.projects && resumeData.projects.length > 0);
-    const [hasLanguage, setHasLanguage] = useState(!!resumeData.languages && resumeData.languages.length > 0);
-    const [hasSkills, setHasSkills] = useState(!!resumeData.skills && resumeData.skills.length > 0);
-    const [hasWorkExperience, setHasWorkExperience] = useState(!!resumeData.workExperience && resumeData.workExperience.length > 0);
-    const [hasEducation, setHasEducation] = useState(!!resumeData.education && resumeData.education.length > 0);
-    const [hasContactInfo, setHasContactInfo] = useState(!!resumeData.contactInfo && resumeData.contactInfo.length > 0);
-
-    useEffect(() => {
-        // Update state for sections visibility
-
-        setHasProjects(!!resumeData.projects && resumeData.projects.length > 0);
-        setHasLanguage(!!resumeData.languages && resumeData.languages.length > 0);
-        setHasSkills(!!resumeData.skills && resumeData.skills.length > 0);
-        setHasWorkExperience(!!resumeData.workExperience && resumeData.workExperience.length > 0);
-        setHasEducation(!!resumeData.education && resumeData.education.length > 0);
-        setHasContactInfo(!!resumeData.contactInfo && resumeData.contactInfo.length > 0);
-    }, [resumeData]);
+    const resume = cleanResume(resumeData);
 
     return(
-        <div className={"style-b-main-container"} style={{
-            // ...DESIGN_BORDER,
-            borderColor: "#015a84"
-        }}>
-            <Row className={"main-row"} style={{
-                border: '1px solid #015a84',
-                paddingLeft: "0",
-                margin:"0",
-                display: 'flex',
-                flexWrap: 'nowrap',
-            }}>
-                <CustomCol className={"left-col"} isLeft={true}
-                    style={{
-                        // ...DESIGN_BORDER,
-                        // backgroundColor: "#015a84"
-                        flex: '0 0 33.3333%',
-                        maxWidth: '33.3333%',
-                    }}>
-                    <AvatarSection/>
-                    {hasContactInfo && (
-                        <ContactInfoSection
-                            resumeData={resumeData}
-                        />
-                    )}
-                    {hasSkills && (
-                        <SkillsSection
-                            resumeData={resumeData}/>
-                    )}
-                    {hasLanguage && (
-                        <LanguageSection
-                            resumeData={resumeData}/>
-                    )}
-                </CustomCol>
-                <CustomCol className={"right-col"} isLeft={false}
-                    style={{
-                        // ...DESIGN_BORDER
-                        flex: '0 0 66.6667%',
-                        maxWidth: '66.6667%',
-                        minWidth: 0,
-                    }}>
-                    <HeaderSection
-                        resumeData={resumeData}/>
-                    <div className={"sub-right-col"}>
-                        <SummarySection
-                            resumeData={resumeData}/>
-                        {hasWorkExperience && (
-                            <WorkExperienceSection
-                                resumeData={resumeData}/>
-                        )}
-                        {hasEducation && (
-                            <EducationSection
-                                resumeData={resumeData}/>
-                        )}
-                        {hasProjects && (
-                            <ProjectsSection
-                                resumeData={resumeData}/>
-                        )}
-                    </div>
-                </CustomCol>
-            </Row>
+        <div className="cv-page cv-b">
+            <aside className="cv-b-side">
+                <AvatarSection resumeData={resume}/>
+                {resume.contactInfo!.length > 0 && <ContactInfoSection resumeData={resume}/>}
+                {resume.skills!.length > 0 && <SkillsSection resumeData={resume}/>}
+                {resume.languages!.length > 0 && <LanguageSection resumeData={resume}/>}
+            </aside>
+            <main className="cv-b-main">
+                <HeaderSection resumeData={resume}/>
+                <div className="cv-b-body">
+                    <SummarySection resumeData={resume}/>
+                    {resume.workExperience!.length > 0 && <WorkExperienceSection resumeData={resume}/>}
+                    {resume.projects!.length > 0 && <ProjectsSection resumeData={resume}/>}
+                    {resume.education!.length > 0 && <EducationSection resumeData={resume}/>}
+                </div>
+            </main>
         </div>
     );
 }

@@ -1,6 +1,6 @@
 import React from "react";
+import '../../styles/resumeBase.css';
 import type { ResumeInfo } from "../../models/ResumeInfo";
-import {Col, Row} from "react-bootstrap";
 import {HeaderSection} from "./HeaderSection";
 import {ResumeStyleCStyle} from "./styles/ResumeStyleCStyle";
 import {ContactInfoSection} from "./ContactInfoSection";
@@ -10,53 +10,24 @@ import {ProjectsSection} from "./ProjectsSection";
 import {SkillsSection} from "./SkillsSection";
 import {EducationSection} from "./EducationSection";
 import {LanguageSection} from "./LanguageSection";
+import {cleanResume} from "../../utils/resumeFormat";
 
 
 export const ResumeStyleC: React.FunctionComponent<{resumeData: ResumeInfo}> = ({resumeData}) => {
+    const resume = cleanResume(resumeData);
 
     return(
-        <div style={
-            ResumeStyleCStyle.mainContainer
-        }>
-            <Col style={{}}>
-                <Row>
-                    <Col defaultValue={6} style={
-                        ResumeStyleCStyle.leftCol
-                    }>
-                        <HeaderSection resumeData={resumeData}/>
-                    </Col>
-
-                    <Col defaultValue={6} style={
-                        ResumeStyleCStyle.rightCol
-                    }>
-                        <ContactInfoSection resumeData={resumeData}/>
-                    </Col>
-                </Row>
-                <div style={{
-                    ...ResumeStyleCStyle.largeSpacing
-                }}></div>
-                <SummarySection resumeData={resumeData}/>
-                <div style={{
-                    ...ResumeStyleCStyle.largeSpacing
-                }}></div>
-                <SkillsSection resumeData={resumeData}/>
-                <div style={{
-                    ...ResumeStyleCStyle.largeSpacing
-                }}></div>
-                <WorkExperienceSection resumeData={resumeData}/>
-                <div style={{
-                    ...ResumeStyleCStyle.largeSpacing
-                }}></div>
-                <ProjectsSection resumeData={resumeData}/>
-                <div style={{
-                    ...ResumeStyleCStyle.largeSpacing
-                }}></div>
-                <EducationSection resumeData={resumeData}/>
-                <div style={{
-                    ...ResumeStyleCStyle.largeSpacing
-                }}></div>
-                <LanguageSection resumeData={resumeData}/>
-            </Col>
+        <div className="cv-page cv-c" style={ResumeStyleCStyle.mainContainer}>
+            <div style={ResumeStyleCStyle.header}>
+                <HeaderSection resumeData={resume}/>
+                <ContactInfoSection resumeData={resume}/>
+            </div>
+            <SummarySection resumeData={resume}/>
+            {resume.skills!.length > 0 && <SkillsSection resumeData={resume}/>}
+            {resume.workExperience!.length > 0 && <WorkExperienceSection resumeData={resume}/>}
+            {resume.projects!.length > 0 && <ProjectsSection resumeData={resume}/>}
+            {resume.education!.length > 0 && <EducationSection resumeData={resume}/>}
+            {resume.languages!.length > 0 && <LanguageSection resumeData={resume}/>}
         </div>
     )
 }

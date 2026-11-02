@@ -1,28 +1,22 @@
 import React from "react";
 import type { ResumeInfo } from "../../models/ResumeInfo";
 import {ResumeStyleCStyle} from "./styles/ResumeStyleCStyle";
+import {contactText} from "../../utils/resumeFormat";
 
 export const ContactInfoSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
 
     return (
-        <div>
+        <div style={ResumeStyleCStyle.contactList}>
             {resumeData.contactInfo?.map((info, index) => (
-                info.infoLink ? (
-                    <p key={index} style={ResumeStyleCStyle.contactInfoP}>
-                        <a
-                            href={info.infoLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={ResumeStyleCStyle.contactInfoA}
-                        >
-                            {info.infoLink}
+                <p key={index} style={ResumeStyleCStyle.contactInfoP}>
+                    {info.infoLink ? (
+                        <a href={info.infoLink} target="_blank" rel="noopener noreferrer" style={ResumeStyleCStyle.contactInfoA}>
+                            {contactText(info)}
                         </a>
-                    </p>
-                ) : (
-                    <p key={index}  style={ResumeStyleCStyle.contactInfoP}>
-                        {info.infoDetails}
-                    </p>
-                )
+                    ) : (
+                        contactText(info)
+                    )}
+                </p>
             ))}
         </div>
     );

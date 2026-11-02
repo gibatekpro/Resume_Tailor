@@ -1,94 +1,123 @@
 import type { CSSProperties } from "react";
 import {textColor} from "../../../utils/applicationData";
 
+const mutedColor = '#5b6070';
+const ruleColor = '#d5d9e3';
+
+// Style C: clean single-column sans serif. Sizes are in points so the PDF matches the preview.
 export const ResumeStyleCStyle: {
     mainContainer: CSSProperties;
+    header: CSSProperties;
     h1: CSSProperties;
     h2: CSSProperties;
     h3: CSSProperties;
     h4: CSSProperties;
     text: CSSProperties;
-    leftCol: CSSProperties;
-    rightCol: CSSProperties;
+    mutedText: CSSProperties;
+    entryHead: CSSProperties;
+    period: CSSProperties;
+    contactList: CSSProperties;
     contactInfoP: CSSProperties;
     contactInfoA: CSSProperties;
-    capitalizeText: CSSProperties;
-    initialCaps: CSSProperties;
+    section: CSSProperties;
+    entry: CSSProperties;
+    bullets: CSSProperties;
+    bullet: CSSProperties;
     boldText: CSSProperties;
     semiBoldText: CSSProperties;
-    largeSpacing: CSSProperties;
-    mediumSpacing: CSSProperties;
 } = {
     mainContainer: {
-        width: '100%',
-        maxWidth: '800px',
-        minWidth: '800px',
-        margin: '0 auto',
-        paddingTop: '50px',
+        padding: '12mm var(--cv-page-gutter) 10mm',
+        fontFamily: '"Inter", "Helvetica Neue", Arial, sans-serif',
+        fontSize: '9.5pt',
+        lineHeight: 1.45,
         color: textColor,
+    },
+    header: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        gap: '8mm',
+        paddingBottom: '4mm',
+        borderBottom: `2px solid ${textColor}`,
     },
     h1: {
-        fontSize: '25px',
+        fontSize: '22pt',
+        fontWeight: 700,
+        letterSpacing: '0.03em',
+        lineHeight: 1.1,
+        textTransform: 'uppercase',
         color: textColor,
-        // fontFamily: 'Crimson Text serif',
     },
     h2: {
-        fontSize: '23px',
+        marginBottom: '2mm',
+        paddingBottom: '1mm',
+        borderBottom: `1px solid ${ruleColor}`,
+        fontSize: '10.5pt',
+        fontWeight: 700,
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
         color: textColor,
-        // fontFamily: 'Crimson Text serif',
     },
     h3: {
-        fontSize: '21px',
+        marginTop: '1.5mm',
+        fontSize: '12pt',
+        fontWeight: 500,
         color: textColor,
-        // fontFamily: 'Crimson Text serif',
     },
     h4: {
-        fontSize: '18px',
+        fontSize: '10.5pt',
+        fontWeight: 600,
         color: textColor,
     },
     text: {
-        fontSize: '16px',
+        fontSize: '9.5pt',
         color: textColor,
-        // fontFamily: 'Crimson Text serif',
     },
-    capitalizeText: {
-        textTransform: 'uppercase',
+    mutedText: {
+        color: mutedColor,
     },
-    initialCaps: {
-        textTransform: 'capitalize',
+    entryHead: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'baseline',
+        gap: '4mm',
     },
-    boldText: {
-        fontWeight: 'bold',
+    period: {
+        flex: '0 0 auto',
+        fontSize: '9pt',
+        fontWeight: 500,
+        color: mutedColor,
     },
-    semiBoldText: {
-        fontWeight: '500',
-    },
-    leftCol: {
-        // border: '1px solid black',
-        textAlign: 'left',
-        // padding: '0px'
-    },
-    rightCol: {
-        // border: '1px solid black',
+    contactList: {
+        flex: '0 0 auto',
         textAlign: 'right',
-        // padding: '0px'
     },
     contactInfoP: {
-        fontSize: '15px',
-        fontStyle: 'italic',
+        fontSize: '9pt',
+        color: mutedColor,
     },
     contactInfoA: {
-        fontSize: '15px',
-        fontStyle: 'italic',
+        fontSize: '9pt',
+        color: mutedColor,
     },
-    largeSpacing: {
-        marginTop: '25px',
-        marginBottom: '25px',
+    section: {
+        marginTop: '5mm',
     },
-    mediumSpacing: {
-        marginTop: '10px',
-        marginBottom: '10px',
-    }
-
-
+    entry: {
+        marginBottom: '3mm',
+        breakInside: 'avoid',
+    },
+    bullets: {
+        marginTop: '1mm',
+    },
+    bullet: {
+        marginTop: '0.4mm',
+    },
+    boldText: {
+        fontWeight: 700,
+    },
+    semiBoldText: {
+        fontWeight: 500,
+    },
 };

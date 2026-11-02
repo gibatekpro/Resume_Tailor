@@ -1,309 +1,198 @@
-@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300');
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Playpen+Sans:wght@100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
-:root {
-    /*//////////////////////*/
-    --styleB-large-text-color-rw: #232e53;
-    --styleB-sections-text-color-rw: #232e53;
-    --styleB-sections-spacing: 10px;
-    --styleB-main-row-top-spacing: 30px;
-    --styleB-main-row-left-col-background: #015a84;
-    --styleB-main-row-bottom-spacing: 8px;
-    --styleB-sub-row-spacing: 8px;
-    --styleB-sub-row-spacing-big: 15px;
-    --styleB-sub-row-green-text: #0f5a73;
-    --styleB-sub-row-text-spacing: 8px;
+/* Style B: blue sidebar with contact, skills and languages; experience on the right. */
+.cv-b {
+    --cv-b-blue: #015a84;
+    --cv-b-teal: #0f5a73;
+    --cv-b-ink: #1f2433;
+    --cv-b-muted: #5b6070;
+    --cv-b-header: #f0f0f0;
+    --cv-b-side: 64mm;
+
+    display: grid;
+    grid-template-columns: var(--cv-b-side) 1fr;
+    min-height: 297mm;
+    /* The sidebar colour is a background on the whole CV, so it carries on down every printed page. */
+    background: linear-gradient(90deg, var(--cv-b-blue) 0 var(--cv-b-side), #fff var(--cv-b-side));
+    font-family: "Crimson Text", Georgia, "Times New Roman", serif;
+    font-size: 11.5pt;
+    line-height: 1.32;
+    color: var(--cv-b-ink);
 }
 
-.style-b-main-container{
-    /*height: 11in;*/
+/* ── Sidebar ─────────────────────────────────────────────── */
+.cv-b .cv-b-side {
+    padding: 12mm 7mm 10mm;
+    color: #fff;
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    font-size: 9pt;
+    line-height: 1.4;
 }
 
-.style-b-main-container h1 {
-    font-size: 30px;
-    font-family: "Crimson Text", serif;
-    font-weight: 700;
-    text-align: center;
-    padding: 0;
-    margin: 0;
-    color: black;
-    text-transform: uppercase;
-    position: relative;
-    display: inline-block;
-}
-
-
-.style-b-main-container h2 {
-    font-size: 20px;
-    font-family: "Crimson Text", serif;
-    font-weight: 400;
-    text-align: center;
-    padding: 0;
-    margin-top: 30px;
-    color: dimgrey;
-    text-transform: uppercase;
-}
-
-.style-b-main-container h1::after {
-    content: '';
-    position: absolute;
-    margin-top: 20px;
-    bottom: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 3px;
-    border-radius: 8px;
-    background-color: black;
-    width: 50%;
-}
-
-
-.style-b-main-container .main-row .header-container{
-    justify-content: center;
-    text-align: center;
-    padding: 25px;
-    background-color: #F0F0F0;
-}
-
-.style-b-main-container .main-row {
-    width: 920px;
-}
-
-.style-b-main-container .main-row .left-col {
-    /*width: 30%;*/
-    background-color: var(--styleB-main-row-left-col-background);
-    padding: 33px 20px 0 20px;
-}
-
-.style-b-main-container .main-row .right-col {
-    /*width: 70%;*/
-}
-
-.style-b-main-container .main-row .right-col .sub-right-col{
-    margin-top: 20px;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-
-.style-b-main-container .main-row .right-col .sub-right-col .sub-row{
-    margin-bottom: 0;
-}
-
-.style-b-main-container .main-row .right-col .sub-right-col text{
-    font-size: 16px;
-    font-family: "Crimson Text", serif;
-    font-weight: 400;
-    font-style: normal;
-    padding: 0;
-    margin-top: 0;
-    margin-bottom: 80px;
-    text-align: justify;
-    color: black;
-}
-
-.style-b-main-container .main-row .right-col .sub-right-col .sub-row .left-sub-col{
-    text-align: start;
-    padding-left: 10px;
-    padding-bottom: 0;
-    padding-top: 0;
-}
-
-.style-b-main-container .main-row .right-col .sub-right-col .sub-row .right-col{
-    text-align: end;
-    padding-right: 20px;
-    padding-bottom: 0;
-    padding-top: 0;
-}
-
-.style-b-main-container .main-row .right-col .sub-right-col .sub-row .left-sub-col h4{
-    font-size: 15px;
-    font-family: "Crimson Text", serif;
-    font-weight: 700;
-    font-style: normal;
-    text-align: start;
-    justify-content: start;
-    color: var(--styleB-sub-row-green-text);
-    margin-bottom: 0;
-}
-
-.style-b-main-container .main-row .right-col .sub-right-col .sub-row .left-sub-col h4 a{
-    font-size: 15px;
-    font-family: "Crimson Text", serif;
-    font-weight: 700;
-    font-style: normal;
-    text-align: start;
-    justify-content: start;
-    color: var(--styleB-sub-row-green-text);
-    margin-bottom: 0;
-}
-
-.style-b-main-container .main-row .right-col .sub-right-col .sub-row .right-col h4{
-    font-size: 15px;
-    font-family: "Crimson Text", serif;
-    font-weight: 700;
-    font-style: normal;
-    text-align: end;
-    justify-content: start;
-    color: var(--styleB-sub-row-green-text);
-    margin-bottom: 0;
-}
-
-.style-b-main-container .main-row .right-col h3{
-    font-size: 15px;
-    font-family: "Crimson Text", serif;
-    font-weight: 700;
-    font-style: normal;
-    text-align: start;
-    color: var(--styleB-sub-row-green-text);
-    margin-bottom: var(--styleB-sub-row-spacing-big);
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--styleB-sub-row-green-text);
-    display: inline-block;
-}
-
-.style-b-main-container .main-row .left-col h2{
-    font-size: 15px;
-    font-family: "Crimson Text", serif;
-    font-weight: 700;
-    font-style: normal;
-    text-align: start;
-    color: white;
-    margin-bottom: var(--styleB-sub-row-spacing);
-    text-transform: uppercase;
-    border-bottom: 1px solid white;
-    display: inline-block;
-}
-
-.style-b-main-container .main-row .left-col p{
-    font-size: 13px;
-    font-weight: normal;
-    text-align: start;
-    padding: 0;
-    margin-bottom: var(--styleB-sub-row-text-spacing);
-    color: white;
-    hyphens: auto; /* Enables hyphenation */
-    word-break: break-word; /* Ensures that long words break */
-    overflow-wrap: break-word;
-}
-
-.style-b-main-container .main-row .left-col a{
-    font-size: 13px;
-    font-weight: normal;
-    text-align: start;
-    padding: 0;
-    margin-bottom: var(--styleB-sub-row-text-spacing);
-    color: white;
-}
-
-.sub-sections-container {
-    margin-bottom: 10px; /* Keep margin consistent */
-    padding: 0; /* Ensure no extra padding disrupts alignment */
-}
-
-.sub-sections-container h2 {
-    font-size: 20px;
-    font-family: "Crimson Text", serif;
-    font-weight: 400;
-    text-align: center;
-    color: dimgrey;
-    margin-top: 30px;
-    text-transform: uppercase;
-    text-decoration: none; /* Remove default underline styles */
-    border-bottom: 2px solid dimgrey; /* Explicit underline via border */
-    display: inline-block; /* Ensure underline is sized to content */
-    padding-bottom: 4px; /* Add space between text and underline */
-}
-
-.sub-sections-container a {
-    color: var(--styleB-sub-row-green-text);
-    text-decoration: none; /* Remove default underline */
-    border-bottom: 1px solid var(--styleB-sub-row-green-text); /* Add custom underline */
-    padding-bottom: 2px; /* Space between text and underline */
-}
-
-.sub-sections-container p {
-    margin: 0;
-    padding: 0;
-    line-height: 1.5; /* Adjust for better spacing */
-}
-
-.style-b-main-container .main-row .left-col .sub-sections-container{
-    margin-bottom: 10px;
-}
-
-.avatar-container {
+.cv-b .cv-b-monogram {
     display: flex;
-    justify-content: center;
     align-items: center;
-}
-
-.avatar {
     justify-content: center;
-    align-items: center;
-    width: 105px;
-    height: 105px;
+    width: 26mm;
+    height: 26mm;
+    margin: 0 auto 7mm;
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
     border-radius: 50%;
-    border: 2px solid black;
-    overflow: hidden;
-    display: inline-block;
+    font-family: "Crimson Text", Georgia, serif;
+    font-size: 24pt;
+    font-weight: 600;
+    letter-spacing: 0.04em;
 }
 
-.avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.cv-b .cv-b-side-section + .cv-b-side-section {
+    margin-top: 6mm;
+}
+
+.cv-b .cv-b-side h2 {
+    display: inline-block;
+    margin-bottom: 2.5mm;
+    padding-bottom: 0.8mm;
+    border-bottom: 1px solid #fff;
+    font-family: "Crimson Text", Georgia, serif;
+    font-size: 11pt;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.cv-b .cv-b-side p {
+    overflow-wrap: anywhere;
+}
+
+.cv-b .cv-b-side p + p {
+    margin-top: 1.5mm;
+}
+
+.cv-b .cv-b-contact {
+    display: flex;
+    gap: 2mm;
+    align-items: flex-start;
+}
+
+.cv-b .cv-b-contact svg {
+    flex: 0 0 auto;
+    margin-top: 0.6mm;
+}
+
+/* ── Main column ─────────────────────────────────────────── */
+.cv-b .cv-b-main {
+    min-width: 0;
+}
+
+.cv-b .cv-b-header {
+    padding: 12mm 8mm 8mm;
+    background: var(--cv-b-header);
+    text-align: center;
+}
+
+.cv-b .cv-b-header h1 {
+    display: inline-block;
+    padding-bottom: 3mm;
+    border-bottom: 2.5px solid #000;
+    font-size: 24pt;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: #000;
+}
+
+.cv-b .cv-b-header p {
+    margin-top: 3mm;
+    font-size: 13pt;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #5f5f5f;
+}
+
+.cv-b .cv-b-body {
+    padding: 9mm var(--cv-page-gutter) 12mm 8mm;
+}
+
+.cv-b .cv-b-section + .cv-b-section {
+    margin-top: 5mm;
+}
+
+.cv-b .cv-section-title {
+    display: inline-block;
+    margin-bottom: 2.5mm;
+    padding-bottom: 0.5mm;
+    border-bottom: 1px solid var(--cv-b-teal);
+    font-size: 11.5pt;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--cv-b-teal);
+}
+
+.cv-b .cv-b-entry + .cv-b-entry {
+    margin-top: 3mm;
+}
+
+.cv-b .cv-b-entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4mm;
+}
+
+.cv-b .cv-b-entry-head h3 {
+    font-size: 12pt;
+    font-weight: 700;
+    color: var(--cv-b-teal);
+}
+
+.cv-b .cv-b-period {
+    flex: 0 0 auto;
+    font-size: 10.5pt;
+    font-weight: 600;
+    color: var(--cv-b-teal);
+}
+
+.cv-b .cv-b-subtitle {
+    font-style: italic;
+    color: var(--cv-b-muted);
+}
+
+.cv-b .cv-b-entry .cv-bullets {
+    margin-top: 1mm;
+}
+
+.cv-b .cv-b-entry .cv-bullets li + li {
+    margin-top: 0.4mm;
+}
+
+/* Full-bleed pages so the sidebar runs edge to edge; the padding is repeated on every page instead of a page margin. */
+@page cv-b-page {
+    margin: 0;
+}
+
+.cv-b {
+    page: cv-b-page;
+}
+
+.cv-b .cv-b-body {
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
 }
 
 @media print {
-    @page { margin: 0; }
-    body { margin: 0; }
-    .style-b-main-container .main-row .left-col{
-        background-color: #015a84 !important;
-        print-color-adjust: exact;
+    .cv-b {
+        min-height: 0;
     }
-    .style-b-main-container .main-row .header-container{
-        justify-content: center;
-        text-align: center;
-        padding: 25px;
-        background-color: #F0F0F0 !important;
+
+    html:has(.cv-b) {
+        background: linear-gradient(90deg, #015a84 0 64mm, #fff 64mm) !important;
+        -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
-    .style-b-main-container .main-row .left-col h2{
-        font-size: 15px;
-        font-family: "Crimson Text", serif;
-        font-weight: 700;
-        font-style: normal;
-        text-align: start;
-        color: white !important;
-        margin-bottom: var(--styleB-sub-row-spacing);
-        text-transform: uppercase;
-        border-bottom: 1px solid white !important;
-        display: inline-block;
-        print-color-adjust: exact;
-    }
-
-    .style-b-main-container .main-row .left-col p{
-        font-size: 13px;
-        font-weight: normal;
-        text-align: start;
-        padding: 0;
-        margin-bottom: var(--styleB-sub-row-text-spacing);
-        color: white !important;
-        hyphens: auto; /* Enables hyphenation */
-        word-break: break-word; /* Ensures that long words break */
-        overflow-wrap: break-word;
-        print-color-adjust: exact;
-    }
-
-    .style-b-main-container .main-row .left-col a{
-        font-size: 13px;
-        font-weight: normal;
-        text-align: start;
-        padding: 0;
-        margin-bottom: var(--styleB-sub-row-text-spacing);
-        color: white !important;
-        print-color-adjust: exact;
+    html:has(.cv-b) body {
+        background: transparent !important;
     }
 }

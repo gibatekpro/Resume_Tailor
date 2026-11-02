@@ -27,9 +27,6 @@
 }
 
 .pdf-container {
-    width: 10in;
-    /*height: 11in;*/
-    padding: 10px;
-    font-family: 'Arial', sans-serif;
-    color: #333;
+    /* Exactly one A4 page wide, so the browser prints at 100% instead of shrinking to fit. */
+    width: 210mm;
 }

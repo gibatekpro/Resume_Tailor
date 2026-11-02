@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
+import '../../styles/resumeBase.css';
 import '../../styles/resumeStyleA.css';
 import {HeaderSection} from "./HeaderSection";
 import {SummarySection} from "./SummarySection";
@@ -8,48 +9,21 @@ import {WorkExperienceSection} from "./WorkExperienceSection";
 import {EducationSection} from "./EducationSection";
 import {ProjectsSection} from "./ProjectsSection";
 import type { ResumeInfo } from "../../models/ResumeInfo";
+import {cleanResume} from "../../utils/resumeFormat";
 
 
 export const ResumeStyleA: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) =>{
-
-    const [hasProjects, setHasProjects] = useState(false);
-    const [hasSkills, setHasSkills] = useState(false);
-    const [hasWorkExperience, setHasWorkExperience] = useState(false);
-    const [hasEducation, setHasEducation] = useState(false);
-
-    useEffect(() => {
-        // Update state for sections visibility
-        setHasProjects(!!resumeData.projects && resumeData.projects.length > 0);
-        setHasSkills(!!resumeData.skills && resumeData.skills.length > 0);
-        setHasWorkExperience(!!resumeData.workExperience && resumeData.workExperience.length > 0);
-        setHasEducation(!!resumeData.education && resumeData.education.length > 0);
-    }, [resumeData]);
+    const resume = cleanResume(resumeData);
 
     return(
-        <div style={{
-            border: '1px solid #b8adfb',
-            borderRadius: '5px',
-            padding: '20px'
-        }}>
-            <HeaderSection
-                resumeData={resumeData}/>
-            <SummarySection
-                resumeData={resumeData}/>
-            <ContactInfoSection
-                resumeData={resumeData}/>
-
-            <>
-                {hasSkills && <SkillsSection
-                    resumeData={resumeData}/>}
-                {hasWorkExperience && <WorkExperienceSection
-                    resumeData={resumeData}/>}
-                {hasEducation && <EducationSection
-                    resumeData={resumeData}/>}
-                {hasProjects && <ProjectsSection
-                    resumeData={resumeData}/>}
-            </>
-            {/*<EducationSection/>*/}
-            {/*<CertificationsSection/>*/}
+        <div className="cv-page cv-a">
+            <HeaderSection resumeData={resume}/>
+            <ContactInfoSection resumeData={resume}/>
+            <SummarySection resumeData={resume}/>
+            {resume.skills!.length > 0 && <SkillsSection resumeData={resume}/>}
+            {resume.workExperience!.length > 0 && <WorkExperienceSection resumeData={resume}/>}
+            {resume.projects!.length > 0 && <ProjectsSection resumeData={resume}/>}
+            {resume.education!.length > 0 && <EducationSection resumeData={resume}/>}
         </div>
     );
 }

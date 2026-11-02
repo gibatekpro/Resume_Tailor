@@ -23,6 +23,7 @@ const baseNavItems: NavItem[] = [
   { path: ROUTES.NEW_CV_PAGE, icon: 'description', label: 'New CV' },
   { path: ROUTES.MY_JOB_APPLICATIONS, icon: 'work_history', label: 'My Job Applications' },
   { path: ROUTES.PROFILE, icon: 'manage_accounts', label: 'Profile' },
+  { path: ROUTES.SETTINGS, icon: 'settings', label: 'Settings' },
   { path: ROUTES.ADMIN_USERS, icon: 'admin_panel_settings', label: 'Admin Users' },
 ];
 

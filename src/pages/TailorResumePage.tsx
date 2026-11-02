@@ -22,12 +22,17 @@ import STORAGE from "../utils/storage";
 import {Dialog, DialogPanel} from "@headlessui/react";
 import PageLoadingOverlay from "../components/shared/PageLoadingOverlay";
 import PaginationControls from "../components/shared/PaginationControls";
+import {lockResumeFacts} from "../utils/resumeFacts";
+import SettingsService from "../service/SettingsService";
+import type {AppSettings} from "../models/AppSettings";
 
 const RESUMES_PER_PAGE = 8;
 
 export const TailorResumePage: React.FC = () => {
     const [user, setUser] = useState<string | null>(localStorage.getItem('user'));
-    const [jobApplicationInfo, setJobApplicationInfo] = useState<JobApplicationInfo>();
+    const [jobApplicationInfo, setJobApplicationInfo] = useState<JobApplicationInfo | undefined>(() =>
+        JSON.parse(localStorage.getItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA) || "null") || undefined
+    );
     const [savedRules, setSavedRules] = useState<string[]>(openAIInstruction.rules || []);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
@@ -43,6 +48,8 @@ export const TailorResumePage: React.FC = () => {
     const [isResumesPanelOpen, setIsResumesPanelOpen] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [generateHasError, setGenerateHasError] = useState(false);
+    const [generateErrorMessage, setGenerateErrorMessage] = useState("");
+    const [settings, setSettings] = useState<AppSettings>(SettingsService.getCachedSettings());
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [resumeList, setResumeList] = useState<SavedResumesResponse[]>([])
     const [currentResumePage, setCurrentResumePage] = useState(1);
@@ -176,6 +183,7 @@ export const TailorResumePage: React.FC = () => {
             ...InstructionResumeData,
             jobDescriptionData: localStorage.getItem(STORAGE.JOB_DESCRIPTION) || "",
             rules: savedRules || InstructionResumeData.rules,
+            model: settings.defaultModel,
         },
         validationSchema: () => Yup.object().shape({
             jobDescriptionData: Yup.string().min(100).required()
@@ -195,18 +203,22 @@ export const TailorResumePage: React.FC = () => {
                 }
 
                 //Fetch OpenAI Response
-                const response = await fetchOpenAIResponse(openAIInstruction);
-                if (response) {
-                    openDialog(false);
-                    const parsedResponse = response;
-                    localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(parsedResponse) || "{}");
-                    setJobApplicationInfo(parsedResponse);
-                    await generatedResumeFormFormik.setValues(parsedResponse.resumeInfo);
-                } else {
-                    openDialog(true);
-                }
+                const {result, generationInfo} = await fetchOpenAIResponse(openAIInstruction);
+                const parsedResponse: JobApplicationInfo = {
+                    ...result,
+                    openAIGaps: Array.isArray(result.openAIGaps) ? result.openAIGaps : [],
+                    generationInfo,
+                    resumeInfo: lockResumeFacts(customResumeFormFormik.values, result.resumeInfo || {}),
+                };
+                openDialog(false);
+                setActiveStep(2);
+                localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(parsedResponse) || "{}");
+                setJobApplicationInfo(parsedResponse);
+                await generatedResumeFormFormik.setValues(parsedResponse.resumeInfo);
             } catch (error) {
-                console.error("Error during resume generation:");
+                console.error("Error during resume generation:", error);
+                setGenerateErrorMessage(error instanceof Error ? error.message : "");
+                openDialog(true);
             } finally {
                 setIsLoading(false);
             }
@@ -280,13 +292,16 @@ export const TailorResumePage: React.FC = () => {
         setIsLoading(true);
         const loadPageData = async () => {
             try {
-                const [savedResumes, rules] = await Promise.all([
+                const [savedResumes, rules, userSettings] = await Promise.all([
                     JobApplicationService.getAllSavedResumes(),
                     JobApplicationService.getRules(user || ""),
+                    SettingsService.getSettings(),
                 ]);
 
                 setResumeList(savedResumes);
                 setSavedRules(rules);
+                setSettings(userSettings);
+                void instructionFormFormik.setFieldValue('model', userSettings.defaultModel);
 
                 if (savedResumes.length > 0) {
                     setIsBeingEdited(savedResumes[0]);
@@ -477,15 +492,21 @@ export const TailorResumePage: React.FC = () => {
                                             )}
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                   fill="currentColor" className="bi bi-x-lg cursor-pointer" viewBox="0 0 16 16"
-                                                  onClick={closeDeleteDialog}>
+                                                  onClick={closeDialog}>
                                                 <path
                                                     d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
                                             </svg>
                                         </div>
                                         {generateHasError ? (
-                                            <text>Failed to generate an output. Check logs for details.</text>
+                                            <text>
+                                                Couldn't generate your CV.{generateErrorMessage && ` OpenAI said: ${generateErrorMessage}`}
+                                            </text>
                                         ) : (
-                                            <text>Successfully generated an resume</text>
+                                            <text>
+                                                Your tailored CV is ready. Job titles, employers, dates, education and your profile were kept exactly as written.
+                                                {(jobApplicationInfo?.openAIGaps?.length || 0) > 0 &&
+                                                    ` ${jobApplicationInfo?.openAIGaps?.length} job requirement(s) aren't shown in your CV. See Gaps.`}
+                                            </text>
                                         )}
                                         <div className="mt-4">
                                             <Button
@@ -610,6 +631,7 @@ export const TailorResumePage: React.FC = () => {
                                     <InstructionForm
                                         isLoading={isLoading}
                                         instructionFormFormik={instructionFormFormik}
+                                        models={settings.models}
                                     />
                                 </div>
                             </div>
@@ -635,6 +657,20 @@ export const TailorResumePage: React.FC = () => {
                                         </svg>
                                     </button>
                                 </div>
+                                {jobApplicationInfo?.openAIGaps && jobApplicationInfo.openAIGaps.length > 0 && (
+                                    <div className="mx-4 mt-4 rounded-lg border border-[#f1d8a8] bg-[#fff8ec] px-4 py-3">
+                                        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#8a5a00]">Gaps</p>
+                                        <p className="mt-1 text-xs leading-5 text-[#5f6370]">
+                                            The job asks for these, but your CV doesn't show them, so nothing was added for them.
+                                            If you do have this experience, add it to your CV and generate again. Otherwise, consider covering it in your cover letter.
+                                        </p>
+                                        <ul className="mt-2 mb-0 list-disc pl-5 text-sm leading-6 text-[#161c22]">
+                                            {jobApplicationInfo.openAIGaps.map((gap) => (
+                                                <li key={gap}>{gap}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                                 <div className="p-4 cursor-pointer">
                                     <CustomAccordion
                                         isOpen={isGeneratedFormOpen}

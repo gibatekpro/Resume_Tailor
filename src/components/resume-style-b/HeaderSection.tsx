@@ -1,16 +1,11 @@
-import React, {useEffect} from 'react';
-import '../../styles/resumeStyleB.css';
+import React from 'react';
 import type { ResumeInfo } from "../../models/ResumeInfo";
 
 export const HeaderSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
-
-    useEffect(() => {
-    }, [resumeData]);
-
     return (
-        <header className={"header-container"}>
+        <header className="cv-b-header">
             <h1>{resumeData.profile?.firstName} {resumeData.profile?.lastName}</h1>
-            <h2>{resumeData.profile?.profession}</h2>
+            {resumeData.profile?.profession && <p>{resumeData.profile.profession}</p>}
         </header>
     );
 };

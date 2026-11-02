@@ -1,17 +1,13 @@
-import '../../styles/resumeStyleB.css';
-import avatarImage from  "../../assets/images/avatar_image.jpeg"
-import placeholderImage from "../../assets/images/placeholder.jpeg"
-import {useState} from "react";
+import React from "react";
+import type { ResumeInfo } from "../../models/ResumeInfo";
+import {initials} from "../../utils/resumeFormat";
 
-export const AvatarSection: React.FC = () => {
-    const [imgSrc, setImgSrc] = useState(avatarImage);
+// A monogram of the candidate's own initials, rather than a photo (UK CVs normally leave photos out).
+export const AvatarSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
+    const monogram = initials(resumeData);
+    if (!monogram) {
+        return null;
+    }
 
-    return (
-        <div className={"avatar-container"}>
-            <div className="avatar">
-                <img src={imgSrc} alt="AvatarSection" onError={() => setImgSrc(placeholderImage)}/>
-            </div>
-        </div>
-    );
+    return <div className="cv-b-monogram" aria-hidden="true">{monogram}</div>;
 };
-

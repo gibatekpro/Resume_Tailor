@@ -1,63 +1,31 @@
-import React, {useEffect} from "react";
+import React from "react";
 import type { ResumeInfo } from "../../models/ResumeInfo";
-import {Col, Row} from "react-bootstrap";
 import {ResumeStyleCStyle} from "./styles/ResumeStyleCStyle";
+import {educationTitle, formatPeriod} from "../../utils/resumeFormat";
 
 
 export const EducationSection: React.FC<{resumeData: ResumeInfo}> = ({resumeData}) => {
-
-    useEffect(()=>{
-
-    },[resumeData]);
-
-
     return (
-        <div>
-            <h2 style={{
-                ...ResumeStyleCStyle.h2,
-                ...ResumeStyleCStyle.boldText,
-                ...ResumeStyleCStyle.initialCaps
-            }}>Education</h2>
-            <div style={{
-                ...ResumeStyleCStyle.mediumSpacing
-            }}></div>
+        <section style={ResumeStyleCStyle.section}>
+            <h2 className="cv-section-title" style={ResumeStyleCStyle.h2}>Education</h2>
             {resumeData.education?.map((education, index) => (
-                <div key={index}>
-                    <Row key={index}>
-                        <Col xs={6} sm={6} md={6} lg={6} style={ResumeStyleCStyle.leftCol}>
-                            <h4 style={{
-                                ...ResumeStyleCStyle.h4,
-                                ...ResumeStyleCStyle.initialCaps,
-                                ...ResumeStyleCStyle.semiBoldText
-                            }}>{education.link ? (
-                                <a href={education.link} target="_blank" rel="noopener noreferrer">
-                                    {education.institutionName}
-                                </a>
-                            ) : (
-                                education.institutionName
-                            )}
-                            </h4>
-                        </Col>
-                        <Col className={"right-col"} xs={6} sm={6} md={6} lg={6} style={ResumeStyleCStyle.rightCol}>
-                            <p style={{
-                                ...ResumeStyleCStyle.text,
-                                ...ResumeStyleCStyle.semiBoldText
-                            }}>{education.startMonth + " " + education.startYear} - {education.endMonth + " " + education.endYear}</p>
-                        </Col>
-                    </Row>
-                    <span style={{
-                        ...ResumeStyleCStyle.text,
-                        ...ResumeStyleCStyle.boldText,
-                    }}>{education.degree}</span>
-                    <span style={{
-                        ...ResumeStyleCStyle.text,
-                    }}> {education.course}</span>
-                    <div style={{
-                        ...ResumeStyleCStyle.mediumSpacing
-                    }}></div>
+                <div key={index} className="cv-entry" style={ResumeStyleCStyle.entry}>
+                    <div style={ResumeStyleCStyle.entryHead}>
+                        <h4 style={ResumeStyleCStyle.h4}>
+                            {educationTitle(education)}
+                            <span style={{...ResumeStyleCStyle.mutedText, fontWeight: 400}}>
+                                {" · "}
+                                {education.link ? (
+                                    <a href={education.link} target="_blank" rel="noopener noreferrer">{education.institutionName}</a>
+                                ) : (
+                                    education.institutionName
+                                )}
+                            </span>
+                        </h4>
+                        <span style={ResumeStyleCStyle.period}>{formatPeriod(education)}</span>
+                    </div>
                 </div>
             ))}
-        </div>
-
+        </section>
     );
 };

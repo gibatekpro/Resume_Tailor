@@ -16,6 +16,10 @@ const normaliseSettings = (settings?: Partial<AppSettings>): AppSettings => {
     return {models, defaultModel};
 };
 
+// Settings and saved sites live as extra fields on the user's rules document, which the Firestore
+// security rules already let them write. Every write merges, so it never clears the other fields.
+const userDocPath = (uid: string) => `rules/${uid}/rules/rulesList`;
+
 class SettingsService {
     private async getAuthenticatedUser(): Promise<User> {
         if (auth.currentUser) {
@@ -55,11 +59,9 @@ class SettingsService {
         const user = await this.getAuthenticatedUser();
 
         try {
-            // Stored next to the user's rules, so it's covered by the same Firestore security rules.
-            const docSnapshot = await getDoc(doc(db, `rules/${user.uid}/rules/settings`));
-            const settings = docSnapshot.exists()
-                ? normaliseSettings(docSnapshot.data() as AppSettings)
-                : this.getCachedSettings();
+            const docSnapshot = await getDoc(doc(db, userDocPath(user.uid)));
+            const stored = docSnapshot.data()?.settings as AppSettings | undefined;
+            const settings = stored ? normaliseSettings(stored) : this.getCachedSettings();
             localStorage.setItem(STORAGE.SETTINGS, JSON.stringify(settings));
             return settings;
         } catch (error) {
@@ -75,7 +77,7 @@ class SettingsService {
 
         localStorage.setItem(STORAGE.SETTINGS, JSON.stringify(normalised));
         try {
-            await setDoc(doc(db, `rules/${user.uid}/rules/settings`), normalised);
+            await setDoc(doc(db, userDocPath(user.uid)), {settings: normalised}, {merge: true});
         } catch (error) {
             console.error("Error saving settings:", error);
             throw new Error("Failed to save settings.", {cause: error});
@@ -96,10 +98,9 @@ class SettingsService {
         const user = await this.getAuthenticatedUser();
 
         try {
-            const docSnapshot = await getDoc(doc(db, `rules/${user.uid}/rules/savedSites`));
-            const sites = docSnapshot.exists()
-                ? ((docSnapshot.data() as {sites?: SavedSite[]}).sites || [])
-                : this.getCachedSavedSites();
+            const docSnapshot = await getDoc(doc(db, userDocPath(user.uid)));
+            const stored = docSnapshot.data()?.savedSites as SavedSite[] | undefined;
+            const sites = stored ?? this.getCachedSavedSites();
             localStorage.setItem(STORAGE.SAVED_SITES, JSON.stringify(sites));
             return sites;
         } catch (error) {
@@ -114,7 +115,7 @@ class SettingsService {
 
         localStorage.setItem(STORAGE.SAVED_SITES, JSON.stringify(sites));
         try {
-            await setDoc(doc(db, `rules/${user.uid}/rules/savedSites`), {sites});
+            await setDoc(doc(db, userDocPath(user.uid)), {savedSites: sites}, {merge: true});
         } catch (error) {
             console.error("Error saving sites:", error);
             throw new Error("Failed to save sites.", {cause: error});

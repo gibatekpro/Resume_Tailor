@@ -72,8 +72,12 @@ export const SettingsPage: React.FC = () => {
             setSettings(await SettingsService.saveSettings(settings));
             setIsDirty(false);
             setStatus({type: "success", message: "Settings saved."});
-        } catch {
-            setStatus({type: "error", message: "Saved on this device, but couldn't save to your account. Try again."});
+        } catch (error) {
+            const code = ((error as Error).cause as {code?: string} | undefined)?.code;
+            setStatus({
+                type: "error",
+                message: `Saved on this device, but couldn't save to your account${code ? ` (${code})` : ""}. Try again.`,
+            });
         } finally {
             setIsSaving(false);
         }

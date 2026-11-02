@@ -224,7 +224,8 @@ class JobApplicationService {
 
         try {
             const userRulesDocRef = doc(db, userRulesDocPath);
-            await setDoc(userRulesDocRef, { rules });
+            // Merge, because this document also holds the user's settings and saved sites.
+            await setDoc(userRulesDocRef, { rules }, { merge: true });
 
             // console.log(`Rules for user ${uid} have been saved successfully.`);
         } catch (error) {

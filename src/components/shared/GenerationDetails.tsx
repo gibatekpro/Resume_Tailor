@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import moment from "moment";
 import type {JobApplicationInfo} from "../../models/JobApplicationInfo";
+import {TailoringChangesView} from "./TailoringChangesView";
 
 const formatNumber = (value?: number) => (value === undefined ? "–" : value.toLocaleString("en-GB"));
 
@@ -90,6 +91,12 @@ export const GenerationDetails: React.FC<{application: JobApplicationInfo}> = ({
                             {info.requestedModel && info.requestedModel !== info.model && ` · requested ${info.requestedModel}`}
                         </p>
                     </>
+                )}
+
+                {application.tailoringChanges && (
+                    <div className="mt-4">
+                        <TailoringChangesView changes={application.tailoringChanges}/>
+                    </div>
                 )}
 
                 {gaps.length > 0 && (

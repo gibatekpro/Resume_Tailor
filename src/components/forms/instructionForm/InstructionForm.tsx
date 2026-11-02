@@ -77,10 +77,10 @@ const InstructionForm: React.FC<InstructionFormProps> = ({instructionFormFormik,
                     <div className="mb-4 rounded-lg border border-[#d8e3f7] bg-[#f8fbff] px-4 py-3">
                         <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2170e4]">Always applied</p>
                         <ul className="mt-2 mb-0 list-disc pl-5 text-xs leading-5 text-[#45464d]">
-                            <li>Job titles, employers, dates, education, your profile and project names are kept exactly as written.</li>
-                            <li>Nothing is added that isn't already in your CV: no new skills, tools, achievements or numbers.</li>
-                            <li>Bullets are rewritten and reordered so your most relevant work for this job comes first, using the job's wording where it's true.</li>
-                            <li>Skills and projects are reordered to match the job, and anything the job asks for that your CV doesn't show is listed under Gaps.</li>
+                            <li>Job titles, employers, dates, education, your name and project names are kept exactly as written.</li>
+                            <li>Bullets are rewritten and reordered so your most relevant work comes first, in the job's wording, without overstating what you did.</li>
+                            <li>A skill the job asks for is only added when your CV backs it up, and you'll see the line from your CV that proves it.</li>
+                            <li>No invented tools, achievements or numbers. Anything the job wants that your CV doesn't show is listed under Gaps.</li>
                         </ul>
                     </div>
                     <SectionHeader
@@ -103,6 +103,23 @@ const InstructionForm: React.FC<InstructionFormProps> = ({instructionFormFormik,
                                 removeRule={(index) => removeNote(index)}/>
                         ))}
                     </div>
+
+                    <label htmlFor="tailorSummary" className="mt-5 flex cursor-pointer items-start gap-3 rounded-lg border border-[#dfe4ee] bg-white px-3 py-2.5">
+                        <input
+                            id="tailorSummary"
+                            name="tailorSummary"
+                            type="checkbox"
+                            className="mt-0.5 h-4 w-4 cursor-pointer accent-[#2170e4]"
+                            checked={!!instructionFormFormik.values.tailorSummary}
+                            onChange={instructionFormFormik.handleChange}
+                        />
+                        <span>
+                            <span className="block text-sm font-semibold text-[#161c22]">Tailor my summary</span>
+                            <span className="block text-xs leading-5 text-[#5f6370]">
+                                Rewrites your profile summary to lead with what this job values, using only facts from your CV.
+                            </span>
+                        </span>
+                    </label>
 
                     <div className="mt-5">
                         <div className="mb-1 flex items-center justify-between">

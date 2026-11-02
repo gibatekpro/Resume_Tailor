@@ -6,5 +6,6 @@ export interface OpenAIInstruction {
     rules?: string[],
     jobDescriptionData?: string,
     model?: string,
+    tailorSummary?: boolean,
     resumeInfo?: ResumeInfo,
 }

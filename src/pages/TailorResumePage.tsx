@@ -22,7 +22,8 @@ import STORAGE from "../utils/storage";
 import {Dialog, DialogPanel} from "@headlessui/react";
 import PageLoadingOverlay from "../components/shared/PageLoadingOverlay";
 import PaginationControls from "../components/shared/PaginationControls";
-import {lockResumeFacts} from "../utils/resumeFacts";
+import {describeChanges, lockResumeFacts, verifyAddedSkills} from "../utils/resumeFacts";
+import {TailoringChangesView} from "../components/shared/TailoringChangesView";
 import SettingsService from "../service/SettingsService";
 import type {AppSettings} from "../models/AppSettings";
 
@@ -184,6 +185,7 @@ export const TailorResumePage: React.FC = () => {
             jobDescriptionData: localStorage.getItem(STORAGE.JOB_DESCRIPTION) || "",
             rules: savedRules || InstructionResumeData.rules,
             model: settings.defaultModel,
+            tailorSummary: true,
         },
         validationSchema: () => Yup.object().shape({
             jobDescriptionData: Yup.string().min(100).required()
@@ -204,11 +206,21 @@ export const TailorResumePage: React.FC = () => {
 
                 //Fetch OpenAI Response
                 const {result, generationInfo} = await fetchOpenAIResponse(openAIInstruction);
+                const originalResume = customResumeFormFormik.values;
+                const {accepted, rejected} = verifyAddedSkills(originalResume, result.openAIAddedSkills);
+                const tailoredResume = lockResumeFacts(originalResume, result.resumeInfo || {}, {
+                    addedSkills: accepted,
+                    allowSummary: values.tailorSummary,
+                });
+                // The raw suggestions are replaced by the verified list in tailoringChanges.
+                const jobDetails = {...result};
+                delete jobDetails.openAIAddedSkills;
                 const parsedResponse: JobApplicationInfo = {
-                    ...result,
+                    ...jobDetails,
                     openAIGaps: Array.isArray(result.openAIGaps) ? result.openAIGaps : [],
                     generationInfo,
-                    resumeInfo: lockResumeFacts(customResumeFormFormik.values, result.resumeInfo || {}),
+                    tailoringChanges: describeChanges(originalResume, tailoredResume, accepted, rejected),
+                    resumeInfo: tailoredResume,
                 };
                 openDialog(false);
                 setActiveStep(2);
@@ -657,6 +669,11 @@ export const TailorResumePage: React.FC = () => {
                                         </svg>
                                     </button>
                                 </div>
+                                {jobApplicationInfo?.tailoringChanges && (
+                                    <div className="mx-4 mt-4">
+                                        <TailoringChangesView changes={jobApplicationInfo.tailoringChanges}/>
+                                    </div>
+                                )}
                                 {jobApplicationInfo?.openAIGaps && jobApplicationInfo.openAIGaps.length > 0 && (
                                     <div className="mx-4 mt-4 rounded-lg border border-[#f1d8a8] bg-[#fff8ec] px-4 py-3">
                                         <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#8a5a00]">Gaps</p>

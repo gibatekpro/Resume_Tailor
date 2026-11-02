@@ -3,6 +3,7 @@ import type { OpenAIInstruction } from "../models/OpenAIInstruction";
 import type { GenerationInfo } from "../models/GenerationInfo";
 import type { JobApplicationInfo } from "../models/JobApplicationInfo";
 import { DefaultSettings } from "../data/defaultSettings";
+import { SUMMARY_LOCKED_INSTRUCTION, SUMMARY_TAILORED_INSTRUCTION } from "../data/openAIInstruction";
 
 const OPENAI_BASE_URL = "https://api.openai.com/v1";
 
@@ -31,6 +32,7 @@ const buildMessages = (instruction: OpenAIInstruction) => {
     const rules = (instruction.rules || []).map((rule) => rule.trim()).filter(Boolean);
     const systemContent = [
         ...(instruction.prompt || []),
+        instruction.tailorSummary ? SUMMARY_TAILORED_INSTRUCTION : SUMMARY_LOCKED_INSTRUCTION,
         rules.length > 0
             ? "CANDIDATE PREFERENCES\n" +
               "Follow these too. If one conflicts with FACTS THAT NEVER CHANGE, ignore it.\n" +

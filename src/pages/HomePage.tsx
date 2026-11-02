@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from '../components/shared/AppLayout';
 import TopNav from '../components/shared/TopNav';
@@ -7,14 +8,55 @@ import linkedinIcon from '../assets/brand/linkedin.com.png';
 import gradcrackerIcon from '../assets/brand/gradcracker.com.png';
 import upworkIcon from '../assets/brand/upwork.svg';
 import fiverrIcon from '../assets/brand/fiverr.svg';
+import { useAuth } from '../context/auth/AuthProvider';
+import SettingsService from '../service/SettingsService';
+import type { SavedSite, SiteGroupKey } from '../models/SavedSite';
+import { AddSiteDialog } from '../components/shared/AddSiteDialog';
 
 type SiteCardItem = {
+  id?: string; // only sites the user added themselves have an id, and only those can be removed
   name: string;
   url: string;
   description: string;
-  icon: string;
+  icon?: string;
   accent: string;
 };
+
+const CUSTOM_SITE_ACCENT = '#2170e4';
+
+const toCardItem = (site: SavedSite): SiteCardItem => ({
+  id: site.id,
+  name: site.name,
+  url: site.url,
+  description: site.description || displayHost(site.url),
+  accent: CUSTOM_SITE_ACCENT,
+});
+
+const displayHost = (url: string) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+};
+
+// Bundled logo for the built-in sites; the site's own favicon for added ones, falling back to its first letter.
+function SiteIcon({ site }: { site: SiteCardItem }) {
+  const [faviconFailed, setFaviconFailed] = useState(false);
+  const src = site.icon ?? (faviconFailed ? undefined : `https://${displayHost(site.url)}/favicon.ico`);
+
+  if (!src) {
+    return <span style={{ fontSize: '20px', fontWeight: 700, color: site.accent }}>{site.name.charAt(0).toUpperCase()}</span>;
+  }
+  return (
+    <img
+      src={src}
+      alt=""
+      onError={() => setFaviconFailed(true)}
+      style={{ width: '26px', height: '26px', objectFit: 'contain' }}
+    />
+  );
+}
 
 const jobSites: SiteCardItem[] = [
   {
@@ -57,20 +99,38 @@ const freelanceSites: SiteCardItem[] = [
   },
 ];
 
-function SiteGroup({ title, sites }: { title: string; sites: SiteCardItem[] }) {
+function SiteGroup({ title, sites, onAdd, onRemove }: {
+  title: string;
+  sites: SiteCardItem[];
+  onAdd?: () => void;
+  onRemove?: (id: string) => void;
+}) {
   return (
     <section style={{ backgroundColor: '#ffffff', border: '1px solid #c6c6cd', borderRadius: '18px', boxShadow: '0px 1px 3px rgba(15,23,42,0.05)', overflow: 'hidden' }}>
-      <div style={{ padding: '18px 20px', borderBottom: '1px solid #eaeaf0', background: 'linear-gradient(180deg, rgba(238,244,252,0.6), rgba(255,255,255,0.9))' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '18px 20px', borderBottom: '1px solid #eaeaf0', background: 'linear-gradient(180deg, rgba(238,244,252,0.6), rgba(255,255,255,0.9))' }}>
         <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, letterSpacing: '-0.02em', color: '#161c22' }}>{title}</h2>
+        {onAdd && (
+          <button
+            type="button"
+            onClick={onAdd}
+            className="cursor-pointer transition-all duration-200 hover:border-[#2170e4] hover:bg-[#eef4fc]"
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', borderRadius: '10px', border: '1px solid #c6d9ff', backgroundColor: '#ffffff', color: '#1f4f9c', fontSize: '13px', fontWeight: 600 }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span>
+            Add site
+          </button>
+        )}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', padding: '20px' }}>
         {sites.map((site) => (
+          <div key={site.id ?? site.name} style={{ position: 'relative', display: 'flex' }}>
           <a
-            key={site.name}
             href={site.url}
             target="_blank"
             rel="noreferrer"
             style={{
+              flex: 1,
+              minWidth: 0,
               display: 'flex',
               alignItems: 'center',
               gap: '14px',
@@ -107,16 +167,30 @@ function SiteGroup({ title, sites }: { title: string; sites: SiteCardItem[] }) {
                 flexShrink: 0,
               }}
             >
-              <img src={site.icon} alt={site.name} style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
+              <SiteIcon site={site} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#161c22' }}>{site.name}</h3>
-                <span className="material-symbols-outlined" style={{ fontSize: '18px', color: site.accent }}>open_in_new</span>
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#161c22', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{site.name}</h3>
+                {/* Added sites show a remove button in this spot instead */}
+                {!site.id && <span className="material-symbols-outlined" style={{ fontSize: '18px', color: site.accent }}>open_in_new</span>}
               </div>
-              <p style={{ margin: '8px 0 0', fontSize: '13px', lineHeight: 1.5, color: '#45464d' }}>{site.description}</p>
+              <p style={{ margin: '8px 0 0', fontSize: '13px', lineHeight: 1.5, color: '#45464d', overflowWrap: 'anywhere' }}>{site.description}</p>
             </div>
           </a>
+          {site.id && onRemove && (
+            <button
+              type="button"
+              onClick={() => onRemove(site.id!)}
+              aria-label={`Remove ${site.name}`}
+              title={`Remove ${site.name}`}
+              className="cursor-pointer text-[#76777d] transition-colors hover:bg-[#fff1f1] hover:text-[#ba1a1a]"
+              style={{ position: 'absolute', top: '14px', right: '12px', display: 'flex', padding: '2px', border: 'none', borderRadius: '6px', backgroundColor: 'transparent' }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>close</span>
+            </button>
+          )}
+          </div>
         ))}
       </div>
     </section>
@@ -125,6 +199,35 @@ function SiteGroup({ title, sites }: { title: string; sites: SiteCardItem[] }) {
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const auth = useAuth();
+  const isAuthenticated = !!auth?.isAuthenticated;
+  const [savedSites, setSavedSites] = useState<SavedSite[]>(() => SettingsService.getCachedSavedSites());
+  const [addToGroup, setAddToGroup] = useState<SiteGroupKey>();
+  const [saveError, setSaveError] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      void SettingsService.getSavedSites().then(setSavedSites);
+    }
+  }, [isAuthenticated]);
+
+  const updateSavedSites = async (sites: SavedSite[]) => {
+    setSavedSites(sites);
+    setSaveError(false);
+    try {
+      await SettingsService.saveSavedSites(sites);
+    } catch {
+      setSaveError(true);
+    }
+  };
+
+  // Added sites belong to the signed-in user, so they're only shown and editable while signed in.
+  const sitesFor = (group: SiteGroupKey) =>
+    isAuthenticated ? savedSites.filter((site) => site.group === group).map(toCardItem) : [];
+  const addSite = (group: SiteGroupKey) => (isAuthenticated ? () => setAddToGroup(group) : undefined);
+  const removeSite = isAuthenticated
+    ? (id: string) => void updateSavedSites(savedSites.filter((site) => site.id !== id))
+    : undefined;
 
   return (
     <AppLayout>
@@ -189,8 +292,26 @@ export default function HomePage() {
             </button>
           </section>
 
-          <SiteGroup title="Job sites" sites={jobSites} />
-          <SiteGroup title="Freelance sites" sites={freelanceSites} />
+          {saveError && (
+            <div role="alert" style={{ padding: '12px 16px', borderRadius: '12px', border: '1px solid #f3c3c3', backgroundColor: '#fff1f1', color: '#7a1f1f', fontSize: '14px' }}>
+              Couldn't save your sites to your account. They're kept on this device for now.
+            </div>
+          )}
+
+          <SiteGroup title="Job sites" sites={[...jobSites, ...sitesFor('job')]} onAdd={addSite('job')} onRemove={removeSite} />
+          <SiteGroup title="Freelance sites" sites={[...freelanceSites, ...sitesFor('freelance')]} onAdd={addSite('freelance')} onRemove={removeSite} />
+
+          {addToGroup && (
+            <AddSiteDialog
+              open={true}
+              initialGroup={addToGroup}
+              onClose={() => setAddToGroup(undefined)}
+              onAdd={(site) => {
+                setAddToGroup(undefined);
+                void updateSavedSites([...savedSites, site]);
+              }}
+            />
+          )}
         </div>
       </main>
     </AppLayout>

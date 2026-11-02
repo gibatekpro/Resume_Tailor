@@ -2,6 +2,7 @@ import {doc, getDoc, getFirestore, setDoc} from "firebase/firestore";
 import {onAuthStateChanged, type User} from "firebase/auth";
 import {auth} from "../Firebase";
 import type {AppSettings} from "../models/AppSettings";
+import type {SavedSite} from "../models/SavedSite";
 import {DefaultSettings} from "../data/defaultSettings";
 import STORAGE from "../utils/storage";
 
@@ -80,6 +81,44 @@ class SettingsService {
             throw new Error("Failed to save settings.", {cause: error});
         }
         return normalised;
+    }
+
+    getCachedSavedSites(): SavedSite[] {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE.SAVED_SITES) || "[]");
+        } catch {
+            return [];
+        }
+    }
+
+    async getSavedSites(): Promise<SavedSite[]> {
+        const db = getFirestore();
+        const user = await this.getAuthenticatedUser();
+
+        try {
+            const docSnapshot = await getDoc(doc(db, `rules/${user.uid}/rules/savedSites`));
+            const sites = docSnapshot.exists()
+                ? ((docSnapshot.data() as {sites?: SavedSite[]}).sites || [])
+                : this.getCachedSavedSites();
+            localStorage.setItem(STORAGE.SAVED_SITES, JSON.stringify(sites));
+            return sites;
+        } catch (error) {
+            console.error("Error retrieving saved sites:", error);
+            return this.getCachedSavedSites();
+        }
+    }
+
+    async saveSavedSites(sites: SavedSite[]): Promise<void> {
+        const db = getFirestore();
+        const user = await this.getAuthenticatedUser();
+
+        localStorage.setItem(STORAGE.SAVED_SITES, JSON.stringify(sites));
+        try {
+            await setDoc(doc(db, `rules/${user.uid}/rules/savedSites`), {sites});
+        } catch (error) {
+            console.error("Error saving sites:", error);
+            throw new Error("Failed to save sites.", {cause: error});
+        }
     }
 }
 

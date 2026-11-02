@@ -1,6 +1,7 @@
 import React from "react";
 import {DutyInput} from "./DutyInput";
 import {MonthYearPicker} from "../shared/MonthYearPicker";
+import {presentToggle} from "../shared/presentToggle";
 import {colors} from "../../../../../styles/theme";
 
 interface WorkExperienceSectionProps {
@@ -117,6 +118,7 @@ export const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
                     yearValue={workExperienceList[index]?.endYear}
                     setFieldValue={resumeFormFormik.setFieldValue}
                     inputFieldClassName={inputFieldClassName}
+                    present={presentToggle(resumeFormFormik.setFieldValue, `workExperience[${index}]`, workExperienceList[index] || {})}
                 />
             </div>
 

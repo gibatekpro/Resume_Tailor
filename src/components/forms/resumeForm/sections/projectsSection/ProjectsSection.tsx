@@ -1,6 +1,7 @@
 import React from "react";
 import {ProjectDetailInput} from "./ProjectDetailInput";
 import {MonthYearPicker} from "../shared/MonthYearPicker";
+import {presentToggle} from "../shared/presentToggle";
 import {colors} from "../../../../../styles/theme";
 
 interface ProjectsSectionProps {
@@ -123,6 +124,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                     yearValue={projectList[index]?.endYear}
                     setFieldValue={resumeFormFormik.setFieldValue}
                     inputFieldClassName={inputFieldClassName}
+                    present={presentToggle(resumeFormFormik.setFieldValue, `projects[${index}]`, projectList[index] || {})}
                 />
             </div>
             <div className="bg-white mb-1">

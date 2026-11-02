@@ -27,7 +27,7 @@ export const ResumeStyleCStyle: {
     semiBoldText: CSSProperties;
 } = {
     mainContainer: {
-        padding: '12mm var(--cv-page-gutter) 10mm',
+        padding: '12mm var(--cv-page-gutter)',
         fontFamily: '"Inter", "Helvetica Neue", Arial, sans-serif',
         fontSize: '9.5pt',
         lineHeight: 1.45,

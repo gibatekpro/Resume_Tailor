@@ -10,6 +10,7 @@ interface MonthYearPickerProps {
     yearValue?: string | number;
     setFieldValue: (field: string, value: string) => void;
     inputFieldClassName: string;
+    present?: { checked: boolean; onChange: (checked: boolean) => void };
 }
 
 export const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
@@ -21,6 +22,7 @@ export const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
     yearValue,
     setFieldValue,
     inputFieldClassName,
+    present,
 }) => {
     const monthInputValue = useMemo(() => {
         if (!monthValue || !yearValue) {
@@ -55,14 +57,29 @@ export const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
     return (
         <div className="grid grid-cols-12 items-center gap-2">
             <span className="col-span-2 text-sm font-normal text-gray-500">{label}</span>
-            <div className="col-span-10">
-                <input
-                    id={`${idPrefix}-${label.toLowerCase()}Date`}
-                    type="month"
-                    value={monthInputValue}
-                    onChange={(event) => handleMonthYearChange(event.target.value)}
-                    className={`${inputFieldClassName} cursor-pointer sm:text-sm`}
-                />
+            <div className="col-span-10 flex items-center gap-3">
+                {present?.checked ? (
+                    <div className={`${inputFieldClassName} flex-1 text-[#45464d] sm:text-sm`}>Present</div>
+                ) : (
+                    <input
+                        id={`${idPrefix}-${label.toLowerCase()}Date`}
+                        type="month"
+                        value={monthInputValue}
+                        onChange={(event) => handleMonthYearChange(event.target.value)}
+                        className={`${inputFieldClassName} flex-1 cursor-pointer sm:text-sm`}
+                    />
+                )}
+                {present && (
+                    <label className="mt-1 flex shrink-0 cursor-pointer items-center gap-1.5 text-sm text-gray-600">
+                        <input
+                            type="checkbox"
+                            checked={present.checked}
+                            onChange={(event) => present.onChange(event.target.checked)}
+                            className="h-4 w-4 cursor-pointer accent-[#2170e4]"
+                        />
+                        Present
+                    </label>
+                )}
             </div>
         </div>
     );

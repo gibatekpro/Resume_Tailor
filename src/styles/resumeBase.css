@@ -5,18 +5,18 @@
     --cv-page-gutter: 14mm;
 }
 
+/* No page margins: react-to-print sets them to 0 anyway (to hide the browser's header and footer), so each
+   style's own top and bottom padding is repeated on every printed page instead (box-decoration-break: clone). */
 @page {
     size: A4;
-    margin: 12mm 0;
-}
-
-@page :first {
-    margin-top: 0;
+    margin: 0;
 }
 
 .cv-page {
     width: var(--cv-page-width);
     box-sizing: border-box;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
     background: #fff;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;

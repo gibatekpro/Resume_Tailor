@@ -47,8 +47,9 @@ export const cleanResume = (resume: ResumeInfo): ResumeInfo => ({
     languages: (resume.languages || []).filter((language) => hasText(language.name)),
 });
 
-// "BSc (Hons) Computer Science, 2:1"
+// "MSc Software Engineering (Distinction)", the standard UK form. A grade already in brackets isn't wrapped twice.
 export const educationTitle = (education: {degree?: string; course?: string; class?: string}) => {
     const title = [education.degree, education.course].filter(hasText).join(" ");
-    return hasText(education.class) ? `${title}, ${education.class!.trim()}` : title;
+    const grade = (education.class || "").trim().replace(/^\((.*)\)$/, "$1");
+    return grade ? `${title} (${grade})` : title;
 };

@@ -1,6 +1,6 @@
 import type {ResumeInfo} from './ResumeInfo';
 import type {GenerationInfo} from './GenerationInfo';
-import type {TailoringChanges} from './TailoringChanges';
+import type {CvImprovement, TailoringChanges} from './TailoringChanges';
 
 export interface JobApplicationInfo {
     date?: string,
@@ -13,6 +13,7 @@ export interface JobApplicationInfo {
     openAISimpleJobDescription?: string,
     openAIGaps?: string[],
     openAIAddedSkills?: unknown,      // raw AI suggestion; verified into tailoringChanges.addedSkills
+    openAIImprovements?: CvImprovement[],
     generationInfo?: GenerationInfo,
     tailoringChanges?: TailoringChanges,
     resumeStyle?: string,

@@ -22,8 +22,9 @@ import STORAGE from "../utils/storage";
 import {Dialog, DialogPanel} from "@headlessui/react";
 import PageLoadingOverlay from "../components/shared/PageLoadingOverlay";
 import PaginationControls from "../components/shared/PaginationControls";
-import {describeChanges, lockResumeFacts, verifyAddedSkills} from "../utils/resumeFacts";
+import {describeChanges, lockResumeFacts, readImprovements, verifyAddedSkills} from "../utils/resumeFacts";
 import {TailoringChangesView} from "../components/shared/TailoringChangesView";
+import {ImprovementsPanel} from "../components/shared/ImprovementsPanel";
 import SettingsService from "../service/SettingsService";
 import type {AppSettings} from "../models/AppSettings";
 
@@ -218,6 +219,7 @@ export const TailorResumePage: React.FC = () => {
                 const parsedResponse: JobApplicationInfo = {
                     ...jobDetails,
                     openAIGaps: Array.isArray(result.openAIGaps) ? result.openAIGaps : [],
+                    openAIImprovements: readImprovements(result.openAIImprovements),
                     generationInfo,
                     tailoringChanges: describeChanges(originalResume, tailoredResume, accepted, rejected),
                     resumeInfo: tailoredResume,
@@ -672,6 +674,11 @@ export const TailorResumePage: React.FC = () => {
                                 {jobApplicationInfo?.tailoringChanges && (
                                     <div className="mx-4 mt-4">
                                         <TailoringChangesView changes={jobApplicationInfo.tailoringChanges}/>
+                                    </div>
+                                )}
+                                {jobApplicationInfo?.openAIImprovements && jobApplicationInfo.openAIImprovements.length > 0 && (
+                                    <div className="mx-4 mt-4">
+                                        <ImprovementsPanel improvements={jobApplicationInfo.openAIImprovements}/>
                                     </div>
                                 )}
                                 {jobApplicationInfo?.openAIGaps && jobApplicationInfo.openAIGaps.length > 0 && (

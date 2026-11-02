@@ -1,5 +1,14 @@
 import type {OpenAIInstruction} from "../models/OpenAIInstruction";
 
+// Words that make a CV sound generic. Banned in the prompt, and checked for again in the AI's answer.
+export const BUZZWORDS = [
+    "leverage", "leveraged", "leveraging", "utilise", "utilised", "utilize", "utilized", "spearheaded", "spearheading",
+    "synergy", "synergies", "dynamic", "passionate", "results-driven", "detail-oriented", "self-starter", "team player",
+    "go-getter", "hard-working", "highly motivated", "proven track record", "cutting-edge", "state-of-the-art",
+    "innovative", "game-changing", "best-in-class", "world-class", "robust", "seamless", "seamlessly", "holistic",
+    "impactful", "orchestrated", "facilitated", "committed to", "think outside the box", "value-add",
+];
+
 // The prompt is fixed: it holds the truthfulness rules and the output contract, and is sent as the system message.
 // The rules are the user's editable preferences; they're appended to the prompt but can never override it.
 export const openAIInstruction: OpenAIInstruction = {
@@ -22,6 +31,7 @@ export const openAIInstruction: OpenAIInstruction = {
     "openAISimpleJobDescription": string, // two or three plain sentences summarising the role
     "openAIAddedSkills": { "skill": string, "evidence": string }[], // see SKILLS below
     "openAIGaps": string[],               // see GAPS below
+    "openAIImprovements": { "section": string, "issue": string, "suggestion": string }[], // see IMPROVEMENTS below
     "resumeInfo": ResumeInfo              // the tailored CV: the same JSON shape as <cv>, with every field and array item kept
 }`,
 
@@ -50,7 +60,9 @@ export const openAIInstruction: OpenAIInstruction = {
         "- projects: reorder so the most relevant project comes first.",
 
         "SKILLS\n" +
-        "- Reorder resumeInfo.skills so the ones this job asks for come first. Keep every existing skill and its spelling.\n" +
+        "- Reorder resumeInfo.skills so the ones this job asks for come first. Keep every existing skill.\n" +
+        "- Write every skill with its standard spelling and capitalisation (\"Typescript\" -> \"TypeScript\", " +
+        "\"postgres\" -> \"PostgreSQL\", \"EF Core\" -> \"Entity Framework Core\"). Correcting a skill's spelling is not adding a skill.\n" +
         "- You may add a skill the job asks for only when <cv> clearly shows the candidate has it, for example: the job asks " +
         "for \"Azure\" and the CV says \"deployed to Azure\"; the job asks for \"CI/CD\" and the CV says \"built release " +
         "pipelines in Azure DevOps\". Use the job's name for the skill.\n" +
@@ -64,17 +76,47 @@ export const openAIInstruction: OpenAIInstruction = {
         "- Start each bullet with a clear past-tense verb (built, designed, automated, fixed, tested); use present tense " +
         "only for a current role.\n" +
         "- Make vague bullets (\"assisted with web development\") concrete using details from the CV, without overstating them.\n" +
-        "- Plain, human language. No buzzwords or filler: avoid \"leveraged\", \"spearheaded\", \"synergy\", " +
-        "\"dynamic\", \"passionate\", \"results-driven\", \"cutting-edge\", \"innovative\" and similar.\n" +
+        "- Every bullet must say what was built, changed, automated, fixed or delivered. A bullet that only says the candidate " +
+        "\"collaborated with\", \"worked with\", \"was responsible for\" or \"helped\" with something must be rewritten around " +
+        "the concrete work the CV mentions, or merged into a bullet that has it. Never keep a pure collaboration bullet.\n" +
+        "- Prefer specifics the CV gives: app or product names, who used it, numbers, technologies.\n" +
+        "- Follow PLAIN LANGUAGE below in every bullet and in the summary.\n" +
+        "- Every bullet in a role must make a different point. If two bullets cover the same work, technology or outcome " +
+        "(e.g. \"worked with Azure and AWS for deployment\" and \"hosted applications on AWS\"; or \"improved security\" and " +
+        "\"improved scalability\" for the same apps), merge them into one bullet.\n" +
         "- Do not repeat the same bullet across roles.\n" +
         "- If a role doesn't have enough genuine material for the requested number of bullets, write fewer. Never pad.",
+
+        "PLAIN LANGUAGE (this matters as much as accuracy)\n" +
+        "- Write the way an engineer describes their work to another engineer: plain verbs, real nouns, no sales talk. " +
+        "Recruiters skip CVs full of buzzwords because they say nothing about what the person actually did.\n" +
+        `- Never use these words or phrases, in any form: ${BUZZWORDS.map((word) => `"${word}"`).join(", ")}.\n` +
+        "- Replace them with the plain verb for what happened: \"Leveraged Azure to deploy the app\" -> \"Deployed the app to Azure\"; " +
+        "\"Utilised React to build\" -> \"Built with React\"; \"Facilitated sprint planning\" -> \"Ran sprint planning\"; " +
+        "\"Spearheaded the migration\" -> \"Migrated\" (or \"Led the migration\" only if the CV says they led it).\n" +
+        "- Don't praise the work or the candidate with adjectives (robust, seamless, high-quality, excellent, efficient). " +
+        "Say what the work did instead: \"robust API\" -> \"API with retry handling and input validation\", if the CV says so; " +
+        "otherwise just \"API\".\n" +
+        "- If the candidate's own text uses one of these words, rewrite that sentence without it.",
 
         "GAPS\n" +
         "- openAIGaps lists the requirements from the job description that <cv> doesn't show, each as a short phrase " +
         "(e.g. \"Kubernetes\", \"Line management experience\"). Don't list anything you added under openAIAddedSkills. " +
         "Use an empty array if there are none.",
 
+        "IMPROVEMENTS\n" +
+        "- openAIImprovements lists the most valuable things only the candidate can fix in their own CV, most important first, " +
+        "at most 6. For example: a role whose bullets are vague (ask which app or process, who used it, what changed, and any " +
+        "numbers such as time saved or users); a project that mentions tests or a repository without counts or a link; " +
+        "a degree written in a non-standard form (\"Masters\" instead of \"MSc\").\n" +
+        "- section names the part of the CV (e.g. \"Ametek Taylor Hobson\", \"Projects\", \"Education\"); issue says what's weak " +
+        "in one sentence; suggestion says exactly what to add, phrased as questions or a fill-in template. " +
+        "Never supply the missing facts yourself.",
+
         "BEFORE YOU ANSWER\n" +
+        "- Search the summary and every bullet for each word in the PLAIN LANGUAGE list, and rewrite any sentence that contains one.\n" +
+        "- Compare the bullets within each role in pairs. Merge any two that make the same point, and rewrite any bullet " +
+        "that doesn't say what was built, changed or delivered.\n" +
         "- Check every bullet against <cv>. If a bullet contains any tool, number, claim or responsibility not " +
         "supported by it, rewrite or remove it.\n" +
         "- Check that every fact listed under FACTS THAT NEVER CHANGE is identical to <cv>.\n" +
@@ -82,7 +124,7 @@ export const openAIInstruction: OpenAIInstruction = {
     ],
     responseFormat: "JSON",
     rules: [
-        "Write exactly 5 bullet points for each work experience role.",
+        "Write up to 5 bullet points for each work experience role.",
         "Use British English spelling.",
         "Keep the whole CV to two pages: keep each bullet under 30 words.",
     ],
@@ -98,4 +140,4 @@ export const SUMMARY_TAILORED_INSTRUCTION =
     "SUMMARY\n" +
     "- Rewrite profile.summary in two or three sentences so it leads with what this job values most, " +
     "using only facts found in <cv> (technologies, years of experience if stated, education, kinds of work).\n" +
-    "- No claims the CV doesn't support, no buzzwords, and don't mention the hiring company by name.";
+    "- No claims the CV doesn't support, no words from the PLAIN LANGUAGE list, and don't mention the hiring company by name.";

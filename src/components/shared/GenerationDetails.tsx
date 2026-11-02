@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import moment from "moment";
 import type {JobApplicationInfo} from "../../models/JobApplicationInfo";
 import {TailoringChangesView} from "./TailoringChangesView";
+import {ImprovementsPanel} from "./ImprovementsPanel";
 
 const formatNumber = (value?: number) => (value === undefined ? "–" : value.toLocaleString("en-GB"));
 
@@ -96,6 +97,12 @@ export const GenerationDetails: React.FC<{application: JobApplicationInfo}> = ({
                 {application.tailoringChanges && (
                     <div className="mt-4">
                         <TailoringChangesView changes={application.tailoringChanges}/>
+                    </div>
+                )}
+
+                {application.openAIImprovements && application.openAIImprovements.length > 0 && (
+                    <div className="mt-4">
+                        <ImprovementsPanel improvements={application.openAIImprovements}/>
                     </div>
                 )}
 

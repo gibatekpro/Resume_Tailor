@@ -55,6 +55,14 @@ export const TailoringChangesView: React.FC<{changes: TailoringChanges}> = ({cha
         <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#2170e4]">What changed</p>
 
         <div className="space-y-4">
+            {changes.buzzwords && changes.buzzwords.length > 0 && (
+                <div role="alert" className="rounded-lg border border-[#f1d8a8] bg-[#fff8ec] px-3 py-2 text-sm leading-6 text-[#5c4300]">
+                    <span className="font-semibold">Buzzwords still in your CV: </span>
+                    {changes.buzzwords.map((item) => `"${item.word}" (${item.where})`).join(", ")}.
+                    <span className="block text-xs text-[#5f6370]">Edit them out below before you send it, or generate again.</span>
+                </div>
+            )}
+
             <section>
                 <h4 className="mb-1 text-sm font-semibold text-[#161c22]">Skills added</h4>
                 {changes.addedSkills.length > 0 ? (

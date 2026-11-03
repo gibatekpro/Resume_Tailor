@@ -23,6 +23,10 @@ import {Dialog, DialogPanel} from "@headlessui/react";
 import PageLoadingOverlay from "../components/shared/PageLoadingOverlay";
 import PaginationControls from "../components/shared/PaginationControls";
 import {runTailoringPipeline} from "../utils/tailoringPipeline";
+import {applySectionChoices, applySummaryChoice, changedSections, NO_CHOICES, SUMMARY_KEY} from "../utils/bulletChoices";
+import type {TailoringChoices} from "../models/TailoringPipeline";
+import {FitReport} from "../components/shared/FitReport";
+import {GapsPanel} from "../components/shared/GapsPanel";
 import {TailoringChangesView} from "../components/shared/TailoringChangesView";
 import {ImprovementsPanel} from "../components/shared/ImprovementsPanel";
 import SettingsService from "../service/SettingsService";
@@ -231,6 +235,28 @@ export const TailorResumePage: React.FC = () => {
 
     });
 
+
+    // Keeps or reverts AI changes in the tailored CV. Only the sections whose choices changed are rewritten,
+    // so manual edits elsewhere in the form survive. The choices are saved with the application.
+    const updateTailoringChoices = (next: TailoringChoices) => {
+        const report = jobApplicationInfo?.tailoringReport;
+        if (!jobApplicationInfo || !report) {
+            return;
+        }
+        const previous = jobApplicationInfo.tailoringChoices || NO_CHOICES;
+        let resume = generatedResumeFormFormik.values;
+        for (const section of changedSections(report.sections, previous, next)) {
+            resume = applySectionChoices(resume, section, next);
+        }
+        const summary = jobApplicationInfo.tailoringChanges?.summary;
+        if (summary && previous.reverted.includes(SUMMARY_KEY) !== next.reverted.includes(SUMMARY_KEY)) {
+            resume = applySummaryChoice(resume, next, summary);
+        }
+        const updated = {...jobApplicationInfo, tailoringChoices: next};
+        setJobApplicationInfo(updated);
+        localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(updated));
+        void generatedResumeFormFormik.setValues(resume);
+    };
 
     const saveInstructionRules = async (uid: string, rules: string[]) => {
         try {
@@ -509,7 +535,11 @@ export const TailorResumePage: React.FC = () => {
                                         ) : (
                                             <text>
                                                 Your tailored CV is ready. Job titles, employers, dates, education and your profile were kept exactly as written.
-                                                {(jobApplicationInfo?.openAIGaps?.length || 0) > 0 &&
+                                                {jobApplicationInfo?.tailoringReport &&
+                                                    ` Fit: ${jobApplicationInfo.tailoringReport.fit.recommendation} (${jobApplicationInfo.tailoringReport.fit.score}/100).`}
+                                                {(jobApplicationInfo?.tailoringReport?.violations.length || 0) > 0 &&
+                                                    ` ${jobApplicationInfo?.tailoringReport?.violations.length} automatic check(s) still fail; they're marked in What changed.`}
+                                                {!jobApplicationInfo?.tailoringReport && (jobApplicationInfo?.openAIGaps?.length || 0) > 0 &&
                                                     ` ${jobApplicationInfo?.openAIGaps?.length} job requirement(s) aren't shown in your CV. See Gaps.`}
                                             </text>
                                         )}
@@ -662,9 +692,19 @@ export const TailorResumePage: React.FC = () => {
                                         </svg>
                                     </button>
                                 </div>
+                                {jobApplicationInfo?.tailoringReport && (
+                                    <div className="mx-4 mt-4">
+                                        <FitReport report={jobApplicationInfo.tailoringReport}/>
+                                    </div>
+                                )}
                                 {jobApplicationInfo?.tailoringChanges && (
                                     <div className="mx-4 mt-4">
-                                        <TailoringChangesView changes={jobApplicationInfo.tailoringChanges} report={jobApplicationInfo.tailoringReport}/>
+                                        <TailoringChangesView
+                                            changes={jobApplicationInfo.tailoringChanges}
+                                            report={jobApplicationInfo.tailoringReport}
+                                            choices={jobApplicationInfo.tailoringChoices}
+                                            onChoicesChange={updateTailoringChoices}
+                                        />
                                     </div>
                                 )}
                                 {jobApplicationInfo?.openAIImprovements && jobApplicationInfo.openAIImprovements.length > 0 && (
@@ -672,7 +712,13 @@ export const TailorResumePage: React.FC = () => {
                                         <ImprovementsPanel improvements={jobApplicationInfo.openAIImprovements}/>
                                     </div>
                                 )}
-                                {jobApplicationInfo?.openAIGaps && jobApplicationInfo.openAIGaps.length > 0 && (
+                                {jobApplicationInfo?.tailoringReport ? (
+                                    (jobApplicationInfo.tailoringReport.gaps.ask.length + jobApplicationInfo.tailoringReport.gaps.real.length > 0) && (
+                                        <div className="mx-4 mt-4">
+                                            <GapsPanel gaps={jobApplicationInfo.tailoringReport.gaps}/>
+                                        </div>
+                                    )
+                                ) : jobApplicationInfo?.openAIGaps && jobApplicationInfo.openAIGaps.length > 0 && (
                                     <div className="mx-4 mt-4 rounded-lg border border-[#f1d8a8] bg-[#fff8ec] px-4 py-3">
                                         <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#8a5a00]">Gaps</p>
                                         <p className="mt-1 text-xs leading-5 text-[#5f6370]">

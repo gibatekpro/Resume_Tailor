@@ -3,6 +3,8 @@ import moment from "moment";
 import type {JobApplicationInfo} from "../../models/JobApplicationInfo";
 import {TailoringChangesView} from "./TailoringChangesView";
 import {ImprovementsPanel} from "./ImprovementsPanel";
+import {FitReport} from "./FitReport";
+import {GapsPanel} from "./GapsPanel";
 
 const formatNumber = (value?: number) => (value === undefined ? "–" : value.toLocaleString("en-GB"));
 
@@ -94,9 +96,19 @@ export const GenerationDetails: React.FC<{application: JobApplicationInfo}> = ({
                     </>
                 )}
 
+                {application.tailoringReport && (
+                    <div className="mt-4">
+                        <FitReport report={application.tailoringReport}/>
+                    </div>
+                )}
+
                 {application.tailoringChanges && (
                     <div className="mt-4">
-                        <TailoringChangesView changes={application.tailoringChanges} report={application.tailoringReport}/>
+                        <TailoringChangesView
+                            changes={application.tailoringChanges}
+                            report={application.tailoringReport}
+                            choices={application.tailoringChoices}
+                        />
                     </div>
                 )}
 
@@ -106,7 +118,13 @@ export const GenerationDetails: React.FC<{application: JobApplicationInfo}> = ({
                     </div>
                 )}
 
-                {gaps.length > 0 && (
+                {application.tailoringReport ? (
+                    (application.tailoringReport.gaps.ask.length + application.tailoringReport.gaps.real.length > 0) && (
+                        <div className="mt-4">
+                            <GapsPanel gaps={application.tailoringReport.gaps}/>
+                        </div>
+                    )
+                ) : gaps.length > 0 && (
                     <div className="mt-4 rounded-lg border border-[#f1d8a8] bg-[#fff8ec] px-4 py-3">
                         <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#8a5a00]">Gaps</p>
                         <ul className="mb-0 list-disc pl-5 text-sm leading-6 text-[#161c22]">

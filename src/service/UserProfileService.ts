@@ -54,6 +54,7 @@ class UserProfileService {
             firstName: data.firstName ?? '',
             lastName: data.lastName ?? '',
             permission: this.normalizePermission(data.permission),
+            aiAccess: data.aiAccess === true,
             email: data.email,
             updatedAt: data.updatedAt,
         };
@@ -97,13 +98,15 @@ class UserProfileService {
                 firstName: data.firstName ?? '',
                 lastName: data.lastName ?? '',
                 permission: this.normalizePermission(data.permission),
+                aiAccess: data.aiAccess === true,
                 email: data.email,
                 updatedAt: data.updatedAt,
             };
         });
     }
 
-    async updateUserPermission(uid: string, permission: UserPermission): Promise<void> {
+    // Admin only (enforced by the Firestore security rules): sets a user's role and AI access.
+    async updateUserAccess(uid: string, permission: UserPermission, aiAccess: boolean): Promise<void> {
         if (!uid) {
             throw new Error('User ID (uid) is required.');
         }
@@ -114,6 +117,7 @@ class UserProfileService {
         await setDoc(targetProfileRef, {
             uid,
             permission,
+            aiAccess,
             updatedAt: new Date().toISOString(),
         }, { merge: true });
     }

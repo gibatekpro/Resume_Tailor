@@ -4,6 +4,7 @@ import {DEFAULT_ALLOWED_MODELS, filterChatModels, friendlyOpenAIError, isChatMod
 import {readTailorRequest} from "./tailorRequest.js";
 import {buildStepPrompt, formatCv} from "./prompts.js";
 import {HttpError, readJsonBody} from "./http.js";
+import {canUseAi} from "./firebaseAdmin.js";
 
 const HOUR = 60 * 60 * 1000;
 
@@ -173,5 +174,20 @@ describe("readJsonBody", () => {
     it("returns undefined for an empty or malformed body", async () => {
         expect(await readJsonBody(new Request("http://x", {method: "POST"}), 100)).toBeUndefined();
         expect(await readJsonBody(new Request("http://x", {method: "POST", body: "not json"}), 100)).toBeUndefined();
+    });
+});
+
+describe("canUseAi", () => {
+    it("allows admins and users an admin has given AI access", () => {
+        expect(canUseAi({permission: "Admin"})).toBe(true);
+        expect(canUseAi({permission: "User", aiAccess: true})).toBe(true);
+    });
+
+    it("refuses everyone else, including users with no profile", () => {
+        expect(canUseAi(undefined)).toBe(false);
+        expect(canUseAi({})).toBe(false);
+        expect(canUseAi({permission: "User"})).toBe(false);
+        expect(canUseAi({permission: "User", aiAccess: "true"})).toBe(false);
+        expect(canUseAi({permission: "admin"})).toBe(false);
     });
 });

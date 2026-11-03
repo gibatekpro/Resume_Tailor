@@ -37,3 +37,14 @@ export const requireUser = async (request: Request): Promise<string> => {
         throw new HttpError(401, "Your session has expired. Please sign in again.");
     }
 };
+
+// Admins always have AI access; anyone else needs aiAccess: true on their profile, which only an admin can set.
+export const canUseAi = (profile?: {permission?: unknown, aiAccess?: unknown}) =>
+    profile?.permission === "Admin" || profile?.aiAccess === true;
+
+export const requireAiAccess = async (uid: string) => {
+    const profile = await adminFirestore().collection("users").doc(uid).get();
+    if (!canUseAi(profile.data())) {
+        throw new HttpError(403, "Your account doesn't have access to AI tailoring yet.");
+    }
+};

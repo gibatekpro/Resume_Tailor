@@ -14,6 +14,7 @@ export const AdminUsersPage: React.FC = () => {
     const [saveError, setSaveError] = useState('');
     const [saveSuccess, setSaveSuccess] = useState('');
     const [permissionEdits, setPermissionEdits] = useState<Record<string, UserPermission>>({});
+    const [aiAccessEdits, setAiAccessEdits] = useState<Record<string, boolean>>({});
 
     const sortedUsers = useMemo(
         () => [...users].sort((a, b) => a.uid.localeCompare(b.uid)),
@@ -39,10 +40,13 @@ export const AdminUsersPage: React.FC = () => {
             setUsers(allUsers);
 
             const edits: Record<string, UserPermission> = {};
+            const aiEdits: Record<string, boolean> = {};
             allUsers.forEach((user) => {
                 edits[user.uid] = user.permission;
+                aiEdits[user.uid] = user.aiAccess;
             });
             setPermissionEdits(edits);
+            setAiAccessEdits(aiEdits);
         } catch (error) {
             setSaveError('Failed to load users.');
             console.error('Error loading users:', error);
@@ -64,21 +68,22 @@ export const AdminUsersPage: React.FC = () => {
 
     const handlePermissionSave = async (uid: string) => {
         const nextPermission = permissionEdits[uid] ?? 'User';
+        const nextAiAccess = aiAccessEdits[uid] ?? false;
         setIsLoading(true);
-        setLoadingMessage('Updating permission...');
+        setLoadingMessage('Updating access...');
         setSaveError('');
         setSaveSuccess('');
 
         try {
-            await userProfileService.updateUserPermission(uid, nextPermission);
+            await userProfileService.updateUserAccess(uid, nextPermission, nextAiAccess);
             setUsers((previous) =>
                 previous.map((user) =>
-                    user.uid === uid ? { ...user, permission: nextPermission } : user
+                    user.uid === uid ? { ...user, permission: nextPermission, aiAccess: nextAiAccess } : user
                 )
             );
-            setSaveSuccess('Permission updated successfully.');
+            setSaveSuccess('Access updated successfully.');
         } catch (error) {
-            setSaveError('Failed to update permission.');
+            setSaveError('Failed to update access.');
             console.error('Error updating permission:', error);
         } finally {
             setIsLoading(false);
@@ -99,7 +104,7 @@ export const AdminUsersPage: React.FC = () => {
                     <div className="mb-4">
                         <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#2170e4]">Administration</p>
                         <h2 className="mt-1 text-xl font-semibold text-[#161c22]">User Permissions</h2>
-                        <p className="text-sm text-[#45464d]">Manage each user permission level: Admin or User.</p>
+                        <p className="text-sm text-[#45464d]">Manage each user's permission level (Admin or User) and whether they can use AI tailoring. Admins always can.</p>
                     </div>
 
                     {saveSuccess && !isLoading && (
@@ -127,6 +132,7 @@ export const AdminUsersPage: React.FC = () => {
                                         <th className="px-3 py-3 font-semibold">Last name</th>
                                         <th className="px-3 py-3 font-semibold">User ID</th>
                                         <th className="px-3 py-3 font-semibold">Permission</th>
+                                        <th className="px-3 py-3 font-semibold">AI access</th>
                                         <th className="px-3 py-3 font-semibold">Action</th>
                                     </tr>
                                 </thead>
@@ -145,6 +151,18 @@ export const AdminUsersPage: React.FC = () => {
                                                     <option value="Admin">Admin</option>
                                                     <option value="User">User</option>
                                                 </select>
+                                            </td>
+                                            <td className="px-3 py-3">
+                                                <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-[#161c22]">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="h-4 w-4 accent-[#2170e4]"
+                                                        checked={(permissionEdits[user.uid] ?? user.permission) === 'Admin' || (aiAccessEdits[user.uid] ?? user.aiAccess)}
+                                                        disabled={(permissionEdits[user.uid] ?? user.permission) === 'Admin'}
+                                                        onChange={(event) => setAiAccessEdits((previous) => ({...previous, [user.uid]: event.target.checked}))}
+                                                    />
+                                                    {(permissionEdits[user.uid] ?? user.permission) === 'Admin' ? 'Always (Admin)' : 'Allowed'}
+                                                </label>
                                             </td>
                                             <td className="px-3 py-3">
                                                 <button

@@ -1,7 +1,7 @@
 import type {GenerationInfo} from "../src/models/GenerationInfo.js";
 import {schemaErrors} from "../src/utils/strictSchema.js";
 import {handle, HttpError, json, numberFromEnv, readJsonBody} from "../server/http.js";
-import {requireUser} from "../server/firebaseAdmin.js";
+import {requireAiAccess, requireUser} from "../server/firebaseAdmin.js";
 import {enforceHourlyLimit} from "../server/rateLimit.js";
 import {createChatCompletion} from "../server/openai.js";
 import {readTailorRequest} from "../server/tailorRequest.js";
@@ -12,6 +12,7 @@ const MAX_BODY_BYTES = 400_000;
 // POST /api/tailor: runs one step of the tailoring pipeline (analyse, rewrite or repair) for the signed-in user.
 export const POST = handle(async (request) => {
     const uid = await requireUser(request);
+    await requireAiAccess(uid);
     await enforceHourlyLimit(uid, "tailor", numberFromEnv("TAILOR_RATE_LIMIT_PER_HOUR", 40));
 
     const input = readTailorRequest(await readJsonBody(request, MAX_BODY_BYTES));

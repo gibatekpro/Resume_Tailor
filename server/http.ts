@@ -35,6 +35,37 @@ export const handle = (handler: (request: Request) => Promise<Response>) =>
         }
     };
 
+const TOO_LARGE = "The job advert and CV are too large to send.";
+
+// The request body as JSON, reading at most `maxBytes`. A declared content-length over the cap is rejected
+// before reading; a chunked body without one is cut off as soon as it passes the cap.
+export const readJsonBody = async (request: Request, maxBytes: number): Promise<unknown> => {
+    if (Number(request.headers.get("content-length")) > maxBytes) {
+        throw new HttpError(413, TOO_LARGE);
+    }
+    if (!request.body) {
+        return undefined;
+    }
+    const reader = request.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+    for (;;) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > maxBytes) {
+            await reader.cancel();
+            throw new HttpError(413, TOO_LARGE);
+        }
+        chunks.push(value);
+    }
+    try {
+        return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+    } catch {
+        return undefined;
+    }
+};
+
 export const NOT_CONFIGURED = "The server isn't set up correctly yet. Please contact the site owner.";
 
 // Reads a positive whole number from an env var, falling back to a default.

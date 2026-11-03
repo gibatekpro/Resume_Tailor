@@ -3,7 +3,7 @@ import {applyRateLimit} from "./rateLimit.js";
 import {DEFAULT_ALLOWED_MODELS, filterChatModels, friendlyOpenAIError, isChatModel, parseAllowedModels} from "./openai.js";
 import {readTailorRequest} from "./tailorRequest.js";
 import {buildStepPrompt, formatCv} from "./prompts.js";
-import {HttpError} from "./http.js";
+import {HttpError, readJsonBody} from "./http.js";
 
 const HOUR = 60 * 60 * 1000;
 
@@ -137,5 +137,41 @@ describe("formatCv", () => {
         });
         expect(text).toContain("[Role 0] Software Developer at Cenitium, Sep 2021 – present (current role)");
         expect(text).toContain("[1] Fixed things");
+    });
+});
+
+describe("readJsonBody", () => {
+    // A streamed body sends no content-length, like a chunked request.
+    const streamed = (text: string, chunkSize = 10) => new Request("http://x/api/tailor", {
+        method: "POST",
+        body: new ReadableStream({
+            start(controller) {
+                for (let i = 0; i < text.length; i += chunkSize) controller.enqueue(new TextEncoder().encode(text.slice(i, i + chunkSize)));
+                controller.close();
+            },
+        }),
+        duplex: "half",
+    } as RequestInit);
+
+    it("parses a body under the cap", async () => {
+        expect(await readJsonBody(new Request("http://x", {method: "POST", body: '{"a":1}'}), 100)).toEqual({a: 1});
+        expect(await readJsonBody(streamed('{"step":"analyse"}'), 100)).toEqual({step: "analyse"});
+    });
+
+    it("rejects a declared content-length over the cap without reading", async () => {
+        const request = new Request("http://x", {method: "POST", body: "{}", headers: {"content-length": "5000"}});
+        await expect(readJsonBody(request, 100)).rejects.toMatchObject({status: 413});
+        expect(request.bodyUsed).toBe(false);
+    });
+
+    it("cuts off a chunked body with no content-length once it passes the cap", async () => {
+        const request = streamed(JSON.stringify({padding: "x".repeat(500)}));
+        expect(request.headers.get("content-length")).toBeNull();
+        await expect(readJsonBody(request, 100)).rejects.toMatchObject({status: 413});
+    });
+
+    it("returns undefined for an empty or malformed body", async () => {
+        expect(await readJsonBody(new Request("http://x", {method: "POST"}), 100)).toBeUndefined();
+        expect(await readJsonBody(new Request("http://x", {method: "POST", body: "not json"}), 100)).toBeUndefined();
     });
 });

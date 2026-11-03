@@ -1,6 +1,6 @@
 import type {GenerationInfo} from "../src/models/GenerationInfo.js";
 import {schemaErrors} from "../src/utils/strictSchema.js";
-import {handle, HttpError, json, numberFromEnv} from "../server/http.js";
+import {handle, HttpError, json, numberFromEnv, readJsonBody} from "../server/http.js";
 import {requireUser} from "../server/firebaseAdmin.js";
 import {enforceHourlyLimit} from "../server/rateLimit.js";
 import {createChatCompletion} from "../server/openai.js";
@@ -14,10 +14,7 @@ export const POST = handle(async (request) => {
     const uid = await requireUser(request);
     await enforceHourlyLimit(uid, "tailor", numberFromEnv("TAILOR_RATE_LIMIT_PER_HOUR", 40));
 
-    if (Number(request.headers.get("content-length")) > MAX_BODY_BYTES) {
-        throw new HttpError(413, "The job advert and CV are too large to send.");
-    }
-    const input = readTailorRequest(await request.json().catch(() => undefined));
+    const input = readTailorRequest(await readJsonBody(request, MAX_BODY_BYTES));
     const {messages, responseFormat} = buildStepPrompt(input);
     const startedAt = Date.now();
 

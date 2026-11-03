@@ -1,8 +1,8 @@
 import type {ResumeInfo} from "../models/ResumeInfo";
 import type {KeptOutFact, ReportSection, Rewrite, Seniority, Violation} from "../models/TailoringPipeline";
 import {bannedWordsIn} from "./resumeFacts";
-import {findTechTerms, mentionsTerm} from "./techTerms";
-import {normaliseText, stem, tokens, wordCount} from "./text";
+import {findTechTerms, mentionsTerm, TECH_TERMS} from "./techTerms";
+import {containsPhrase, normaliseText, stem, tokens, wordCount} from "./text";
 import {buildSections} from "./applyRewrite";
 
 // Deterministic checks on a rewrite. Each returns plain data, so the same results drive the repair prompt and the UI.
@@ -25,25 +25,33 @@ const STOPWORDS = new Set((
 
 const contentWords = (text: string) => tokens(text).filter((word) => !STOPWORDS.has(word)).map(stem);
 
+const overlap = (a: string, b: string) => {
+    const setA = new Set(contentWords(a));
+    const setB = new Set(contentWords(b));
+    const shared = [...setA].filter((word) => setB.has(word)).length;
+    const union = new Set([...setA, ...setB]).size;
+    return {shared, jaccard: union > 0 ? shared / union : 0, smaller: Math.min(setA.size, setB.size)};
+};
+
 // Two bullets make the same point when most of their words are shared (Jaccard ≥ 0.5), when the shorter one is
 // mostly contained in the longer (≥ 0.7), or when they start with the same verb and object.
 export const areNearDuplicates = (a: string, b: string) => {
+    const {shared, jaccard, smaller} = overlap(a, b);
+    if (jaccard >= 0.5) return true;
+    if (smaller >= 5 && shared / smaller >= 0.7) return true;
     const wordsA = contentWords(a);
     const wordsB = contentWords(b);
-    const setA = new Set(wordsA);
-    const setB = new Set(wordsB);
-    const shared = [...setA].filter((word) => setB.has(word)).length;
-    const union = new Set([...setA, ...setB]).size;
-    const smaller = Math.min(setA.size, setB.size);
-    if (union > 0 && shared / union >= 0.5) return true;
-    if (smaller >= 5 && shared / smaller >= 0.7) return true;
     return wordsA.length >= 3 && wordsB.length >= 3 && wordsA.slice(0, 3).join(" ") === wordsB.slice(0, 3).join(" ");
 };
 
-export const findNearDuplicates = (bullets: string[]) => {
+// A looser test, used when a point was dropped for the bullet limit: two bullets about the same work share about a third
+// of their words (the two Power Automate bullets in the reported run), where bullets that only share a stack share far fewer.
+export const coverSameWork = (a: string, b: string) => areNearDuplicates(a, b) || overlap(a, b).jaccard >= 0.3;
+
+export const findNearDuplicates = (bullets: string[], same: (a: string, b: string) => boolean = areNearDuplicates) => {
     const pairs: [number, number][] = [];
     bullets.forEach((a, i) => bullets.slice(i + 1).forEach((b, offset) => {
-        if (areNearDuplicates(a, b)) pairs.push([i, i + 1 + offset]);
+        if (same(a, b)) pairs.push([i, i + 1 + offset]);
     }));
     return pairs;
 };
@@ -56,14 +64,21 @@ export interface Fact {
     present: (text: string) => boolean;
 }
 
-const RESPONSIBILITIES: [string, RegExp][] = [
-    ["promoted", /\bpromot(?:ed|ion|ions|e|es|ing)\b/],
-    ["led", /\b(?:led|lead|leads|leading)\b/],
-    ["mentored", /\bmentor(?:ed|ing|s|ship)?\b/],
-    ["migrated", /\bmigrat(?:ed|e|es|ing|ion|ions)\b/],
-    ["automated", /\bautomat(?:ed|e|es|ing|ion|ions)\b/],
-    ["owned", /\b(?:owned|owning|ownership)\b/],
-    ["designed", /\bdesign(?:ed|s|ing)?\b/],
+// A base verb only counts when an object follows it ("design the API", "lead and mentor"), so a noun phrase such as
+// "design patterns" or "lead developer" isn't read as something the candidate did.
+const OBJECT = "(?:the|a|an|and|our|their|its|new|\\d+)";
+const asVerb = (forms: string, base: string) => new RegExp(`\\b(?:${forms})\\b|\\b${base}s? ${OBJECT}\\b`);
+
+// Each responsibility: the forms that show the candidate did it (to find it in the original), and any form at all
+// (to find it in the rewrite).
+const RESPONSIBILITIES: [string, RegExp, RegExp][] = [
+    ["promoted", /\b(?:promoted|promotion)\b/, /\bpromot(?:ed|ion|ions|e|es|ing)\b/],
+    ["led", asVerb("led|leading", "lead"), /\b(?:led|lead|leads|leading)\b/],
+    ["mentored", asVerb("mentored|mentoring|mentorship", "mentor"), /\bmentor(?:ed|ing|s|ship)?\b/],
+    ["migrated", asVerb("migrated|migrating", "migrate"), /\bmigrat(?:ed|e|es|ing|ion|ions)\b/],
+    ["automated", asVerb("automated|automating", "automate"), /\bautomat(?:ed|e|es|ing|ion|ions)\b/],
+    ["owned", asVerb("owned|owning|ownership", "own"), /\b(?:owned|owning|ownership)\b/],
+    ["designed", asVerb("designed|designing", "design"), /\bdesign(?:ed|s|ing)?\b/],
 ];
 
 const isNumber = (word: string) => /^\d+(?:\.\d+)?$/.test(word);
@@ -94,14 +109,44 @@ export const extractFacts = (text: string, skills: string[] = []): Fact[] => {
             label: term,
             present: (output) => mentionsTerm(output, term),
         })),
-        ...RESPONSIBILITIES.filter(([, pattern]) => pattern.test(normalised)).map(([label, pattern]): Fact => ({
+        ...RESPONSIBILITIES.filter(([, done]) => done.test(normalised)).map(([label, , anyForm]): Fact => ({
             kind: "responsibility",
             label,
-            present: (output) => pattern.test(normaliseText(output)),
+            present: (output) => anyForm.test(normaliseText(output)),
         })),
     ];
     return facts.filter((fact, index) => facts.findIndex((other) => other.label === fact.label) === index);
 };
+
+// ---- Degrees in the summary ----
+
+const DEGREE = /\b(BSc|BA|BEng|MEng|MSci|MSc|MA|MBA|MRes|MPhil|PhD|DPhil|LLB|LLM|HND|HNC)\b(?:[^.;]{0,60}?\b(Distinction|Merit|First[- ]Class(?: Honours)?|Upper Second(?:[- ]Class)?(?: Honours)?|2:1|2:2))?/g;
+
+// Each degree a text names, with its grade when one follows it ("MSc Advanced Computer Science (Distinction)").
+export const degreesIn = (text = ""): Fact[] => [...text.matchAll(DEGREE)].map(([, degree, grade]) => ({
+    kind: "responsibility",
+    label: grade ? `${degree} (${grade})` : degree,
+    present: (output) => new RegExp(`\\b${degree}\\b`).test(output) && (!grade || new RegExp(grade, "i").test(output)),
+}));
+
+// ---- Plain writing ----
+
+// "~", a slash between words ("emails/day") and abbreviations. Technology names keep their own slashes (CI/CD), and so do links.
+const SLASHED_TERMS = TECH_TERMS.flat().filter((spelling) => spelling.includes("/"));
+const ABBREVIATIONS = /(?<![\w.])(?:approx|hrs|mins|etc|e\.g|i\.e|vs)\b\.?/gi;
+const LINK = /^(?:https?:\/\/|www\.|[\w-]+(?:\.[\w-]+)+\/)/i;
+
+export const unplainMarks = (text: string) => {
+    const rest = SLASHED_TERMS.reduce((value, term) => value.split(term).join(" "), text);
+    return [
+        ...(rest.includes("~") ? ["~"] : []),
+        ...rest.split(/\s+/).filter((word) => word.includes("/") && !LINK.test(word)).map((word) => word.replace(/^\W+|[^\w/]+$/g, "")),
+        ...(rest.match(ABBREVIATIONS) || []),
+    ];
+};
+
+const PLAIN_WORDS = "Write it in plain words: \"about\" instead of \"~\", \"emails a day\" instead of \"emails/day\", " +
+    "\"and\" or \"or\" instead of a slash, and no abbreviations.";
 
 // ---- Raised responsibility ----
 
@@ -187,7 +232,7 @@ const sectionContext = (original: ResumeInfo, section: ReportSection) => {
 export const runChecks = (
     original: ResumeInfo,
     rewrite: Rewrite,
-    options: {rules?: string[], addedSkills?: string[], tailorSummary?: boolean, seniority?: Seniority} = {},
+    options: {rules?: string[], addedSkills?: string[], tailorSummary?: boolean, seniority?: Seniority, jobTerms?: string[]} = {},
 ) => {
     const {maxBullets, maxWords} = parseBulletRules(options.rules || []);
     const skills = (original.skills || []).filter((skill) => skill.trim());
@@ -218,6 +263,11 @@ export const runChecks = (
             add("escalation", "Summary", `The summary says the candidate ${word}, which the CV never says. Use the CV's own level of responsibility.`);
         }
         for (const term of newTechnologies(rewrite.summary)) add("new-technology", "Summary", `The summary mentions "${term}", which isn't anywhere in the CV. Remove it.`);
+        for (const degree of degreesIn(original.profile?.summary)) {
+            if (!degree.present(rewrite.summary)) add("lost-fact", "Summary", `The original summary mentions "${degree.label}". Keep it in the summary.`);
+        }
+        const marks = unplainMarks(rewrite.summary);
+        if (marks.length > 0) add("plain-writing", "Summary", `The summary uses ${marks.map((mark) => `"${mark}"`).join(", ")}. ${PLAIN_WORDS}`);
     }
 
     const sections = buildSections(original, rewrite);
@@ -237,6 +287,8 @@ export const runChecks = (
                 add("escalation", where, `Bullet ${n} says the candidate ${word} something, but the original never says so. Keep the original level of responsibility.`, index);
             }
             for (const term of newTechnologies(bullet.text)) add("new-technology", where, `Bullet ${n} mentions "${term}", which isn't anywhere in the CV. Remove it.`, index);
+            const marks = unplainMarks(bullet.text);
+            if (marks.length > 0) add("plain-writing", where, `Bullet ${n} uses ${marks.map((mark) => `"${mark}"`).join(", ")}. ${PLAIN_WORDS}`, index);
 
             // Completed work: a role that has ended, or a bullet whose every source was written in the past tense.
             const completed = !current || (bullet.from.length > 0 && bullet.from.every((from) => startsWithPastTense(section.original[from] || "")));
@@ -248,8 +300,20 @@ export const runChecks = (
             if (words > maxWords) add("too-long", where, `Bullet ${n} is ${words} words long. Keep it to ${maxWords} words or fewer.`, index);
         });
 
-        for (const [a, b] of findNearDuplicates(texts)) {
-            add("near-duplicate", where, `Bullets ${a + 1} and ${b + 1} make the same point. Merge them into one bullet.`, b);
+        // Dropping a distinct point while two bullets still make the same point wastes a place: merge them and keep the point.
+        const droppedHere = rewrite.droppedPoints.find((point) => point.section.trim() && containsPhrase(where, point.section));
+        for (const [a, b] of findNearDuplicates(texts, droppedHere ? coverSameWork : areNearDuplicates)) {
+            add("near-duplicate", where, droppedHere
+                ? `Bullets ${a + 1} and ${b + 1} make the same point, while ${quote(droppedHere.text)} was dropped. Merge bullets ${a + 1} and ${b + 1} into one bullet and put the dropped point back.`
+                : `Bullets ${a + 1} and ${b + 1} make the same point. Merge them into one bullet.`, b);
+        }
+
+        // Project bullets are ordered for the job like role bullets: the one naming most of the job's technologies first.
+        const relevance = texts.map((text) => (options.jobTerms || []).filter((term) => mentionsTerm(text, term)));
+        const best = relevance.reduce((top, terms, index) => terms.length > relevance[top].length ? index : top, 0);
+        if (section.kind === "project" && best > 0) {
+            add("order", where, `Bullet ${best + 1} names more of the job's technologies (${relevance[best].join(", ")}) than bullet 1. ` +
+                "Rewrite and order this project's bullets for the job, as for roles: most relevant first.", 0);
         }
 
         if (section.kind === "role" && maxBullets && texts.length > maxBullets) {

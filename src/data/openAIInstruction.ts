@@ -33,7 +33,10 @@ export const ANALYSIS_PROMPT = [
     "or duties such as \"lead a team\", \"line manage\", \"set technical direction\").\n" +
     "- senior: a Senior title, or the advert expects several years' experience and ownership of systems, without managing people.\n" +
     "- mid: a few years' experience expected; works independently.\n" +
-    "- junior: graduate, entry-level or junior roles.",
+    "- junior: graduate, entry-level or junior roles.\n" +
+    "- Judge by the title, the years of experience asked for and who the role works under, not by a single phrase. " +
+    "An advert that asks for over three years and says the role works with the Lead Developer is mid, even if it says " +
+    "the role will \"shape and lead the development\" of something. senior usually asks for five or more years.",
 
     "THEMES\n" +
     "- The 3 to 5 things this employer cares about most, most important first, judged by what the advert repeats, " +
@@ -98,7 +101,8 @@ export const openAIInstruction: OpenAIInstruction = {
         "For each bullet: text; from: the numbers of the original bullets in that role it is based on (several if you merged them; " +
         "[] only for a bullet built from elsewhere in the CV); why: a few words on which requirement the change serves, named as in " +
         "<analysis> (e.g. \"Leadership first, for 'technical leadership' (must)\"), or \"\" if the bullet is unchanged.\n" +
-        "- projects: the same for each project.\n" +
+        "- projects: the same for each project. Rewrite and order project bullets for the job exactly as you do role bullets: " +
+        "the most relevant first, reworded where the job's vocabulary fits, following every rule below.\n" +
         "- projectOrder: every project number, most relevant first.\n" +
         "- skills: every existing skill, reordered (see SKILLS), plus any you add.\n" +
         "- addedSkills: see SKILLS.\n" +
@@ -123,8 +127,10 @@ export const openAIInstruction: OpenAIInstruction = {
         "named technologies. Rewording may move a fact to another bullet in the same role, never delete it. For example, " +
         "\"Promoted from intern to full-time developer after the first year, then led a team of 3 developers, splitting and tracking " +
         "work in Jira and GitHub\" must still say they were promoted, led 3 developers, and used Jira and GitHub.\n" +
-        "- If the bullet limit forces something out, drop the least relevant whole point rather than parts of several, " +
-        "and list it in droppedPoints.",
+        "- If the bullet limit forces something out, first merge bullets that cover the same work or tool (e.g. two bullets " +
+        "about the same Power Automate flows). Only if the role is still over the limit, drop the least relevant whole point " +
+        "rather than parts of several, and list it in droppedPoints. Never drop a distinct relevant point, such as mentoring, " +
+        "while two bullets make the same point.",
 
         "NOTHING UNTRUE\n" +
         "- Do not add any tool, technology, responsibility, achievement or number that <cv> doesn't support.\n" +
@@ -157,7 +163,10 @@ export const openAIInstruction: OpenAIInstruction = {
         "them. For example \"Led a team of 3 developers while building React and .NET features for client finance applications\" " +
         "and \"Built and maintained React and .NET features for client finance applications\" make the same point.\n" +
         "- Split a bullet that covers two distinct pieces of work. Don't repeat the same bullet across roles.\n" +
-        "- If a role doesn't have enough genuine material for the requested number of bullets, write fewer. Never pad.",
+        "- If a role doesn't have enough genuine material for the requested number of bullets, write fewer. Never pad.\n" +
+        "- Write in full, plain words and end every bullet with a full stop. No \"~\" (write \"about\"), no slash between " +
+        "words (\"emails/day\" -> \"emails a day\", \"React/Redux\" -> \"React and Redux\") and no abbreviations such as " +
+        "approx., hrs or e.g. Technology names keep their own spelling (CI/CD).",
 
         "PLAIN LANGUAGE (this matters as much as accuracy)\n" +
         "- Write the way an engineer describes their work to another engineer: plain verbs, real nouns, no sales talk. " +
@@ -174,7 +183,9 @@ export const openAIInstruction: OpenAIInstruction = {
         "SKILLS\n" +
         "- Reorder skills so the ones this job asks for come first. Keep every existing skill.\n" +
         "- Write every skill with its standard spelling and capitalisation (\"Typescript\" -> \"TypeScript\", " +
-        "\"postgres\" -> \"PostgreSQL\", \"EF Core\" -> \"Entity Framework Core\"). Correcting a skill's spelling is not adding a skill.\n" +
+        "\"postgres\" -> \"PostgreSQL\"). Correcting a skill's spelling is not adding a skill.\n" +
+        "- Different names for the same skill are one skill (\"EF Core\" and \"Entity Framework Core\", \"TS\" and " +
+        "\"TypeScript\"): keep the CV's name and never add the other name as a new skill.\n" +
         "- You may add a skill the job asks for only when <analysis> marks it strong or <cv> clearly shows it, for example: the job asks " +
         "for \"CI/CD\" and the CV says \"built release pipelines in Azure DevOps\". Use the job's name for the skill.\n" +
         "- For every skill you add, put an entry in addedSkills whose evidence is copied word for word from <cv>, " +
@@ -197,6 +208,7 @@ export const openAIInstruction: OpenAIInstruction = {
         "- For each original bullet, check its numbers, team sizes, promotions, named products and technologies are still in that " +
         "role's bullets, or that the point is listed in droppedPoints.\n" +
         "- Check each bullet's tense against TENSE.\n" +
+        "- Check every bullet is in plain words and ends with a full stop, and that each project's bullets are reordered for the job.\n" +
         "- Check every bullet against <cv>: no tool, number, claim or responsibility it doesn't support.\n" +
         "- If the job is senior or lead, check that leadership or mentoring evidence is within the first two bullets of at least " +
         "one role that has it, and in the summary.\n" +
@@ -221,6 +233,7 @@ export const SUMMARY_TAILORED_INSTRUCTION =
     "- Rewrite the summary in two or three sentences. Lead with the 2-3 strongest matches between the CV and the job's themes " +
     "(the requirements <analysis> marks strong), using only facts found in <cv>.\n" +
     "- If the job's seniority is senior or lead and the CV shows leadership, mentoring or a promotion, mention it, at its real scale.\n" +
+    "- If the current summary names a degree, keep it with its grade (e.g. \"MSc (Distinction)\").\n" +
     "- No claims the CV doesn't support, no words from the PLAIN LANGUAGE list, and don't mention the hiring company by name.";
 
 // Step C: added to the rewrite prompt when the checks in code found problems.
@@ -231,4 +244,6 @@ export const REPAIR_INSTRUCTION =
     "unless fixing a problem requires changing it.\n" +
     "- A missing fact goes back into that role's bullets; if the role is at its bullet limit, merge it into the most related bullet. " +
     "A banned word, a raised responsibility or a technology the CV doesn't name is removed or replaced with the CV's own words. " +
-    "Bullets that make the same point are merged into one. A bullet in the wrong tense is put into the right one.";
+    "Bullets that make the same point are merged into one; if a point was dropped for the bullet limit, it goes back in the " +
+    "place the merge frees. A bullet in the wrong tense is put into the right one. A project's bullets are reordered and " +
+    "rewritten for the job.";

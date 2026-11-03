@@ -3,6 +3,7 @@ import type {Project} from "../models/Project";
 import type {AddedSkill, CvImprovement, TailoringChanges} from "../models/TailoringChanges";
 import {BUZZWORDS} from "../data/openAIInstruction";
 import {normaliseText} from "./text";
+import {skillKey} from "./techTerms";
 
 const normalise = (value?: string) => (value || "").trim().toLowerCase();
 
@@ -21,16 +22,17 @@ const cvText = (resume: ResumeInfo) => normaliseText([
 ].filter(Boolean).join("\n"));
 
 // A skill the AI added is kept only if the CV names it outright, or the AI's evidence is a real quote from the CV.
+// Another name for a skill the CV already lists ("Entity Framework Core" for "EF Core") isn't an addition.
 export const verifyAddedSkills = (original: ResumeInfo, suggested: unknown) => {
     const text = cvText(original);
-    const existing = new Set((original.skills || []).map(normalise));
+    const existing = new Set((original.skills || []).map(skillKey));
     const accepted: AddedSkill[] = [];
     const rejected: string[] = [];
 
     for (const item of Array.isArray(suggested) ? suggested : []) {
         const skill = typeof item?.skill === "string" ? item.skill.trim() : "";
         const evidence = typeof item?.evidence === "string" ? item.evidence.trim() : "";
-        if (!skill || existing.has(normalise(skill)) || accepted.some((added) => normalise(added.skill) === normalise(skill))) {
+        if (!skill || existing.has(skillKey(skill)) || accepted.some((added) => skillKey(added.skill) === skillKey(skill))) {
             continue;
         }
         const quote = normaliseText(evidence);
@@ -86,20 +88,24 @@ export const lockResumeFacts = <T extends ResumeInfo>(
     });
 
     // Skills: the original list plus verified additions, in the AI's order; anything else is dropped.
+    // Another name for a listed skill ("Entity Framework Core" for "EF Core") takes that skill's place under the CV's name.
     // The AI's spelling is kept when it only adds capitals (e.g. "Typescript" -> "TypeScript"), never when it removes them.
     const allowedSkills = [...(nonEmptyList(original.skills) || []), ...(options.addedSkills || []).map((added) => added.skill)];
     let skills = original.skills;
     if (allowedSkills.length > 0) {
         const capitals = (value: string) => (value.match(/[A-Z]/g) || []).length;
-        const spelling = new Map(allowedSkills.map((skill) => [normalise(skill), skill.trim()]));
+        const spelling = new Map<string, string>();
+        for (const skill of allowedSkills) {
+            if (!spelling.has(skillKey(skill))) spelling.set(skillKey(skill), skill.trim());
+        }
         for (const skill of tailored.skills || []) {
-            const current = spelling.get(normalise(skill));
-            if (current !== undefined && capitals(skill) > capitals(current)) {
-                spelling.set(normalise(skill), skill.trim());
+            const current = spelling.get(skillKey(skill));
+            if (current !== undefined && normalise(skill) === normalise(current) && capitals(skill) > capitals(current)) {
+                spelling.set(skillKey(skill), skill.trim());
             }
         }
-        const ordered = (tailored.skills || []).map(normalise).filter((key) => spelling.has(key));
-        skills = [...new Set([...ordered, ...allowedSkills.map(normalise)])].map((key) => spelling.get(key)!);
+        const ordered = (tailored.skills || []).map(skillKey).filter((key) => spelling.has(key));
+        skills = [...new Set([...ordered, ...allowedSkills.map(skillKey)])].map((key) => spelling.get(key)!);
     }
 
     const tailoredSummary = tailored.profile?.summary?.trim();
@@ -143,7 +149,11 @@ export const findBuzzwords = (resume: ResumeInfo) => {
     return found;
 };
 
-// Side-by-side record of what the tailoring changed, for the "What changed" view.
+// What the success message says was kept and what was tailored.
+export const keptAndTailoredMessage = (changes?: TailoringChanges) => changes?.summary
+    ? "Titles, employers, dates and education were kept; your summary and bullets were tailored."
+    : "Titles, employers, dates, education and your summary were kept; your bullets were tailored.";
+
 // Things only the candidate can fix in their own CV, as suggested by the AI. Malformed entries are dropped.
 export const readImprovements = (suggested: unknown): CvImprovement[] =>
     (Array.isArray(suggested) ? suggested : [])
@@ -155,6 +165,7 @@ export const readImprovements = (suggested: unknown): CvImprovement[] =>
         }))
         .slice(0, 6);
 
+// Side-by-side record of what the tailoring changed, for the "What changed" view.
 export const describeChanges = (
     original: ResumeInfo,
     tailored: ResumeInfo,

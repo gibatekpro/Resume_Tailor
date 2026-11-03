@@ -71,7 +71,7 @@ export interface Rewrite {
 
 export type CheckName =
     | "banned-word" | "near-duplicate" | "lost-fact" | "escalation"
-    | "new-technology" | "tense" | "too-long" | "too-many-bullets" | "leadership-first";
+    | "new-technology" | "tense" | "too-long" | "too-many-bullets" | "leadership-first" | "plain-writing" | "order";
 
 // One failed check on the rewrite. `bullet` is the bullet's index in its section, when the problem is in one bullet.
 export interface Violation {

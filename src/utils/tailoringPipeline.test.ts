@@ -3,10 +3,13 @@ import type {GenerationInfo} from "../models/GenerationInfo";
 import type {JobAnalysis, Rewrite} from "../models/TailoringPipeline";
 import {runTailoringPipeline, type StepCaller, type StepRequest} from "./tailoringPipeline";
 import {findNearDuplicates, startsWithPresentTense} from "./tailoringChecks";
-import {findBuzzwords} from "./resumeFacts";
+import {findBuzzwords, keptAndTailoredMessage} from "./resumeFacts";
+import {computeFit} from "./evidence";
+import type {ResumeInfo} from "../models/ResumeInfo";
 import {findTechTerms, mentionsTerm} from "./techTerms";
 import {
-    CV, DOTNET_ANALYSIS, DOTNET_JOB, DOTNET_REWRITE, LEAD_ANALYSIS, LEAD_FIRST_REWRITE, LEAD_JOB, LEAD_REPAIRED_REWRITE, RULES,
+    CV, DOTNET_ANALYSIS, DOTNET_JOB, DOTNET_REWRITE, FULLSTACK_ANALYSIS, FULLSTACK_CV, FULLSTACK_FIRST_REWRITE, FULLSTACK_JOB,
+    FULLSTACK_REPAIRED_REWRITE, LEAD_ANALYSIS, LEAD_FIRST_REWRITE, LEAD_JOB, LEAD_REPAIRED_REWRITE, RULES,
 } from "./__fixtures__/tailoringFixtures";
 
 const usage = (step: string): GenerationInfo => ({
@@ -26,10 +29,10 @@ const playback = (responses: {analyse: JobAnalysis, rewrite: Rewrite, repair?: R
     return {callStep, requests};
 };
 
-const run = (job: string, responses: Parameters<typeof playback>[0]) => {
+const run = (job: string, responses: Parameters<typeof playback>[0], resume: ResumeInfo = CV) => {
     const recorded = playback(responses);
     const result = runTailoringPipeline(
-        {resumeInfo: structuredClone(CV), jobDescription: job, rules: RULES, tailorSummary: true, model: "gpt-5"},
+        {resumeInfo: structuredClone(resume), jobDescription: job, rules: RULES, tailorSummary: true, model: "gpt-5"},
         recorded.callStep,
     );
     return {result, requests: recorded.requests};
@@ -142,5 +145,83 @@ describe(".NET Developer (mid-level, a strong fit)", () => {
         const application = await dotnet.result;
         expect(application.resumeInfo!.workExperience![0].duties[0]).toMatch(/React and \.NET features/);
         expect(application.tailoringReport!.keptOut.map((item) => item.fact)).toEqual(expect.arrayContaining(["mentored", "3 placement"]));
+    });
+});
+
+describe("Full Stack Developer – Praetorian, London (mid-level, the reported run)", () => {
+    const fullstack = run(FULLSTACK_JOB, {analyse: FULLSTACK_ANALYSIS, rewrite: FULLSTACK_FIRST_REWRITE, repair: FULLSTACK_REPAIRED_REWRITE}, FULLSTACK_CV);
+    const firstPass = async () => (await fullstack.result).tailoringReport!.firstPassViolations;
+    const cenitium = async () => (await fullstack.result).resumeInfo!.workExperience![0].duties;
+
+    it("1. reads the job as mid-level from the years asked for and the reporting line, so the fit is worth applying", async () => {
+        const report = (await fullstack.result).tailoringReport!;
+        expect(report.seniority).toBe("mid");
+        expect((fullstack.requests[1] as StepRequest & {step: "rewrite"}).analysis.seniority).toBe("mid");
+        expect(report.fit).toMatchObject({score: 69, recommendation: "Worth applying"});
+        // The model's "senior" would have capped the same evidence at a stretch.
+        expect(computeFit(report.requirements, "senior").recommendation).toBe("Stretch");
+    });
+
+    it("2. doesn't report \"designed\" lost from a bullet that only says \"design patterns\"", async () => {
+        const all = [...await firstPass(), ...(await fullstack.result).tailoringReport!.violations];
+        expect(all.filter((violation) => violation.message.includes('"designed"'))).toEqual([]);
+    });
+
+    it("3. merges the two Power Automate bullets instead of dropping mentoring", async () => {
+        const merge = (await firstPass()).find((violation) => violation.check === "near-duplicate");
+        expect(merge).toMatchObject({where: "Software Developer · Cenitium", bullet: 3});
+        expect(merge!.message).toMatch(/Bullets 3 and 4 make the same point, while "Mentored 3 placement-year students.*" was dropped/);
+        const duties = await cenitium();
+        expect(duties.filter((duty) => /Power Automate/.test(duty))).toHaveLength(1);
+        expect(duties).toContain("Mentored 3 placement-year students in full-stack development with React and .NET.");
+        expect((await fullstack.result).tailoringReport!.keptOut).toEqual([]);
+    });
+
+    it("4. treats Entity Framework Core as the CV's EF Core, not a new skill", async () => {
+        const application = await fullstack.result;
+        expect(application.resumeInfo!.skills!.filter((skill) => /^(EF Core|Entity Framework Core)$/.test(skill))).toEqual(["EF Core"]);
+        expect(application.tailoringChanges!.addedSkills).toEqual([]);
+    });
+
+    it("5. writes bullets in plain words, without \"~\", slashes or abbreviations", async () => {
+        const plain = (await firstPass()).filter((violation) => violation.check === "plain-writing");
+        expect(plain).toMatchObject([{where: "Software Developer · Cenitium", bullet: 2}]);
+        expect(plain[0].message).toContain('"~", "emails/day"');
+        expect((await cenitium()).filter((duty) => /[~/]/.test(duty))).toEqual([]);
+        expect(await cenitium()).toContain(
+            "Built Power Automate flows that read supplier invoice emails and save the attachments to SharePoint for the finance team, handling about 200 emails a day.");
+    });
+
+    it("6. rewrites and orders project bullets for the job, each ending with a full stop", async () => {
+        expect((await firstPass()).find((violation) => violation.check === "order")).toMatchObject({where: "Resume Tailor", bullet: 0});
+        expect((await fullstack.result).resumeInfo!.projects![0].projectDetails).toEqual([
+            "Built a React and TypeScript web app that tailors CVs to job adverts with the OpenAI API.",
+            "Stored users' CVs and applications in Firebase Firestore.",
+            "Wrote the user guide and recorded a demo video.",
+        ]);
+    });
+
+    it("7. says accurately what was kept and what was tailored", async () => {
+        const application = await fullstack.result;
+        expect(keptAndTailoredMessage(application.tailoringChanges))
+            .toBe("Titles, employers, dates and education were kept; your summary and bullets were tailored.");
+        expect(keptAndTailoredMessage({...application.tailoringChanges!, summary: undefined}))
+            .toBe("Titles, employers, dates, education and your summary were kept; your bullets were tailored.");
+    });
+
+    it("8. keeps the MSc (Distinction) in the tailored summary", async () => {
+        expect((await firstPass()).find((violation) => violation.where === "Summary")).toMatchObject({
+            check: "lost-fact",
+            message: 'The original summary mentions "MSc (Distinction)". Keep it in the summary.',
+        });
+        expect((await fullstack.result).resumeInfo!.profile!.summary).toContain("MSc Advanced Computer Science (Distinction)");
+    });
+
+    it("fixes everything in one repair", async () => {
+        const report = (await fullstack.result).tailoringReport!;
+        expect([...new Set((await firstPass()).map((violation) => violation.check))].sort())
+            .toEqual(["lost-fact", "near-duplicate", "order", "plain-writing"]);
+        expect(fullstack.requests.map((request) => request.step)).toEqual(["analyse", "rewrite", "repair"]);
+        expect(report.violations).toEqual([]);
     });
 });

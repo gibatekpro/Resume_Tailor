@@ -74,4 +74,14 @@ describe("verifyAddedSkills", () => {
         expect(accepted).toEqual([]);
         expect(rejected).toEqual(["Kubernetes"]);
     });
+
+    it("treats another name for a listed skill as that skill (EF Core and Entity Framework Core, TS and TypeScript)", () => {
+        const resume: ResumeInfo = {...original, skills: ["EF Core", "TS", "React"], workExperience: [{...original.workExperience![0], duties: ["Built APIs with EF Core."]}]};
+        expect(verifyAddedSkills(resume, [
+            {skill: "Entity Framework Core", evidence: "Built APIs with EF Core"},
+            {skill: "TypeScript", evidence: "TS"},
+        ])).toEqual({accepted: [], rejected: []});
+        const locked = lockResumeFacts(resume, {...resume, skills: ["TypeScript", "Entity Framework Core", "EF Core", "React"]});
+        expect(locked.skills).toEqual(["TS", "EF Core", "React"]);
+    });
 });

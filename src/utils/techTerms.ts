@@ -1,4 +1,4 @@
-import {containsPhrase} from "./text";
+import {containsPhrase, normaliseText} from "./text";
 
 // Technologies, practices and architecture claims the checks look for. Each entry lists the spellings of one thing.
 // Words that are also ordinary English ("Go", "Swift", "Spring", "rest", "helm") are only listed in unambiguous forms.
@@ -20,6 +20,7 @@ export const TECH_TERMS: string[][] = [
     ["SQL Server", "MSSQL", "Microsoft SQL Server"], ["PostgreSQL", "Postgres"], ["MySQL"], ["MariaDB"], ["SQLite"],
     ["Oracle"], ["MongoDB"], ["Cosmos DB", "CosmosDB"], ["Redis"], ["Elasticsearch"], ["DynamoDB"], ["Firebase"],
     ["Firestore"], ["Snowflake"], ["Databricks"], ["Power BI"], ["SSIS"], ["SSRS"],
+    ["Power Automate", "Microsoft Flow"], ["Power Apps", "PowerApps"], ["SharePoint"],
     // Cloud
     ["Azure", "Microsoft Azure"], ["AWS", "Amazon Web Services"], ["GCP", "Google Cloud"], ["Azure Functions"],
     ["Azure App Service"], ["Azure DevOps"], ["Azure Service Bus"], ["Event Grid"], ["Event Hubs"], ["Logic Apps"],
@@ -54,4 +55,12 @@ export const findTechTerms = (text: string, extraTerms: string[] = []) => {
 export const mentionsTerm = (text: string, term: string) => {
     const spellings = TECH_TERMS.find((group) => group[0] === term) ?? [term];
     return spellings.some((spelling) => containsPhrase(text, spelling));
+};
+
+// The same key for every spelling of one skill ("EF Core" and "Entity Framework Core", "TS" and "TypeScript"),
+// so a renamed skill isn't counted as a new one. A skill not in the dictionary is its own key.
+export const skillKey = (skill: string) => {
+    const name = normaliseText(skill);
+    const group = TECH_TERMS.find((spellings) => spellings.some((spelling) => normaliseText(spelling) === name));
+    return group ? normaliseText(group[0]).trim() : name.trim();
 };

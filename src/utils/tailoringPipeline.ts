@@ -6,6 +6,8 @@ import {computeFit, groupGaps, verifyAnalysis} from "./evidence";
 import {buildSections, rewriteToResume, sanitiseRewrite} from "./applyRewrite";
 import {runChecks} from "./tailoringChecks";
 import {describeChanges, lockResumeFacts, readImprovements, verifyAddedSkills} from "./resumeFacts";
+import {settleSeniority} from "./seniority";
+import {findTechTerms} from "./techTerms";
 
 export interface TailorInput {
     resumeInfo: ResumeInfo;
@@ -78,11 +80,12 @@ export const runTailoringPipeline = async (
     const calls: {step: TailorStep, info: GenerationInfo}[] = [];
 
     // Step A: analyse the job and map its requirements to the CV, keeping only quotes that are really in the CV.
+    // The seniority is checked against the years the advert asks for and who the role works under.
     onProgress("Reading the job advert...");
     const analysed = await callStep({...input, step: "analyse"});
     calls.push({step: "analyse", info: analysed.generationInfo});
     const verified = verifyAnalysis(original, analysed.result);
-    const analysis = verified.analysis;
+    const analysis = {...verified.analysis, seniority: settleSeniority(input.jobDescription, verified.analysis)};
     const fit = computeFit(verified.requirements, analysis.seniority, analysis);
 
     // Step B: rewrite, guided by the verified evidence.
@@ -90,6 +93,8 @@ export const runTailoringPipeline = async (
     const rewritten = await callStep({...input, step: "rewrite", analysis});
     calls.push({step: "rewrite", info: rewritten.generationInfo});
 
+    // The technologies the job names, including any of the CV's own skills, to judge which project bullets matter most.
+    const jobTerms = findTechTerms(input.jobDescription, original.skills || []);
     const evaluate = (raw: Rewrite) => {
         const rewrite = sanitiseRewrite(original, raw);
         const skills = verifyAddedSkills(original, rewrite.addedSkills);
@@ -98,6 +103,7 @@ export const runTailoringPipeline = async (
             addedSkills: skills.accepted.map((added) => added.skill),
             tailorSummary: input.tailorSummary,
             seniority: analysis.seniority,
+            jobTerms,
         });
         return {rewrite, skills, ...checks};
     };

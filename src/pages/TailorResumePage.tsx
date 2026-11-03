@@ -23,6 +23,7 @@ import {Dialog, DialogPanel} from "@headlessui/react";
 import PageLoadingOverlay from "../components/shared/PageLoadingOverlay";
 import PaginationControls from "../components/shared/PaginationControls";
 import {runTailoringPipeline} from "../utils/tailoringPipeline";
+import {keptAndTailoredMessage} from "../utils/resumeFacts";
 import {applySectionChoices, applySummaryChoice, changedSections, NO_CHOICES, SUMMARY_KEY} from "../utils/bulletChoices";
 import type {TailoringChoices} from "../models/TailoringPipeline";
 import {FitReport} from "../components/shared/FitReport";
@@ -534,7 +535,7 @@ export const TailorResumePage: React.FC = () => {
                                             </text>
                                         ) : (
                                             <text>
-                                                Your tailored CV is ready. Job titles, employers, dates, education and your profile were kept exactly as written.
+                                                Your tailored CV is ready. {keptAndTailoredMessage(jobApplicationInfo?.tailoringChanges)}
                                                 {jobApplicationInfo?.tailoringReport &&
                                                     ` Fit: ${jobApplicationInfo.tailoringReport.fit.recommendation} (${jobApplicationInfo.tailoringReport.fit.score}/100).`}
                                                 {(jobApplicationInfo?.tailoringReport?.violations.length || 0) > 0 &&

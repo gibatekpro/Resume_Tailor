@@ -2,8 +2,8 @@ import {describe, expect, it} from "vitest";
 import type {ResumeInfo} from "../models/ResumeInfo";
 import type {Rewrite} from "../models/TailoringPipeline";
 import {
-    areNearDuplicates, extractFacts, findEscalations, findNearDuplicates, parseBulletRules, pastTenseOf, runChecks,
-    startsWithPastTense, startsWithPresentTense,
+    areNearDuplicates, coverSameWork, degreesIn, extractFacts, findEscalations, findNearDuplicates, parseBulletRules, pastTenseOf,
+    runChecks, startsWithPastTense, startsWithPresentTense, unplainMarks,
 } from "./tailoringChecks";
 import {bannedWordsIn} from "./resumeFacts";
 
@@ -95,6 +95,15 @@ describe("lost facts", () => {
         expect(result.violations[0].message).toContain('"promoted"');
     });
 
+    it("reads responsibility words as verbs, not as part of a noun phrase", () => {
+        const labels = (text: string) => extractFacts(text).filter((fact) => fact.kind === "responsibility").map((fact) => fact.label);
+        expect(labels("Refactored the invoice service in C# using SOLID principles and design patterns.")).toEqual([]);
+        expect(labels("Worked with the lead developer on code reviews.")).toEqual([]);
+        expect(labels("Designed the invoice schema.")).toEqual(["designed"]);
+        expect(labels("Design and build the pricing API.")).toEqual(["designed"]);
+        expect(labels("Lead a team of 3 developers.")).toEqual(["led"]);
+    });
+
     it("reports a fact the model said it had to drop instead of flagging it", () => {
         const original = cv(["Migrated 12 reports to Power BI.", "Built the invoice API in C#."]);
         const result = runChecks(original, rewriteOf([{text: "Built the invoice API in C#.", from: [1]}], {
@@ -102,6 +111,85 @@ describe("lost facts", () => {
         }));
         expect(result.violations).toEqual([]);
         expect(result.keptOut.map((item) => item.fact)).toEqual(expect.arrayContaining(["12 reports", "Power BI", "migrated"]));
+    });
+});
+
+describe("merging before dropping", () => {
+    const original = cv([
+        "Built Power Automate flows that read supplier invoice emails and save the attachments to SharePoint.",
+        "Automated supplier invoice emails with Power Automate, saving the attachments to SharePoint for the finance team.",
+        "Mentored 3 placement-year students in React.",
+    ]);
+    const kept = [{text: original.workExperience![0].duties[0], from: [0]}, {text: original.workExperience![0].duties[1], from: [1]}];
+    const mentoring = {section: "Cenitium", text: "Mentored 3 placement-year students in React.", reason: "Bullet limit"};
+
+    it("treats bullets about the same work as one point once a point has been dropped", () => {
+        expect(areNearDuplicates(kept[0].text, kept[1].text)).toBe(false);
+        expect(coverSameWork(kept[0].text, kept[1].text)).toBe(true);
+        expect(coverSameWork("Built React and .NET features for client finance applications.",
+            "Modernised the price-list tool, moving it from Excel to a React and .NET web app.")).toBe(false);
+    });
+
+    it("asks to merge them and put the dropped point back", () => {
+        const result = runChecks(original, rewriteOf(kept, {droppedPoints: [mentoring]}));
+        expect(result.violations).toMatchObject([{check: "near-duplicate", bullet: 1}]);
+        expect(result.violations[0].message).toContain('while "Mentored 3 placement-year students in React." was dropped');
+        expect(checksOf(runChecks(original, rewriteOf([...kept, {text: mentoring.text, from: [2]}])))).toEqual([]);
+    });
+});
+
+describe("plain writing", () => {
+    it("finds \"~\", slashes between words and abbreviations", () => {
+        expect(unplainMarks("Handled ~200 emails/day.")).toEqual(["~", "emails/day"]);
+        expect(unplainMarks("Built forms in React/Redux, approx. 3 hrs a week, e.g. invoices.")).toEqual(["React/Redux", "approx.", "hrs", "e.g."]);
+    });
+
+    it("allows technology names with slashes, links and plain words", () => {
+        expect(unplainMarks("Built CI/CD pipelines and PL/SQL reports, handling about 200 emails a day.")).toEqual([]);
+        expect(unplainMarks("Published the code at github.com/example/resume-tailor.")).toEqual([]);
+    });
+
+    it("is flagged per bullet and in the summary", () => {
+        const original = cv(["Built Power Automate flows handling about 200 emails a day."]);
+        const result = runChecks(original, rewriteOf([{text: "Built Power Automate flows handling ~200 emails/day.", from: [0]}], {summary: "Developer w/ 4 years' experience."}));
+        expect(result.violations.filter((violation) => violation.check === "plain-writing").map((violation) => violation.where))
+            .toEqual(["Summary", "Software Developer · Cenitium"]);
+    });
+});
+
+describe("project order", () => {
+    const original = cv([], true, {
+        projects: [{
+            projectName: "Resume Tailor", role: "", startMonth: "", startYear: "", endMonth: "", endYear: "", current: true,
+            projectDetails: ["Wrote the user guide.", "Built a React and TypeScript web app."],
+        }],
+    });
+    const projectRewrite = (order: number[]) => rewriteOf([], {
+        roles: [],
+        projects: [{index: 0, bullets: order.map((index) => ({text: original.projects![0].projectDetails[index], from: [index], why: ""}))}],
+        projectOrder: [0],
+    });
+
+    it("flags a project whose first bullet names fewer of the job's technologies than a later one", () => {
+        const result = runChecks(original, projectRewrite([0, 1]), {jobTerms: ["React", "TypeScript"]});
+        expect(result.violations).toMatchObject([{check: "order", where: "Resume Tailor", bullet: 0}]);
+        expect(checksOf(runChecks(original, projectRewrite([1, 0]), {jobTerms: ["React", "TypeScript"]}))).toEqual([]);
+    });
+});
+
+describe("degrees in the summary", () => {
+    it("finds a degree and the grade that follows it", () => {
+        expect(degreesIn("Developer. MSc Advanced Computer Science (Distinction).").map((fact) => fact.label)).toEqual(["MSc (Distinction)"]);
+        expect(degreesIn("BSc Computer Science, 2:1.").map((fact) => fact.label)).toEqual(["BSc (2:1)"]);
+        expect(degreesIn("Full-stack developer in the first year of a role.")).toEqual([]);
+    });
+
+    it("flags a tailored summary that leaves out the degree, only when the summary is tailored", () => {
+        const original = cv(["Built the API in C#."], true, {profile: {summary: "Developer with an MSc in Computer Science (Distinction)."}});
+        const rewrite = rewriteOf([{text: "Built the API in C#.", from: [0]}], {summary: "C# developer building APIs."});
+        expect(runChecks(original, rewrite).violations).toMatchObject([{check: "lost-fact", where: "Summary"}]);
+        expect(runChecks(original, {...rewrite, summary: "C# developer building APIs, with an MSc (Distinction)."}).violations).toEqual([]);
+        expect(runChecks(original, rewrite, {tailorSummary: false}).violations).toEqual([]);
     });
 });
 

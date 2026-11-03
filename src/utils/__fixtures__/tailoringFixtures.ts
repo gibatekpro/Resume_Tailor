@@ -301,3 +301,174 @@ export const DOTNET_REWRITE: Rewrite = {
     droppedPoints: [{section: "Cenitium", text: "Mentored 3 placement-year students in full-stack development with React and .NET.", reason: "Least relevant to a mid-level .NET role, and the role is at its 5-bullet limit."}],
     improvements: [],
 };
+
+// ---------------------------------------------------------------- Full Stack Developer (mid, worth applying)
+
+// Rebuilt from a reported run on a mid-level Full Stack Developer advert (Praetorian, London): the phrases the analysis
+// misread are as reported, the rest is filler. The CV is the main one plus the facts that run turned on: an MSc
+// (Distinction) in the summary, "EF Core" as a skill, two Power Automate bullets and project bullets without full stops.
+
+export const FULLSTACK_JOB = `Full Stack Developer
+Praetorian, London
+
+We're looking for a Full Stack Developer with over three years' experience to join our development team. You'll work
+with the Lead Developer to shape and lead the development of our client-facing web applications, from the database to
+the front end.
+
+What you'll do
+- Build and maintain web applications in C#, .NET and React with TypeScript.
+- Model data in SQL Server with EF Core.
+- Automate business processes with Power Automate.
+- Take part in code reviews with the Lead Developer.
+
+What you'll need
+- Over three years' commercial experience as a full stack developer.
+- C# and .NET.
+- React and TypeScript.
+- SQL Server and EF Core.
+- Power Automate.
+- CI/CD pipelines.
+- Docker.
+
+Nice to have
+- Mentoring junior developers.
+- Financial services experience.`;
+
+export const FULLSTACK_CV: ResumeInfo = {
+    ...CV,
+    profile: {
+        ...CV.profile,
+        summary: "Full-stack developer with four years' experience building React and .NET applications for finance clients. MSc Advanced Computer Science (Distinction).",
+    },
+    skills: ["C#", ".NET Core", "ASP.NET Core", "React", "TypeScript", "SQL Server", "EF Core", "Power Automate", "SharePoint", "Azure", "Git", "GitHub", "Jira"],
+    workExperience: [
+        {
+            ...CV.workExperience![0],
+            duties: [
+                "Promoted from intern to full-time developer after the first year, then led a team of 3 developers, splitting and tracking work in Jira and GitHub.",
+                "Build and maintain full-stack React and .NET features for client finance applications, with SQL Server and EF Core.",
+                "Refactored the invoice service in C# using SOLID principles and design patterns, making it easier to test.",
+                "Built Power Automate flows that read supplier invoice emails and save the attachments to SharePoint, handling about 200 emails a day.",
+                "Automated supplier invoice emails with Power Automate, saving the attachments to SharePoint for the finance team.",
+                "Mentored 3 placement-year students in full-stack development with React and .NET.",
+                "Deployed applications to Azure App Service.",
+            ],
+        },
+        CV.workExperience![1],
+    ],
+    projects: [{
+        ...CV.projects![0],
+        projectDetails: [
+            "Wrote the user guide and recorded a demo video",
+            "Stored users' CVs and applications in Firebase Firestore",
+            "Built a React and TypeScript web app that tailors CVs to job adverts with the OpenAI API",
+        ],
+    }],
+    education: [
+        {
+            institutionName: "University of Leicester", degree: "MSc", course: "Advanced Computer Science",
+            startMonth: "Sep", startYear: "2021", endMonth: "Sep", endYear: "2022", current: false, class: "Distinction",
+        },
+        ...CV.education!,
+    ],
+};
+
+// As reported: "shape and lead the development" made the analysis call the job senior.
+export const FULLSTACK_ANALYSIS: JobAnalysis = {
+    job: {
+        title: "Full Stack Developer",
+        company: "Praetorian",
+        location: "London",
+        salary: "",
+        summary: "Full stack developer role building client-facing web applications in C#, .NET and React, working with the Lead Developer.",
+    },
+    seniority: "senior",
+    themes: [
+        {name: "C# and .NET with React", jobPhrases: ["C#, .NET and React with TypeScript"]},
+        {name: "Data with SQL Server", jobPhrases: ["SQL Server with EF Core"]},
+        {name: "Process automation", jobPhrases: ["Automate business processes with Power Automate"]},
+        {name: "Shaping development", jobPhrases: ["shape and lead the development"]},
+    ],
+    requirements: [
+        {id: "R1", text: "Over three years' experience as a full stack developer", priority: "must", category: "other", evidence: [{quote: "four years' experience", strength: "strong"}], ifMissing: {kind: "real", text: ""}},
+        {id: "R2", text: "Shape and lead the development of web applications", priority: "must", category: "leadership", evidence: [{quote: "led a team of 3 developers", strength: "partial"}], ifMissing: {kind: "real", text: ""}},
+        {id: "R3", text: "C# and .NET", priority: "must", category: "technical", evidence: [{quote: "Refactored the invoice service in C#", strength: "strong"}, {quote: ".NET Core", strength: "strong"}], ifMissing: {kind: "ask", text: ""}},
+        {id: "R4", text: "React and TypeScript", priority: "must", category: "technical", evidence: [{quote: "Built a React and TypeScript web app", strength: "strong"}], ifMissing: {kind: "ask", text: ""}},
+        {id: "R5", text: "SQL Server and EF Core", priority: "must", category: "technical", evidence: [{quote: "with SQL Server and EF Core", strength: "strong"}], ifMissing: {kind: "ask", text: ""}},
+        {id: "R6", text: "Power Automate", priority: "must", category: "technical", evidence: [{quote: "Built Power Automate flows", strength: "strong"}], ifMissing: {kind: "ask", text: ""}},
+        {id: "R7", text: "CI/CD pipelines", priority: "must", category: "technical", evidence: [], ifMissing: {kind: "ask", text: "Have you used CI/CD pipelines? Which tool, e.g. GitHub Actions or Azure DevOps?"}},
+        {id: "R8", text: "Docker", priority: "must", category: "technical", evidence: [], ifMissing: {kind: "ask", text: "Have you built or run apps in Docker containers?"}},
+        {id: "R9", text: "Mentoring junior developers", priority: "nice", category: "leadership", evidence: [{quote: "Mentored 3 placement-year students", strength: "strong"}], ifMissing: {kind: "ask", text: ""}},
+        {id: "R10", text: "Financial services experience", priority: "nice", category: "domain", evidence: [{quote: "client finance applications", strength: "partial"}], ifMissing: {kind: "real", text: ""}},
+    ],
+    fitStrength: "Four years of C#, .NET and React work for finance clients, with SQL Server, EF Core and Power Automate.",
+    fitConcern: "The role shapes and leads development; your leadership evidence is a team of 3.",
+};
+
+const fullstackSkills = ["C#", ".NET Core", "ASP.NET Core", "React", "TypeScript", "SQL Server", "Entity Framework Core", "EF Core", "Power Automate", "SharePoint", "Azure", "Git", "GitHub", "Jira"];
+const fullstackAddedSkills = [{skill: "Entity Framework Core", evidence: "with SQL Server and EF Core"}];
+
+// The first rewrite, reproducing the reported run: the MSc left out of the summary, both Power Automate bullets kept
+// (one with "~200 emails/day") while mentoring was dropped, "design patterns" reworded away, "Entity Framework Core"
+// added beside "EF Core", and the project bullets returned as written, least relevant first.
+export const FULLSTACK_FIRST_REWRITE: Rewrite = {
+    summary: "Full-stack developer with four years' experience building C# and .NET, React and TypeScript applications for finance clients, with SQL Server, EF Core and Power Automate.",
+    roles: [
+        {
+            index: 0,
+            bullets: [
+                {text: "Build and maintain full-stack React and .NET features for client finance applications, with SQL Server and EF Core, deployed to Azure App Service.", from: [1, 6], why: "C# and .NET (must)"},
+                {text: "Promoted from intern to full-time developer after the first year, then led a team of 3 developers, splitting and tracking work in Jira and GitHub.", from: [0], why: "Shape and lead the development (must)"},
+                {text: "Built Power Automate flows that read supplier invoice emails and save the attachments to SharePoint, handling ~200 emails/day.", from: [3], why: "Power Automate (must)"},
+                {text: "Automated supplier invoice emails with Power Automate, saving the attachments to SharePoint for the finance team.", from: [4], why: "Power Automate (must)"},
+                {text: "Refactored the invoice service in C# using SOLID principles, making it easier to test.", from: [2], why: "C# and .NET (must)"},
+            ],
+        },
+        unchangedAmetek,
+    ],
+    projects: [{
+        index: 0,
+        bullets: [
+            {text: "Wrote the user guide and recorded a demo video", from: [0], why: ""},
+            {text: "Stored users' CVs and applications in Firebase Firestore", from: [1], why: ""},
+            {text: "Built a React and TypeScript web app that tailors CVs to job adverts with the OpenAI API", from: [2], why: ""},
+        ],
+    }],
+    projectOrder: [0],
+    skills: fullstackSkills,
+    addedSkills: fullstackAddedSkills,
+    droppedPoints: [{section: "Cenitium", text: "Mentored 3 placement-year students in full-stack development with React and .NET.", reason: "Least relevant, and the role is at its 5-bullet limit."}],
+    improvements: [],
+};
+
+// The repair. The model still lists "Entity Framework Core" (the code keeps "EF Core" once) and still leaves one
+// project bullet without a full stop (the code adds it).
+export const FULLSTACK_REPAIRED_REWRITE: Rewrite = {
+    summary: "Full-stack developer with four years' experience building C# and .NET, React and TypeScript applications for finance clients, with SQL Server, EF Core and Power Automate. MSc Advanced Computer Science (Distinction).",
+    roles: [
+        {
+            index: 0,
+            bullets: [
+                {text: "Build and maintain full-stack React and .NET features for client finance applications, with SQL Server and EF Core, deployed to Azure App Service.", from: [1, 6], why: "C# and .NET (must)"},
+                {text: "Built Power Automate flows that read supplier invoice emails and save the attachments to SharePoint for the finance team, handling about 200 emails a day.", from: [3, 4], why: "Merged: Power Automate (must)"},
+                {text: "Promoted from intern to full-time developer after the first year, then led a team of 3 developers, splitting and tracking work in Jira and GitHub.", from: [0], why: "Shape and lead the development (must)"},
+                {text: "Mentored 3 placement-year students in full-stack development with React and .NET.", from: [5], why: "Mentoring junior developers (nice)"},
+                {text: "Refactored the invoice service in C# using SOLID principles, making it easier to test.", from: [2], why: "C# and .NET (must)"},
+            ],
+        },
+        unchangedAmetek,
+    ],
+    projects: [{
+        index: 0,
+        bullets: [
+            {text: "Built a React and TypeScript web app that tailors CVs to job adverts with the OpenAI API.", from: [2], why: "React and TypeScript (must) first"},
+            {text: "Stored users' CVs and applications in Firebase Firestore", from: [1], why: ""},
+            {text: "Wrote the user guide and recorded a demo video.", from: [0], why: ""},
+        ],
+    }],
+    projectOrder: [0],
+    skills: fullstackSkills,
+    addedSkills: fullstackAddedSkills,
+    droppedPoints: [],
+    improvements: [],
+};

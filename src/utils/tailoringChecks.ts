@@ -1,0 +1,276 @@
+import type {ResumeInfo} from "../models/ResumeInfo";
+import type {KeptOutFact, ReportSection, Rewrite, Seniority, Violation} from "../models/TailoringPipeline";
+import {bannedWordsIn} from "./resumeFacts";
+import {findTechTerms, mentionsTerm} from "./techTerms";
+import {normaliseText, stem, tokens, wordCount} from "./text";
+import {buildSections} from "./applyRewrite";
+
+// Deterministic checks on a rewrite. Each returns plain data, so the same results drive the repair prompt and the UI.
+
+// ---- Rules the user set ----
+
+export const parseBulletRules = (rules: string[]) => {
+    const text = rules.join("\n");
+    const maxBullets = Number(text.match(/(\d+)\s+bullet/i)?.[1]) || undefined;
+    const maxWords = Number(text.match(/(?:under|fewer than|less than|at most|no more than|up to|maximum of)\s+(\d+)\s+words/i)?.[1]) || 30;
+    return {maxBullets, maxWords};
+};
+
+// ---- Near-duplicate bullets ----
+
+const STOPWORDS = new Set((
+    "a an and the of for to in on with by at from into as while including using via that which this these their " +
+    "our its it was were is are be been my me i we who across over under within per each all both also so such"
+).split(" "));
+
+const contentWords = (text: string) => tokens(text).filter((word) => !STOPWORDS.has(word)).map(stem);
+
+// Two bullets make the same point when most of their words are shared (Jaccard ≥ 0.5), when the shorter one is
+// mostly contained in the longer (≥ 0.7), or when they start with the same verb and object.
+export const areNearDuplicates = (a: string, b: string) => {
+    const wordsA = contentWords(a);
+    const wordsB = contentWords(b);
+    const setA = new Set(wordsA);
+    const setB = new Set(wordsB);
+    const shared = [...setA].filter((word) => setB.has(word)).length;
+    const union = new Set([...setA, ...setB]).size;
+    const smaller = Math.min(setA.size, setB.size);
+    if (union > 0 && shared / union >= 0.5) return true;
+    if (smaller >= 5 && shared / smaller >= 0.7) return true;
+    return wordsA.length >= 3 && wordsB.length >= 3 && wordsA.slice(0, 3).join(" ") === wordsB.slice(0, 3).join(" ");
+};
+
+export const findNearDuplicates = (bullets: string[]) => {
+    const pairs: [number, number][] = [];
+    bullets.forEach((a, i) => bullets.slice(i + 1).forEach((b, offset) => {
+        if (areNearDuplicates(a, b)) pairs.push([i, i + 1 + offset]);
+    }));
+    return pairs;
+};
+
+// ---- Facts that must survive ----
+
+export interface Fact {
+    kind: "number" | "technology" | "responsibility";
+    label: string;
+    present: (text: string) => boolean;
+}
+
+const RESPONSIBILITIES: [string, RegExp][] = [
+    ["promoted", /\bpromot(?:ed|ion|ions|e|es|ing)\b/],
+    ["led", /\b(?:led|lead|leads|leading)\b/],
+    ["mentored", /\bmentor(?:ed|ing|s|ship)?\b/],
+    ["migrated", /\bmigrat(?:ed|e|es|ing|ion|ions)\b/],
+    ["automated", /\bautomat(?:ed|e|es|ing|ion|ions)\b/],
+    ["owned", /\b(?:owned|owning|ownership)\b/],
+    ["designed", /\bdesign(?:ed|s|ing)?\b/],
+];
+
+const isNumber = (word: string) => /^\d+(?:\.\d+)?$/.test(word);
+
+// A number counts as kept when it appears near the word it described ("3 developers" -> "a 3-developer team").
+const numberFact = (words: string[], index: number): Fact => {
+    const number = words[index];
+    const context = words.slice(index + 1, index + 4).find((word) => !STOPWORDS.has(word) && !isNumber(word));
+    return {
+        kind: "number",
+        label: context ? `${number} ${context}` : number,
+        present: (text) => {
+            const output = tokens(text);
+            return output.some((word, i) => word === number &&
+                (!context || output.slice(Math.max(0, i - 4), i + 5).some((near) => stem(near) === stem(context))));
+        },
+    };
+};
+
+// Numbers, named technologies (from the dictionary and the CV's own skills) and key responsibility words in a bullet.
+export const extractFacts = (text: string, skills: string[] = []): Fact[] => {
+    const words = tokens(text);
+    const normalised = normaliseText(text);
+    const facts: Fact[] = [
+        ...words.flatMap((word, index) => isNumber(word) ? [numberFact(words, index)] : []),
+        ...findTechTerms(text, skills).map((term): Fact => ({
+            kind: "technology",
+            label: term,
+            present: (output) => mentionsTerm(output, term),
+        })),
+        ...RESPONSIBILITIES.filter(([, pattern]) => pattern.test(normalised)).map(([label, pattern]): Fact => ({
+            kind: "responsibility",
+            label,
+            present: (output) => pattern.test(normaliseText(output)),
+        })),
+    ];
+    return facts.filter((fact, index) => facts.findIndex((other) => other.label === fact.label) === index);
+};
+
+// ---- Raised responsibility ----
+
+const ESCALATIONS: {word: string, output: RegExp, original: RegExp}[] = [
+    {word: "led", output: /\b(?:led|leading)\b|^ lead\b/, original: /\b(?:led|lead|leads|leading|leader)\b/},
+    {word: "owned", output: /\b(?:owned|owning|ownership)\b/, original: /\b(?:own|owned|owning|ownership|owner)\b/},
+    {word: "architected", output: /\b(?:architected|architecting)\b/, original: /\barchitect(?:ed|ing|s)?\b/},
+    {word: "managed", output: /\b(?:managed|managing)\b/, original: /\bmanag(?:e|ed|es|ing|er|ers|ement)\b/},
+];
+
+// Responsibility words in `output` that the original text never uses.
+export const findEscalations = (originalText: string, output: string) => {
+    const original = normaliseText(originalText);
+    const rewritten = normaliseText(output);
+    return ESCALATIONS.filter((item) => item.output.test(rewritten) && !item.original.test(original)).map((item) => item.word);
+};
+
+// ---- Leadership first, for senior and lead jobs ----
+
+const LEADERSHIP = /\b(?:led|lead|leads|leading|mentor(?:ed|ing|s)?|promot(?:ed|ion)|managed|managing|owned|ownership|supervis(?:ed|ing)|coach(?:ed|ing))\b/;
+
+export const showsLeadership = (text: string) => LEADERSHIP.test(normaliseText(text));
+
+// ---- Tense ----
+
+const IRREGULAR: Record<string, string> = {
+    build: "built", rebuild: "rebuilt", lead: "led", write: "wrote", rewrite: "rewrote", run: "ran", make: "made",
+    teach: "taught", drive: "drove", oversee: "oversaw", take: "took", undertake: "undertook", give: "gave",
+    bring: "brought", begin: "began", grow: "grew", hold: "held", keep: "kept", send: "sent", spend: "spent",
+    win: "won", choose: "chose", become: "became", find: "found", see: "saw", meet: "met", get: "got", sell: "sold",
+    tell: "told", think: "thought", understand: "understood", plan: "planned", ship: "shipped", drop: "dropped",
+    commit: "committed", scope: "scoped",
+};
+const PAST_IRREGULAR = new Set(Object.values(IRREGULAR));
+
+const REGULAR_VERBS = (
+    "design develop create implement maintain manage mentor automate modernise modernize migrate test deploy deliver " +
+    "improve optimise optimize reduce increase integrate support own coordinate collaborate work analyse analyze " +
+    "refactor fix debug document review train coach configure monitor launch produce provide introduce establish " +
+    "streamline upgrade redesign replace convert extend add enable help assist contribute handle prepare present report " +
+    "research prototype model define guide organise organize partner liaise communicate translate investigate resolve " +
+    "troubleshoot secure scale host administer install track assign architect engineer code program serve use apply " +
+    "standardise standardize simplify consolidate digitise digitize centralise centralize validate verify process match " +
+    "check generate schedule identify evaluate assess recommend onboard recruit interview supervise direct oversee " +
+    "deliver ensure respond operate perform publish release roll trial pilot speed cut save shorten raise lower"
+).split(" ");
+const BASE_VERBS = new Set([...REGULAR_VERBS, ...Object.keys(IRREGULAR)]);
+
+const firstWord = (text: string) => tokens(text)[0] || "";
+
+export const startsWithPastTense = (text: string) => {
+    const word = firstWord(text);
+    return PAST_IRREGULAR.has(word) || (word.length > 3 && word.endsWith("ed") && !BASE_VERBS.has(word));
+};
+
+// "Build", "Builds", "Modernise": a verb in the present tense. Unknown words are not flagged.
+export const startsWithPresentTense = (text: string) => {
+    const word = firstWord(text);
+    return BASE_VERBS.has(word) || (word.endsWith("s") && BASE_VERBS.has(word.slice(0, -1))) ||
+        (word.endsWith("es") && BASE_VERBS.has(word.slice(0, -2)));
+};
+
+export const pastTenseOf = (verb: string) => {
+    const word = verb.toLowerCase();
+    const past = IRREGULAR[word] ?? (word.endsWith("e") ? `${word}d` : /[^aeiou]y$/.test(word) ? `${word.slice(0, -1)}ied` : `${word}ed`);
+    return past.charAt(0).toUpperCase() + past.slice(1);
+};
+
+// ---- All checks ----
+
+const quote = (text: string) => `"${text.length > 90 ? `${text.slice(0, 87)}...` : text}"`;
+
+const sectionIsCurrent = (original: ResumeInfo, section: ReportSection) =>
+    !!(section.kind === "role" ? original.workExperience?.[section.index]?.current : original.projects?.[section.index]?.current);
+
+// Text kept from the original that the rewrite doesn't replace: the job title or project role, and the description.
+const sectionContext = (original: ResumeInfo, section: ReportSection) => {
+    const role = section.kind === "role" ? original.workExperience?.[section.index] : undefined;
+    const project = section.kind === "project" ? original.projects?.[section.index] : undefined;
+    return {title: role?.jobTitle || project?.role || "", description: role?.description || project?.description || ""};
+};
+
+export const runChecks = (
+    original: ResumeInfo,
+    rewrite: Rewrite,
+    options: {rules?: string[], addedSkills?: string[], tailorSummary?: boolean, seniority?: Seniority} = {},
+) => {
+    const {maxBullets, maxWords} = parseBulletRules(options.rules || []);
+    const skills = (original.skills || []).filter((skill) => skill.trim());
+    const allCvText = [
+        original.profile?.summary, original.profile?.profession, ...skills,
+        ...(original.workExperience || []).flatMap((role) => [role.jobTitle, role.description, ...(role.duties || [])]),
+        ...(original.projects || []).flatMap((project) => [project.projectName, project.role, project.description, ...(project.projectDetails || [])]),
+        ...(original.education || []).flatMap((education) => [education.degree, education.course]),
+    ].filter(Boolean).join("\n");
+    const allowedText = [allCvText, ...(options.addedSkills || [])].join("\n");
+    const newTechnologies = (text: string) => findTechTerms(text).filter((term) => !mentionsTerm(allowedText, term));
+
+    const violations: Violation[] = [];
+    const keptOut: KeptOutFact[] = [];
+    const add = (check: Violation["check"], where: string, message: string, bullet?: number) =>
+        violations.push({check, where, message, ...(bullet !== undefined ? {bullet} : {})});
+
+    const leadershipFirst = options.seniority === "senior" || options.seniority === "lead";
+    const cvShowsLeadership = [...(original.workExperience || []), ...(original.projects || [])]
+        .some((item) => ("duties" in item ? item.duties : item.projectDetails)?.some(showsLeadership));
+
+    if (options.tailorSummary !== false && rewrite.summary) {
+        if (leadershipFirst && cvShowsLeadership && !showsLeadership(rewrite.summary)) {
+            add("leadership-first", "Summary", "This is a senior or lead job and the CV shows leadership, mentoring or a promotion, but the summary doesn't mention it. Add it, at its real scale.");
+        }
+        for (const word of bannedWordsIn(rewrite.summary)) add("banned-word", "Summary", `The summary uses the banned word "${word}".`);
+        for (const word of findEscalations(allCvText, rewrite.summary)) {
+            add("escalation", "Summary", `The summary says the candidate ${word}, which the CV never says. Use the CV's own level of responsibility.`);
+        }
+        for (const term of newTechnologies(rewrite.summary)) add("new-technology", "Summary", `The summary mentions "${term}", which isn't anywhere in the CV. Remove it.`);
+    }
+
+    for (const section of buildSections(original, rewrite)) {
+        const where = section.title;
+        const texts = section.bullets.map((bullet) => bullet.text);
+        const current = sectionIsCurrent(original, section);
+        const {title, description} = sectionContext(original, section);
+        const originalText = [...section.original, title, description].join("\n");
+        // The description is kept as written, so a fact that is still there counts as kept.
+        const output = [...texts, description].join("\n");
+
+        section.bullets.forEach((bullet, index) => {
+            const n = index + 1;
+            for (const word of bannedWordsIn(bullet.text)) add("banned-word", where, `Bullet ${n} uses the banned word "${word}".`, index);
+            for (const word of findEscalations(originalText, bullet.text)) {
+                add("escalation", where, `Bullet ${n} says the candidate ${word} something, but the original never says so. Keep the original level of responsibility.`, index);
+            }
+            for (const term of newTechnologies(bullet.text)) add("new-technology", where, `Bullet ${n} mentions "${term}", which isn't anywhere in the CV. Remove it.`, index);
+
+            // Completed work: a role that has ended, or a bullet whose every source was written in the past tense.
+            const completed = !current || (bullet.from.length > 0 && bullet.from.every((from) => startsWithPastTense(section.original[from] || "")));
+            if (completed && startsWithPresentTense(bullet.text)) {
+                const verb = tokens(bullet.text)[0];
+                add("tense", where, `Bullet ${n} starts with the present tense "${verb}" for completed work. Use the past tense ("${pastTenseOf(verb)}").`, index);
+            }
+            const words = wordCount(bullet.text);
+            if (words > maxWords) add("too-long", where, `Bullet ${n} is ${words} words long. Keep it to ${maxWords} words or fewer.`, index);
+        });
+
+        for (const [a, b] of findNearDuplicates(texts)) {
+            add("near-duplicate", where, `Bullets ${a + 1} and ${b + 1} make the same point. Merge them into one bullet.`, b);
+        }
+
+        if (leadershipFirst && section.kind === "role" && section.original.some(showsLeadership) && texts.length > 0 && !showsLeadership(texts[0])) {
+            add("leadership-first", where, "This is a senior or lead job: start this role with its leadership, mentoring or promotion bullet.", 0);
+        }
+
+        if (section.kind === "role" && maxBullets && texts.length > maxBullets) {
+            add("too-many-bullets", where, `This role has ${texts.length} bullets; the limit is ${maxBullets}. Merge bullets or drop the least relevant point and report it in droppedPoints.`);
+        }
+
+        const facts = section.original.flatMap((source) => extractFacts(source, skills).map((fact) => ({fact, source})))
+            .filter((item, index, all) => all.findIndex((other) => other.fact.label === item.fact.label) === index);
+        for (const {fact, source} of facts) {
+            if (fact.present(output)) continue;
+            const dropped = rewrite.droppedPoints.find((point) => fact.present(point.text));
+            if (dropped) {
+                keptOut.push({where, fact: fact.label, text: dropped.text, reason: dropped.reason});
+            } else {
+                add("lost-fact", where, `The fact "${fact.label}" from the original bullet ${quote(source)} is missing. Put it back in one of this section's bullets.`);
+            }
+        }
+    }
+
+    return {violations, keptOut};
+};

@@ -7,6 +7,7 @@ export const BUZZWORDS = [
     "go-getter", "hard-working", "highly motivated", "proven track record", "cutting-edge", "state-of-the-art",
     "innovative", "game-changing", "best-in-class", "world-class", "robust", "seamless", "seamlessly", "holistic",
     "impactful", "orchestrated", "facilitated", "committed to", "think outside the box", "value-add",
+    "high-quality", "excellent", "efficient", "various",
 ];
 
 // The prompt is fixed: it holds the truthfulness rules and the output contract, and is sent as the system message.

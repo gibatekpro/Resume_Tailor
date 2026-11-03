@@ -2,11 +2,9 @@ import type {ResumeInfo} from "../models/ResumeInfo";
 import type {Project} from "../models/Project";
 import type {AddedSkill, CvImprovement, TailoringChanges} from "../models/TailoringChanges";
 import {BUZZWORDS} from "../data/openAIInstruction";
+import {normaliseText} from "./text";
 
 const normalise = (value?: string) => (value || "").trim().toLowerCase();
-
-// Lowercase words only, keeping the characters that matter in tech names (C#, C++, .NET, Node.js).
-const normaliseText = (value?: string) => ` ${(value || "").toLowerCase().replace(/[^a-z0-9#+.]+/g, " ").trim()} `;
 
 const nonEmptyList = (items?: string[]) => {
     const filtered = (items || []).filter((item) => item && item.trim());
@@ -124,6 +122,9 @@ const buzzwordPatterns = BUZZWORDS.map((word) => ({
     pattern: new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i"),
 }));
 
+// The banned words in one piece of text.
+export const bannedWordsIn = (text: string) => buzzwordPatterns.filter(({pattern}) => pattern.test(text)).map(({word}) => word);
+
 // Banned words the AI left in (or kept from the candidate's own text), with where they appear.
 export const findBuzzwords = (resume: ResumeInfo) => {
     const places: [string, string][] = [
@@ -133,8 +134,8 @@ export const findBuzzwords = (resume: ResumeInfo) => {
     ];
     const found: {word: string, where: string}[] = [];
     for (const [where, text] of places) {
-        for (const {word, pattern} of buzzwordPatterns) {
-            if (pattern.test(text) && !found.some((item) => item.word === word && item.where === where)) {
+        for (const word of bannedWordsIn(text)) {
+            if (!found.some((item) => item.word === word && item.where === where)) {
                 found.push({word, where});
             }
         }

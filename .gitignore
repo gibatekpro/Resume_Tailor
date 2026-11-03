@@ -26,3 +26,6 @@ src/utils/ApplicationProperties.ts
 
 # build output (Vercel builds on deploy)
 /dist
+
+# Firebase emulator logs
+*-debug.log

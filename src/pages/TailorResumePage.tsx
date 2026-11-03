@@ -5,7 +5,7 @@ import {DefaultResumeData} from "../data/defaultResumeData";
 import type { OpenAIInstruction } from "../models/OpenAIInstruction";
 import {InstructionResumeData} from "../data/instructionResumeData";
 import * as Yup from "yup";
-import {fetchOpenAIResponse} from "../service/OpenAIService";
+import {fetchOpenAIResponse} from "../service/TailorService";
 import InstructionForm from "../components/forms/instructionForm/InstructionForm";
 import {useNavigate} from "react-router-dom";
 import AppLayout from "../components/shared/AppLayout";

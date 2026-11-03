@@ -1,3 +1,6 @@
 {
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "functions": {
+    "api/tailor.ts": { "maxDuration": 300 }
+  }
 }

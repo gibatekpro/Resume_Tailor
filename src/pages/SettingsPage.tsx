@@ -3,7 +3,7 @@ import AppLayout from "../components/shared/AppLayout";
 import TopNav from "../components/shared/TopNav";
 import PageLoadingOverlay from "../components/shared/PageLoadingOverlay";
 import SettingsService from "../service/SettingsService";
-import {fetchAvailableModels} from "../service/OpenAIService";
+import {fetchAvailableModels} from "../service/TailorService";
 import type {AppSettings} from "../models/AppSettings";
 import {DefaultSettings} from "../data/defaultSettings";
 

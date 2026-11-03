@@ -184,7 +184,7 @@ const unchangedProject = {
     ],
 };
 
-// The first rewrite, reproducing the reported run: promotion dropped, leadership not first and missing from the summary,
+// The first rewrite, reproducing the reported run: promotion dropped, leadership missing from the summary,
 // a duplicate pair, an invented nominalisation, completed work in the present tense, plus a claimed technology and a buzzword.
 export const LEAD_FIRST_REWRITE: Rewrite = {
     summary: "Full-stack developer with four years' experience building React and .NET applications for finance clients, with a focus on efficient delivery.",

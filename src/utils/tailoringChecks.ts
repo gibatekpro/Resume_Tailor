@@ -220,7 +220,8 @@ export const runChecks = (
         for (const term of newTechnologies(rewrite.summary)) add("new-technology", "Summary", `The summary mentions "${term}", which isn't anywhere in the CV. Remove it.`);
     }
 
-    for (const section of buildSections(original, rewrite)) {
+    const sections = buildSections(original, rewrite);
+    for (const section of sections) {
         const where = section.title;
         const texts = section.bullets.map((bullet) => bullet.text);
         const current = sectionIsCurrent(original, section);
@@ -251,10 +252,6 @@ export const runChecks = (
             add("near-duplicate", where, `Bullets ${a + 1} and ${b + 1} make the same point. Merge them into one bullet.`, b);
         }
 
-        if (leadershipFirst && section.kind === "role" && section.original.some(showsLeadership) && texts.length > 0 && !showsLeadership(texts[0])) {
-            add("leadership-first", where, "This is a senior or lead job: start this role with its leadership, mentoring or promotion bullet.", 0);
-        }
-
         if (section.kind === "role" && maxBullets && texts.length > maxBullets) {
             add("too-many-bullets", where, `This role has ${texts.length} bullets; the limit is ${maxBullets}. Merge bullets or drop the least relevant point and report it in droppedPoints.`);
         }
@@ -270,6 +267,15 @@ export const runChecks = (
                 add("lost-fact", where, `The fact "${fact.label}" from the original bullet ${quote(source)} is missing. Put it back in one of this section's bullets.`);
             }
         }
+    }
+
+    // For a senior or lead job, at least one role with leadership evidence must show it within its first two bullets.
+    // Other roles may lead with their strongest technical work.
+    const leadershipRoles = sections.filter((section) => section.kind === "role" && section.original.some(showsLeadership));
+    if (leadershipFirst && leadershipRoles.length > 0 &&
+        !leadershipRoles.some((section) => section.bullets.slice(0, 2).some((bullet) => showsLeadership(bullet.text)))) {
+        add("leadership-first", leadershipRoles[0].title,
+            "This is a senior or lead job: put a leadership, mentoring or promotion bullet within the first two bullets of this role.");
     }
 
     return {violations, keptOut};

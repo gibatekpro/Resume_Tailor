@@ -172,23 +172,51 @@ describe("tense", () => {
 });
 
 describe("leadership first", () => {
-    const original = cv([
+    const leadershipRole = role([
         "Built and maintain React and .NET features for client finance applications.",
+        "Automated invoice checking in C#.",
         "Promoted from intern to full-time developer, then led a team of 3 developers.",
     ]);
-    const builtFirst = rewriteOf([
-        {text: "Built and maintain React and .NET features for client finance applications.", from: [0]},
-        {text: "Promoted from intern to full-time developer, then led a team of 3 developers.", from: [1]},
-    ], {summary: "Full-stack developer."});
+    const thRole = {
+        ...role([
+            "Wrote automated tests in C# for metrology software.",
+            "Fixed bugs in a WPF desktop application.",
+            "Mentored a new intern on the test framework.",
+        ], false),
+        companyName: "Taylor Hobson", jobTitle: "Software Engineer",
+    };
+    const original: ResumeInfo = {...cv([]), workExperience: [leadershipRole, thRole]};
+    const rewrite = (cenitium: string[], th: string[], summary = "Full-stack developer.") => ({
+        ...rewriteOf([], {summary}),
+        roles: [
+            {index: 0, bullets: cenitium.map((text) => ({text, from: [leadershipRole.duties.indexOf(text)], why: ""}))},
+            {index: 1, bullets: th.map((text) => ({text, from: [thRole.duties.indexOf(text)], why: ""}))},
+        ],
+    });
+    const leadershipChecks = (result: ReturnType<typeof runChecks>) =>
+        result.violations.filter((violation) => violation.check === "leadership-first").map((violation) => violation.where);
 
-    it("flags a lead job whose roles and summary don't open with the leadership evidence", () => {
-        const result = runChecks(original, builtFirst, {seniority: "lead"});
-        expect(result.violations.filter((violation) => violation.check === "leadership-first").map((violation) => violation.where))
-            .toEqual(["Summary", "Software Developer · Cenitium"]);
+    it("flags a lead job when no role shows leadership in its first two bullets, and a summary without it", () => {
+        const result = runChecks(original, rewrite(leadershipRole.duties, thRole.duties), {seniority: "lead"});
+        expect(leadershipChecks(result)).toEqual(["Summary", "Software Developer · Cenitium"]);
+    });
+
+    it("accepts leadership as the second bullet of one role, while the TH role opens with its technical bullet", () => {
+        const result = runChecks(original, rewrite(
+            [leadershipRole.duties[0], leadershipRole.duties[2], leadershipRole.duties[1]],
+            thRole.duties,
+            "Full-stack developer who led a team of 3 developers.",
+        ), {seniority: "lead"});
+        expect(leadershipChecks(result)).toEqual([]);
+    });
+
+    it("accepts leadership early in any one role that has it", () => {
+        const result = runChecks(original, rewrite(leadershipRole.duties, [thRole.duties[2], thRole.duties[0], thRole.duties[1]], "Mentored an intern."), {seniority: "senior"});
+        expect(leadershipChecks(result)).toEqual([]);
     });
 
     it("doesn't apply to mid-level jobs", () => {
-        expect(checksOf(runChecks(original, builtFirst, {seniority: "mid"}))).not.toContain("leadership-first");
+        expect(leadershipChecks(runChecks(original, rewrite(leadershipRole.duties, thRole.duties), {seniority: "mid"}))).toEqual([]);
     });
 });
 

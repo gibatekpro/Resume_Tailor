@@ -111,8 +111,9 @@ export const openAIInstruction: OpenAIInstruction = {
         "must-have requirements; the bullet with the best evidence for the first theme comes first.\n" +
         "- Lead each bullet with the part of the work this job cares about most (e.g. if the job stresses security and " +
         "a bullet says \"improved scalability, performance and security\", put security first).\n" +
-        "- If the job's seniority is senior or lead, put leadership, ownership, mentoring and promotion evidence first: in the " +
-        "first bullets of each role that has it, and in the summary. Keep its scale exactly as the CV gives it: " +
+        "- If the job's seniority is senior or lead, bring leadership, ownership, mentoring and promotion evidence forward: " +
+        "within the first two bullets of the most relevant role that has it, and in the summary. Other roles may lead with " +
+        "their strongest technical work. Keep its scale exactly as the CV gives it: " +
         "\"led a team of 3\" stays 3, and \"mentored\" doesn't become \"managed\".\n" +
         "- Make real changes where they help: reorder, and reword where the job's vocabulary fits a true fact. A bullet that is " +
         "already strong and relevant may stay almost as it is. Never reword just to look different.",
@@ -197,7 +198,8 @@ export const openAIInstruction: OpenAIInstruction = {
         "role's bullets, or that the point is listed in droppedPoints.\n" +
         "- Check each bullet's tense against TENSE.\n" +
         "- Check every bullet against <cv>: no tool, number, claim or responsibility it doesn't support.\n" +
-        "- If the job is senior or lead, check that leadership and mentoring evidence comes first, and is in the summary.\n" +
+        "- If the job is senior or lead, check that leadership or mentoring evidence is within the first two bullets of at least " +
+        "one role that has it, and in the summary.\n" +
         "- Check that every addedSkills evidence is an exact quote from <cv>.",
     ],
     responseFormat: "JSON",

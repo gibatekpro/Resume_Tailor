@@ -110,14 +110,21 @@ export const computeFit = (
 };
 
 // Requirements the CV shows nothing for, split into questions for the candidate and gaps for a cover letter.
+// A real gap with only partial evidence is listed too (e.g. the job leads ~10 engineers; the CV shows a team of 3).
 export const groupGaps = (requirements: JobRequirement[]): Gaps => {
     const missing = requirements.filter((requirement) => requirement.evidence.length === 0);
+    const partlyMet = requirements.filter((requirement) => strengthOf(requirement.evidence) === "partial");
     return {
         ask: missing
             .filter((requirement) => requirement.ifMissing.kind === "ask")
             .map((requirement) => requirement.ifMissing.text.trim() || `Do you have experience with ${requirement.text}?`),
-        real: missing
-            .filter((requirement) => requirement.ifMissing.kind === "real")
-            .map((requirement) => requirement.ifMissing.text.trim() || requirement.text),
+        real: [
+            ...missing
+                .filter((requirement) => requirement.ifMissing.kind === "real")
+                .map((requirement) => requirement.ifMissing.text.trim() || requirement.text),
+            ...partlyMet
+                .filter((requirement) => requirement.ifMissing.kind === "real" && requirement.ifMissing.text.trim())
+                .map((requirement) => requirement.ifMissing.text.trim()),
+        ],
     };
 };

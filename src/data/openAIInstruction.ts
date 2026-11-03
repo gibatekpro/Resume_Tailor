@@ -61,13 +61,14 @@ export const ANALYSIS_PROMPT = [
     "- Don't stretch: a technology the CV doesn't name is not evidence. Leave evidence empty when the CV has nothing.",
 
     "IF MISSING\n" +
-    "- For every requirement, say what to do if the CV has no evidence for it. It is ignored when there is evidence.\n" +
+    "- For every requirement, say what to do if the CV has no evidence for it, or only partial evidence.\n" +
     "- kind \"ask\": the candidate may well have this but not written it down, because it is common in their kind of work " +
     "(e.g. CI/CD, Git, unit testing, Agile, code review). text is a direct question naming examples: " +
     "\"Have you used CI/CD pipelines? Which tool, e.g. GitHub Actions or Azure DevOps?\"\n" +
     "- kind \"real\": the CV clearly doesn't cover it: more years than the CV shows, a bigger level of responsibility, " +
     "a domain or qualification they don't have. text is one sentence saying what is missing, for a cover letter: " +
-    "\"The role manages ~10 engineers; your CV shows leading a team of 3.\"",
+    "\"The role manages ~10 engineers; your CV shows leading a team of 3.\" When the evidence is only partial, " +
+    "use \"real\" with that sentence if the difference matters to the employer, otherwise \"ask\" with text \"\".",
 
     "FIT\n" +
     "- fitStrength: one plain sentence naming the candidate's strongest match for this job, with specifics from the CV.\n" +

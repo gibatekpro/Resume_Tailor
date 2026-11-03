@@ -88,11 +88,19 @@ describe("computeFit", () => {
 });
 
 describe("groupGaps", () => {
-    it("splits requirements with no evidence into questions and real gaps", () => {
+    it("splits missing requirements into questions and real gaps, and adds partly met real gaps", () => {
         expect(groupGaps([
             requirement("CI/CD", {ifMissing: {kind: "ask", text: "Have you used CI/CD pipelines? Which tool?"}}),
             requirement("Managing 10 engineers", {ifMissing: {kind: "real", text: "The role manages ~10 engineers."}}),
             requirement("C#", {evidence: [{quote: "C#", strength: "strong"}]}),
-        ])).toEqual({ask: ["Have you used CI/CD pipelines? Which tool?"], real: ["The role manages ~10 engineers."]});
+            requirement("Leading ~10 engineers", {
+                evidence: [{quote: "led a team of 3 developers", strength: "partial"}],
+                ifMissing: {kind: "real", text: "The role leads ~10 engineers; your CV shows a team of 3."},
+            }),
+            requirement("Algorithms", {evidence: [{quote: "Computer Science", strength: "partial"}], ifMissing: {kind: "ask", text: ""}}),
+        ])).toEqual({
+            ask: ["Have you used CI/CD pipelines? Which tool?"],
+            real: ["The role manages ~10 engineers.", "The role leads ~10 engineers; your CV shows a team of 3."],
+        });
     });
 });

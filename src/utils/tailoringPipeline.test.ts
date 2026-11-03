@@ -108,6 +108,7 @@ describe("Lead Software Engineer C# .NET – FinTech (the reported run)", () => 
         expect(fit.score).toBe(50);
         expect(fit.reason).toBe("Lead role managing ~10 engineers; your leadership evidence is a team of 3.");
         expect(gaps.ask).toEqual(expect.arrayContaining([expect.stringMatching(/CI\/CD/), expect.stringMatching(/Terraform/)]));
+        expect(gaps.real).toContain("The role leads around 10 engineers; your CV shows leading a team of 3.");
     });
 
     it("keeps facts the AI may not change, and fills in the job details", async () => {

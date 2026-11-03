@@ -40,10 +40,21 @@ export const isChatModel = (id: string) =>
     /^(gpt-|o\d|chatgpt-)[a-z0-9.\-:]*$/i.test(id) &&
     !/(audio|realtime|tts|transcribe|image|search|embedding|instruct|moderation|computer-use|codex)/.test(id);
 
-// Chat models from OpenAI's model list, newest first.
-export const filterChatModels = (models: {id: string; created: number}[]) =>
+// Models the server will call when ALLOWED_MODELS isn't set. Excludes the expensive "pro" models.
+export const DEFAULT_ALLOWED_MODELS = ["gpt-5", "gpt-5-mini", "gpt-5.1", "gpt-4.1", "gpt-4.1-mini", "gpt-4o", "gpt-4o-mini"];
+
+// The allowlist from a comma-separated ALLOWED_MODELS value, or the default list when it's empty.
+export const parseAllowedModels = (value?: string) => {
+    const models = (value || "").split(",").map((model) => model.trim()).filter((model) => model && isChatModel(model));
+    return models.length > 0 ? [...new Set(models)] : DEFAULT_ALLOWED_MODELS;
+};
+
+export const allowedModels = () => parseAllowedModels(process.env.ALLOWED_MODELS);
+
+// Allowed chat models from OpenAI's model list, newest first.
+export const filterChatModels = (models: {id: string; created: number}[], allowed: string[] = allowedModels()) =>
     models
-        .filter(({id}) => isChatModel(id))
+        .filter(({id}) => isChatModel(id) && allowed.includes(id))
         .sort((a, b) => b.created - a.created)
         .map(({id}) => id);
 

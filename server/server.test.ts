@@ -1,6 +1,6 @@
 import {describe, expect, it} from "vitest";
 import {applyRateLimit} from "./rateLimit.js";
-import {filterChatModels, friendlyOpenAIError, isChatModel} from "./openai.js";
+import {DEFAULT_ALLOWED_MODELS, filterChatModels, friendlyOpenAIError, isChatModel, parseAllowedModels} from "./openai.js";
 import {readTailorRequest} from "./tailorRequest.js";
 import {buildStepPrompt, formatCv} from "./prompts.js";
 import {HttpError} from "./http.js";
@@ -44,20 +44,31 @@ describe("friendlyOpenAIError", () => {
 });
 
 describe("chat model filter", () => {
-    it("keeps chat models newest first and drops the rest", () => {
+    it("keeps allowed chat models newest first and drops the rest", () => {
         expect(filterChatModels([
             {id: "gpt-4o", created: 1},
             {id: "gpt-5", created: 3},
+            {id: "gpt-5-pro", created: 6},
             {id: "text-embedding-3-small", created: 4},
             {id: "gpt-4o-realtime-preview", created: 5},
             {id: "o3-mini", created: 2},
-        ])).toEqual(["gpt-5", "o3-mini", "gpt-4o"]);
+        ], ["gpt-5", "gpt-5-pro", "o3-mini", "gpt-4o", "text-embedding-3-small"])).toEqual(["gpt-5-pro", "gpt-5", "o3-mini", "gpt-4o"]);
+        expect(filterChatModels([{id: "gpt-5-pro", created: 6}, {id: "gpt-5", created: 3}])).toEqual(["gpt-5"]);
     });
 
     it("rejects ids that aren't chat models", () => {
         expect(isChatModel("gpt-5-mini-2025-08-07")).toBe(true);
         expect(isChatModel("dall-e-3")).toBe(false);
         expect(isChatModel("gpt-4o/../../files")).toBe(false);
+    });
+});
+
+describe("model allowlist", () => {
+    it("reads ALLOWED_MODELS, ignoring blanks and non-chat models, and falls back to the default list", () => {
+        expect(parseAllowedModels(" gpt-5, gpt-5-mini ,,dall-e-3")).toEqual(["gpt-5", "gpt-5-mini"]);
+        expect(parseAllowedModels("")).toEqual(DEFAULT_ALLOWED_MODELS);
+        expect(parseAllowedModels(undefined)).toEqual(DEFAULT_ALLOWED_MODELS);
+        expect(DEFAULT_ALLOWED_MODELS.some((model) => model.includes("pro"))).toBe(false);
     });
 });
 
@@ -87,11 +98,12 @@ describe("readTailorRequest", () => {
         expect(request.tailorSummary).toBe(true);
     });
 
-    it("rejects an unknown step, a short job advert, a missing CV and an unknown model", () => {
+    it("rejects an unknown step, a short job advert, a missing CV and a model that isn't allowed", () => {
         expect(() => readTailorRequest({...valid, step: "anything"})).toThrow(/step/);
         expect(() => readTailorRequest({...valid, jobDescription: "too short"})).toThrow(/at least 100/);
         expect(() => readTailorRequest({...valid, resumeInfo: undefined})).toThrow(/CV/);
         expect(() => readTailorRequest({...valid, model: "dall-e-3"})).toThrow(/model/);
+        expect(() => readTailorRequest({...valid, model: "gpt-5-pro"})).toThrow(/isn't enabled/);
         expect(() => readTailorRequest(null)).toThrow(HttpError);
     });
 

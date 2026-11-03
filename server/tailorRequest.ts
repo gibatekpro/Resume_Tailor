@@ -4,7 +4,7 @@ import {DefaultSettings} from "../src/data/defaultSettings.js";
 import {ANALYSIS_SCHEMA, REWRITE_SCHEMA} from "../src/data/tailoringSchemas.js";
 import {schemaErrors} from "../src/utils/strictSchema.js";
 import {HttpError} from "./http.js";
-import {isChatModel} from "./openai.js";
+import {allowedModels} from "./openai.js";
 
 // What the browser sends to /api/tailor for one step. The prompts live on the server, so callers can only run ours.
 interface BaseRequest {
@@ -69,8 +69,8 @@ export const readTailorRequest = (body: unknown): TailorRequest => {
         throw new HttpError(400, `Keep your rules to at most ${MAX_RULES}, each under ${MAX_RULE_LENGTH} characters.`);
     }
     const model = typeof body.model === "string" && body.model.trim() ? body.model.trim() : DefaultSettings.defaultModel;
-    if (!isChatModel(model)) {
-        throw new HttpError(400, "That model can't be used for CV tailoring. Choose another model in Settings.");
+    if (!allowedModels().includes(model)) {
+        throw new HttpError(400, "That model isn't enabled for CV tailoring. Choose another model in Settings.");
     }
     const base: BaseRequest = {
         jobDescription,

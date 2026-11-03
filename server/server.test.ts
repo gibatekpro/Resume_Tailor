@@ -1,7 +1,8 @@
 import {describe, expect, it} from "vitest";
 import {applyRateLimit} from "./rateLimit.js";
 import {filterChatModels, friendlyOpenAIError, isChatModel} from "./openai.js";
-import {buildTailorMessages, readTailorRequest} from "./tailorRequest.js";
+import {readTailorRequest} from "./tailorRequest.js";
+import {buildStepPrompt, formatCv} from "./prompts.js";
 import {HttpError} from "./http.js";
 
 const HOUR = 60 * 60 * 1000;
@@ -62,10 +63,22 @@ describe("chat model filter", () => {
 
 describe("readTailorRequest", () => {
     const valid = {
+        step: "analyse",
         jobDescription: "x".repeat(150),
         resumeInfo: {profile: {firstName: "Ada"}},
         rules: [" Use British English. ", ""],
         model: "gpt-4o",
+    };
+    const analysis = {
+        job: {title: "Developer", company: "Acme", location: "", salary: "", summary: "Builds things."},
+        seniority: "mid",
+        themes: [{name: "C#", jobPhrases: ["C# .NET"]}],
+        requirements: [{
+            id: "R1", text: "C#", priority: "must", category: "technical",
+            evidence: [{quote: "Built APIs in C#", strength: "strong"}],
+            ifMissing: {kind: "ask", text: ""},
+        }],
+        fitStrength: "", fitConcern: "",
     };
 
     it("accepts a valid request and tidies the rules", () => {
@@ -74,18 +87,43 @@ describe("readTailorRequest", () => {
         expect(request.tailorSummary).toBe(true);
     });
 
-    it("rejects a short job advert, a missing CV and an unknown model", () => {
+    it("rejects an unknown step, a short job advert, a missing CV and an unknown model", () => {
+        expect(() => readTailorRequest({...valid, step: "anything"})).toThrow(/step/);
         expect(() => readTailorRequest({...valid, jobDescription: "too short"})).toThrow(/at least 100/);
         expect(() => readTailorRequest({...valid, resumeInfo: undefined})).toThrow(/CV/);
         expect(() => readTailorRequest({...valid, model: "dall-e-3"})).toThrow(/model/);
         expect(() => readTailorRequest(null)).toThrow(HttpError);
     });
 
+    it("needs a well-formed analysis for the rewrite step and violations for the repair step", () => {
+        expect(readTailorRequest({...valid, step: "rewrite", analysis}).step).toBe("rewrite");
+        expect(() => readTailorRequest({...valid, step: "rewrite", analysis: {...analysis, seniority: "boss"}})).toThrow(/out of sync/);
+        expect(() => readTailorRequest({...valid, step: "repair", analysis, rewrite: {}, violations: ["x"]})).toThrow(/out of sync/);
+    });
+
     it("puts the fixed prompt in the system message and the user's data in the user message", () => {
-        const [system, user] = buildTailorMessages(readTailorRequest(valid));
-        expect(system.content).toContain("FACTS THAT NEVER CHANGE");
-        expect(system.content).toContain("- Use British English.");
-        expect(user.content).toContain("<job_description>");
-        expect(user.content).toContain('"firstName": "Ada"');
+        const analyse = buildStepPrompt(readTailorRequest(valid));
+        expect(analyse.messages[0].content).toContain("EVIDENCE");
+        expect(analyse.messages[1].content).toContain("<job_description>");
+        expect(analyse.responseFormat).toMatchObject({type: "json_schema", json_schema: {name: "job_analysis", strict: true}});
+
+        const rewrite = buildStepPrompt(readTailorRequest({...valid, step: "rewrite", analysis}));
+        expect(rewrite.messages[0].content).toContain("KEEP EVERY FACT");
+        expect(rewrite.messages[0].content).toContain("- Use British English.");
+        expect(rewrite.messages[1].content).toContain('R1 [must, technical] C#: strong');
+        expect(rewrite.messages[1].content).toContain('Name: Ada');
+    });
+});
+
+describe("formatCv", () => {
+    it("numbers roles and bullets so the model can refer to them", () => {
+        const text = formatCv({
+            workExperience: [{
+                companyName: "Cenitium", jobTitle: "Software Developer", duties: ["Built things", "Fixed things"],
+                startMonth: "Sep", startYear: "2021", endMonth: "", endYear: "", current: true,
+            }],
+        });
+        expect(text).toContain("[Role 0] Software Developer at Cenitium, Sep 2021 – present (current role)");
+        expect(text).toContain("[1] Fixed things");
     });
 });

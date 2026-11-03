@@ -1,8 +1,6 @@
 import axios from "axios";
 import {auth} from "../Firebase";
-import type { OpenAIInstruction } from "../models/OpenAIInstruction";
-import type { GenerationInfo } from "../models/GenerationInfo";
-import type { JobApplicationInfo } from "../models/JobApplicationInfo";
+import type {StepCaller, StepRequest} from "../utils/tailoringPipeline";
 
 // The browser never talks to OpenAI: it calls our serverless functions in /api, which hold the key.
 // Each call carries the user's Firebase ID token so the server knows who is asking.
@@ -28,22 +26,15 @@ const toReadableError = (error: unknown) => {
     return error instanceof Error ? error : new Error(String(error));
 };
 
-export const fetchOpenAIResponse = async (
-    instruction: OpenAIInstruction
-): Promise<{ result: JobApplicationInfo; generationInfo: GenerationInfo }> => {
+// One step of the tailoring pipeline (see utils/tailoringPipeline.ts).
+export const callTailorStep = (async (request: StepRequest) => {
     try {
-        const response = await axios.post("/api/tailor", {
-            jobDescription: instruction.jobDescriptionData || "",
-            resumeInfo: instruction.resumeInfo || {},
-            rules: instruction.rules || [],
-            tailorSummary: instruction.tailorSummary,
-            model: instruction.model,
-        }, {headers: await authHeaders()});
+        const response = await axios.post("/api/tailor", request, {headers: await authHeaders()});
         return response.data;
     } catch (error) {
         throw toReadableError(error);
     }
-};
+}) as StepCaller;
 
 // Chat models available to the server's API key, newest first.
 export const fetchAvailableModels = async (): Promise<string[]> => {

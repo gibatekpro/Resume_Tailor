@@ -5,7 +5,7 @@ import {DefaultResumeData} from "../data/defaultResumeData";
 import type { OpenAIInstruction } from "../models/OpenAIInstruction";
 import {InstructionResumeData} from "../data/instructionResumeData";
 import * as Yup from "yup";
-import {fetchOpenAIResponse} from "../service/TailorService";
+import {callTailorStep} from "../service/TailorService";
 import InstructionForm from "../components/forms/instructionForm/InstructionForm";
 import {useNavigate} from "react-router-dom";
 import AppLayout from "../components/shared/AppLayout";
@@ -22,7 +22,7 @@ import STORAGE from "../utils/storage";
 import {Dialog, DialogPanel} from "@headlessui/react";
 import PageLoadingOverlay from "../components/shared/PageLoadingOverlay";
 import PaginationControls from "../components/shared/PaginationControls";
-import {describeChanges, lockResumeFacts, readImprovements, verifyAddedSkills} from "../utils/resumeFacts";
+import {runTailoringPipeline} from "../utils/tailoringPipeline";
 import {TailoringChangesView} from "../components/shared/TailoringChangesView";
 import {ImprovementsPanel} from "../components/shared/ImprovementsPanel";
 import SettingsService from "../service/SettingsService";
@@ -37,6 +37,7 @@ export const TailorResumePage: React.FC = () => {
     );
     const [savedRules, setSavedRules] = useState<string[]>(openAIInstruction.rules || []);
     const [isLoading, setIsLoading] = useState(false);
+    const [progressMessage, setProgressMessage] = useState("");
     const navigate = useNavigate();
     const saved = localStorage.getItem(STORAGE.LOCAL_STORAGE_RESUME_DATA);
     const SavedResumeDataOpenAI = saved ? JSON.parse(saved) : DefaultResumeData;
@@ -205,25 +206,14 @@ export const TailorResumePage: React.FC = () => {
                     await saveInstructionRules(user, openAIInstruction.rules);
                 }
 
-                //Fetch OpenAI Response
-                const {result, generationInfo} = await fetchOpenAIResponse(openAIInstruction);
-                const originalResume = customResumeFormFormik.values;
-                const {accepted, rejected} = verifyAddedSkills(originalResume, result.openAIAddedSkills);
-                const tailoredResume = lockResumeFacts(originalResume, result.resumeInfo || {}, {
-                    addedSkills: accepted,
-                    allowSummary: values.tailorSummary,
-                });
-                // The raw suggestions are replaced by the verified list in tailoringChanges.
-                const jobDetails = {...result};
-                delete jobDetails.openAIAddedSkills;
-                const parsedResponse: JobApplicationInfo = {
-                    ...jobDetails,
-                    openAIGaps: Array.isArray(result.openAIGaps) ? result.openAIGaps : [],
-                    openAIImprovements: readImprovements(result.openAIImprovements),
-                    generationInfo,
-                    tailoringChanges: describeChanges(originalResume, tailoredResume, accepted, rejected),
-                    resumeInfo: tailoredResume,
-                };
+                // Analyse the job, rewrite the CV, check the rewrite and repair it once if needed.
+                const parsedResponse: JobApplicationInfo = await runTailoringPipeline({
+                    resumeInfo: customResumeFormFormik.values,
+                    jobDescription: values.jobDescriptionData || "",
+                    rules: values.rules || [],
+                    tailorSummary: values.tailorSummary !== false,
+                    model: values.model || settings.defaultModel,
+                }, callTailorStep, setProgressMessage);
                 openDialog(false);
                 setActiveStep(2);
                 localStorage.setItem(STORAGE.LOCAL_STORAGE_APPLICATION_DATA, JSON.stringify(parsedResponse) || "{}");
@@ -235,6 +225,7 @@ export const TailorResumePage: React.FC = () => {
                 openDialog(true);
             } finally {
                 setIsLoading(false);
+                setProgressMessage("");
             }
         }
 
@@ -487,7 +478,7 @@ export const TailorResumePage: React.FC = () => {
                     <PageLoadingOverlay
                         visible={isLoading}
                         withinParent={true}
-                        message="Loading your saved CVs and personalization rules..."
+                        message={progressMessage || "Loading your saved CVs and personalization rules..."}
                     />
                     {isDialogOpen && (
                         <Dialog open={isDialogOpen} as="div" className="relative z-0 focus:outline-hidden" style={dialogOverlayStyle}
@@ -513,7 +504,7 @@ export const TailorResumePage: React.FC = () => {
                                         </div>
                                         {generateHasError ? (
                                             <text>
-                                                Couldn't generate your CV.{generateErrorMessage && ` OpenAI said: ${generateErrorMessage}`}
+                                                Couldn't generate your CV.{generateErrorMessage && ` ${generateErrorMessage}`}
                                             </text>
                                         ) : (
                                             <text>
@@ -673,7 +664,7 @@ export const TailorResumePage: React.FC = () => {
                                 </div>
                                 {jobApplicationInfo?.tailoringChanges && (
                                     <div className="mx-4 mt-4">
-                                        <TailoringChangesView changes={jobApplicationInfo.tailoringChanges}/>
+                                        <TailoringChangesView changes={jobApplicationInfo.tailoringChanges} report={jobApplicationInfo.tailoringReport}/>
                                     </div>
                                 )}
                                 {jobApplicationInfo?.openAIImprovements && jobApplicationInfo.openAIImprovements.length > 0 && (

@@ -1,5 +1,6 @@
 import React from "react";
 import type {TailoringChanges} from "../../models/TailoringChanges";
+import type {TailoringReport} from "../../models/TailoringPipeline";
 
 const sameList = (a: string[], b: string[]) => a.length === b.length && a.every((item, index) => item === b[index]);
 
@@ -49,12 +50,41 @@ const EntryChanges: React.FC<{entries: TailoringChanges["roles"], defaultOpenFir
     </div>
 );
 
+// Problems the automatic checks still found after the repair, and facts the rewrite had to leave out. Never hidden.
+const CheckResults: React.FC<{report: TailoringReport}> = ({report}) => (
+    <>
+        {report.violations.length > 0 && (
+            <div role="alert" className="rounded-lg border border-[#f1c4c4] bg-[#fff4f4] px-3 py-2 text-sm leading-6 text-[#6b1f1f]">
+                <span className="font-semibold">Checks that still fail{report.repaired ? " after one automatic fix" : ""}:</span>
+                <ul className="mb-0 mt-1 list-disc pl-5">
+                    {report.violations.map((violation, index) => (
+                        <li key={index}><span className="font-semibold">{violation.where}:</span> {violation.message}</li>
+                    ))}
+                </ul>
+                <span className="block text-xs text-[#5f6370]">Fix these below before you send it, or generate again.</span>
+            </div>
+        )}
+        {report.keptOut.length > 0 && (
+            <div className="rounded-lg border border-[#f1d8a8] bg-[#fff8ec] px-3 py-2 text-sm leading-6 text-[#5c4300]">
+                <span className="font-semibold">Facts that couldn't be kept:</span>
+                <ul className="mb-0 mt-1 list-disc pl-5">
+                    {report.keptOut.map((item, index) => (
+                        <li key={index}><span className="font-semibold">{item.where}:</span> {item.fact} ({item.reason || "bullet limit"})</li>
+                    ))}
+                </ul>
+            </div>
+        )}
+    </>
+);
+
 // Shows what one generation changed: verified new skills with their evidence, the summary, and bullets before and after.
-export const TailoringChangesView: React.FC<{changes: TailoringChanges}> = ({changes}) => (
+export const TailoringChangesView: React.FC<{changes: TailoringChanges, report?: TailoringReport}> = ({changes, report}) => (
     <div className="rounded-lg border border-[#d8e3f7] bg-[#f8fbff] px-4 py-3">
         <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#2170e4]">What changed</p>
 
         <div className="space-y-4">
+            {report && <CheckResults report={report}/>}
+
             {changes.buzzwords && changes.buzzwords.length > 0 && (
                 <div role="alert" className="rounded-lg border border-[#f1d8a8] bg-[#fff8ec] px-3 py-2 text-sm leading-6 text-[#5c4300]">
                     <span className="font-semibold">Buzzwords still in your CV: </span>

@@ -96,7 +96,7 @@ export const GenerationDetails: React.FC<{application: JobApplicationInfo}> = ({
 
                 {application.tailoringChanges && (
                     <div className="mt-4">
-                        <TailoringChangesView changes={application.tailoringChanges}/>
+                        <TailoringChangesView changes={application.tailoringChanges} report={application.tailoringReport}/>
                     </div>
                 )}
 

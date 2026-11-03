@@ -1,13 +1,15 @@
 import type {GenerationInfo} from "../src/models/GenerationInfo.js";
+import {schemaErrors} from "../src/utils/strictSchema.js";
 import {handle, HttpError, json, numberFromEnv} from "../server/http.js";
 import {requireUser} from "../server/firebaseAdmin.js";
 import {enforceHourlyLimit} from "../server/rateLimit.js";
 import {createChatCompletion} from "../server/openai.js";
-import {buildTailorMessages, readTailorRequest} from "../server/tailorRequest.js";
+import {readTailorRequest} from "../server/tailorRequest.js";
+import {buildStepPrompt, STEP_SCHEMAS} from "../server/prompts.js";
 
-const MAX_BODY_BYTES = 300_000;
+const MAX_BODY_BYTES = 400_000;
 
-// POST /api/tailor: tailors the signed-in user's CV to a job advert.
+// POST /api/tailor: runs one step of the tailoring pipeline (analyse, rewrite or repair) for the signed-in user.
 export const POST = handle(async (request) => {
     const uid = await requireUser(request);
     await enforceHourlyLimit(uid, "tailor", numberFromEnv("TAILOR_RATE_LIMIT_PER_HOUR", 40));
@@ -16,15 +18,21 @@ export const POST = handle(async (request) => {
         throw new HttpError(413, "The job advert and CV are too large to send.");
     }
     const input = readTailorRequest(await request.json().catch(() => undefined));
-    const messages = buildTailorMessages(input);
+    const {messages, responseFormat} = buildStepPrompt(input);
     const startedAt = Date.now();
 
-    const {content, model, usage} = await createChatCompletion(input.model, messages, {type: "json_object"});
+    const {content, model, usage} = await createChatCompletion(input.model, messages, responseFormat);
     let result: unknown;
     try {
         result = JSON.parse(content);
     } catch {
         throw new HttpError(502, "The AI returned an answer we couldn't read. Please try again.");
+    }
+    // Structured outputs should guarantee the shape; check anyway. Only field paths are logged, never content.
+    const errors = schemaErrors(STEP_SCHEMAS[input.step], result);
+    if (errors.length > 0) {
+        console.error(`Step ${input.step} answer didn't match its schema:`, errors.slice(0, 5).map((error) => error.split(":")[0]).join(", "));
+        throw new HttpError(502, "The AI's answer was incomplete. Please try again, or choose another model.");
     }
 
     const generationInfo: GenerationInfo = {

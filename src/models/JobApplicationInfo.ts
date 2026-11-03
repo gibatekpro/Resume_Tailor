@@ -1,7 +1,7 @@
 import type {ResumeInfo} from './ResumeInfo';
 import type {GenerationInfo} from './GenerationInfo';
 import type {CvImprovement, TailoringChanges} from './TailoringChanges';
-import type {TailoringReport} from './TailoringPipeline';
+import type {TailoringChoices, TailoringReport} from './TailoringPipeline';
 
 export interface JobApplicationInfo {
     date?: string,
@@ -18,6 +18,7 @@ export interface JobApplicationInfo {
     generationInfo?: GenerationInfo,
     tailoringChanges?: TailoringChanges,
     tailoringReport?: TailoringReport,
+    tailoringChoices?: TailoringChoices,
     resumeStyle?: string,
     resumeInfo?: ResumeInfo,
 }

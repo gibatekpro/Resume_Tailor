@@ -112,4 +112,10 @@ export interface TailoringReport {
     keptOut: KeptOutFact[];
 }
 
+// What the user decided about the AI's proposal before saving. Keys come from utils/bulletChoices.ts.
+export interface TailoringChoices {
+    reverted: string[];                 // bullets ("role:0:2") and "summary" put back to the original
+    originalOrder: string[];            // sections ("role:0") shown in the original bullet order
+}
+
 export type TailorStep = "analyse" | "rewrite" | "repair";
